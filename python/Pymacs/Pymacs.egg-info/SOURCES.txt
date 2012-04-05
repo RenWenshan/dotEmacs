@@ -1,0 +1,7 @@
+Pymacs.py
+README
+setup.py
+Pymacs.egg-info/PKG-INFO
+Pymacs.egg-info/SOURCES.txt
+Pymacs.egg-info/dependency_links.txt
+Pymacs.egg-info/top_level.txt
