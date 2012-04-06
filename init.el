@@ -1,8 +1,8 @@
-;; ---- Server ----
-(server-start)
-;; ---- Server Ends ---
-
 ;; ---- Nicer ----
+(setq backup-directory-alist
+      `((".*" . ,"~/.emacs.d/backup")))
+(setq auto-save-file-name-transforms
+      `((".*" ,"~/.emacs.d/backup" t)))
 
 ;; Color theme
 (color-theme-initialize)
@@ -44,26 +44,17 @@
 ;; Support trash
 (setq delete-by-moving-to-trash t)
 
-;; Spaces instead of tabs
-(setq-default indent-tabs-mode nil)
-(setq-default tab-width 4)
-
 ;; ---- Nicer end ----
 
-;; ---- Code Reading ----
-(require 'xcscope)
-(require 'ecb)
-
-(require 'highlight-symbol)
-
-(global-set-key [(control f3)] 'highlight-symbol-at-point)
-(global-set-key [f3] 'highlight-symbol-next)
-(global-set-key [(shift f3)] 'highlight-symbol-prev)
-(global-set-key [(meta f3)] 'highlight-symbol-prev)
-
-;; ---- Code Reading end ----
 
 ;; ---- Programming ----
+;; == flymake ==
+(require 'flymake)
+(global-set-key [f3] 'flymake-display-err-menu-for-current-line)
+(global-set-key [f4] 'flymake-goto-next-error)
+;; == flymake ==
+
+
 
 ;; == Python ==
 (add-to-list 'load-path "~/.emacs.d/site-lisp")
@@ -77,33 +68,33 @@
 (add-to-list 'auto-mode-alist '("\\.py\\'" . python-mode))
 (add-to-list 'interpreter-mode-alist '("python" . python-mode))
 
-;; Initialize Pymacs                                                                                           
+;; Initialize Pymacs
 (autoload 'pymacs-apply "pymacs")
 (autoload 'pymacs-call "pymacs")
 (autoload 'pymacs-eval "pymacs" nil t)
 (autoload 'pymacs-exec "pymacs" nil t)
 (autoload 'pymacs-load "pymacs" nil t)
-;; Initialize Rope                                                                                             
+;; Initialize Rope
 (pymacs-load "ropemacs" "rope-")
 (setq ropemacs-enable-autoimport t)
 
-;; Initialize Yasnippet                                                                                        
-;Don't map TAB to yasnippet                                                                                    
-;In fact, set it to something we'll never use because                                                          
-;we'll only ever trigger it indirectly.                                                                        
-(setq yas/trigger-key (kbd "C-c <kp-multiply>"))
+;; Initialize Yasnippet
+;Don't map TAB to yasnippet
+;In fact, set it to something we'll never use because
+;we'll only ever trigger it indirectly.
+;; (setq yas/trigger-key (kbd "C-c <kp-multiply>"))
 (yas/initialize)
 (yas/load-directory "~/.emacs.d/site-lisp/yasnippet-0.5.9/snippets")
 
 
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;                                         
-;;; Auto-completion                                                                                            
-;;;  Integrates:                                                                                               
-;;;   1) Rope                                                                                                  
-;;;   2) Yasnippet                                                                                             
-;;;   all with AutoComplete.el                                                                                 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;                                         
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; Auto-completion
+;;;  Integrates:
+;;;   1) Rope
+;;;   2) Yasnippet
+;;;   all with AutoComplete.el
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defun prefix-list-elements (list prefix)
   (let (value)
     (nreverse
@@ -153,12 +144,12 @@
                  (set (make-local-variable 'ac-candidate-function) 'ac-python-candidate)
                  (set (make-local-variable 'ac-auto-start) nil)))
 
-;;Ryan's python specific tab completion                                                                        
+;;Ryan's python specific tab completion
 (defun ryan-python-tab ()
-  ; Try the following:                                                                                         
-  ; 1) Do a yasnippet expansion                                                                                
-  ; 2) Do a Rope code completion                                                                               
-  ; 3) Do an indent                                                                                            
+  ; Try the following:
+  ; 1) Do a yasnippet expansion
+  ; 2) Do a Rope code completion
+  ; 3) Do an indent
   (interactive)
   (if (eql (ac-start) 0)
       (indent-for-tab-command)))
@@ -169,8 +160,8 @@
   (set (make-local-variable 'ac-auto-start) nil))
 
 (define-key python-mode-map "\t" 'ryan-python-tab)
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;                                         
-;;; End Auto Completion                                                                                        
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; End Auto Completion
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Electric Pairs
@@ -234,3 +225,15 @@
 
 
 
+;; ---- Code Reading ----
+(require 'xcscope)
+(require 'ecb)
+(require 'ede)
+(require 'highlight-symbol)
+
+(global-set-key [(control f3)] 'highlight-symbol-at-point)
+(global-set-key [f3] 'highlight-symbol-next)
+(global-set-key [(shift f3)] 'highlight-symbol-prev)
+(global-set-key [(meta f3)] 'highlight-symbol-prev)
+
+;; ---- Code Reading end ----
