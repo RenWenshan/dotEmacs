@@ -48,13 +48,26 @@
 
 
 ;; ---- Programming ----
+;; ;; == electric-pair ==
+;; (defun electric-pair ()
+;;   "Insert character pair without sournding spaces"
+;;   (interactive)
+;;   (let (parens-require-spaces)
+;;     (insert-pair)))
+
+(require 'autopair)
+(autopair-global-mode 1)
+(setq autopair-autowrap t)
+
 ;; == flymake ==
 (require 'flymake)
 (global-set-key [f3] 'flymake-display-err-menu-for-current-line)
 (global-set-key [f4] 'flymake-goto-next-error)
 ;; == flymake ==
 
+;; == C ==
 
+;; == C ==
 
 ;; == Python ==
 (add-to-list 'load-path "~/.emacs.d/site-lisp")
@@ -164,22 +177,18 @@
 ;;; End Auto Completion
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; Electric Pairs
-(add-hook 'python-mode-hook
-	  (lambda ()
-	    (define-key python-mode-map "\"" 'electric-pair)
-	    (define-key python-mode-map "\'" 'electric-pair)
-	    (define-key python-mode-map "(" 'electric-pair)
-	    (define-key python-mode-map "[" 'electric-pair)
-	    (define-key python-mode-map "{" 'electric-pair)))
-(defun electric-pair ()
-  "Insert character pair without sournding spaces"
-  (interactive)
-  (let (parens-require-spaces)
-    (insert-pair)))
-;; bind RET to py-newline-and-indent
-(add-hook 'python-mode-hook '(lambda ()
-			       (define-key python-mode-map "\C-m" 'newline-and-indent)))
+;; ;; Electric Pairs
+;; (add-hook 'python-mode-hook
+;; 	  (lambda ()
+;; 	    (define-key python-mode-map "\"" 'electric-pair)
+;; 	    (define-key python-mode-map "\'" 'electric-pair)
+;; 	    (define-key python-mode-map "(" 'electric-pair)
+;; 	    (define-key python-mode-map "[" 'electric-pair)
+;; 	    (define-key python-mode-map "{" 'electric-pair)))
+
+;; ;; bind RET to py-newline-and-indent
+;; (add-hook 'python-mode-hook '(lambda ()
+;; 			       (define-key python-mode-map "\C-m" 'newline-and-indent)))
 
 
 ;; Lambda
@@ -207,6 +216,7 @@
 
 ;; set search option if you want
 ;; (setq pylookup-search-options '("--insensitive" "0" "--desc" "0"))
+
 
 ;; to speedup, just load it on demand
 (autoload 'pylookup-lookup "pylookup"
