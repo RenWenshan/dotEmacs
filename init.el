@@ -1,4 +1,4 @@
-;; ---- Nicer ----
+;init.el ---- Nicer ----
 (setq backup-directory-alist
       `((".*" . ,"~/.emacs.d/backup")))
 (setq auto-save-file-name-transforms
@@ -48,16 +48,20 @@
 
 
 ;; ---- Programming ----
-;; ;; == electric-pair ==
-;; (defun electric-pair ()
-;;   "Insert character pair without sournding spaces"
-;;   (interactive)
-;;   (let (parens-require-spaces)
-;;     (insert-pair)))
+(require 'yasnippet)
+;; Initialize Yasnippet
+;Don't map TAB to yasnippet
+;In fact, set it to something we'll never use because
+;we'll only ever trigger it indirectly.
+;; (setq yas/trigger-key (kbd "C-c <kp-multiply>"))
+(yas/initialize)
+(yas/load-directory "~/.emacs.d/site-lisp/yasnippet-0.5.9/snippets")
+
 
 (require 'autopair)
 (autopair-global-mode 1)
 (setq autopair-autowrap t)
+
 
 ;; == flymake ==
 (require 'flymake)
@@ -75,7 +79,6 @@
 	(normal-top-level-add-subdirs-to-load-path))
 (require 'python)
 (require 'auto-complete)
-(require 'yasnippet)
 
 (autoload 'python-mode "python-mode" "Python Mode." t)
 (add-to-list 'auto-mode-alist '("\\.py\\'" . python-mode))
@@ -91,13 +94,7 @@
 (pymacs-load "ropemacs" "rope-")
 (setq ropemacs-enable-autoimport t)
 
-;; Initialize Yasnippet
-;Don't map TAB to yasnippet
-;In fact, set it to something we'll never use because
-;we'll only ever trigger it indirectly.
-;; (setq yas/trigger-key (kbd "C-c <kp-multiply>"))
-(yas/initialize)
-(yas/load-directory "~/.emacs.d/site-lisp/yasnippet-0.5.9/snippets")
+
 
 
 
@@ -177,18 +174,9 @@
 ;;; End Auto Completion
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; ;; Electric Pairs
-;; (add-hook 'python-mode-hook
-;; 	  (lambda ()
-;; 	    (define-key python-mode-map "\"" 'electric-pair)
-;; 	    (define-key python-mode-map "\'" 'electric-pair)
-;; 	    (define-key python-mode-map "(" 'electric-pair)
-;; 	    (define-key python-mode-map "[" 'electric-pair)
-;; 	    (define-key python-mode-map "{" 'electric-pair)))
-
-;; ;; bind RET to py-newline-and-indent
-;; (add-hook 'python-mode-hook '(lambda ()
-;; 			       (define-key python-mode-map "\C-m" 'newline-and-indent)))
+;; bind RET to py-newline-and-indent
+(add-hook 'python-mode-hook '(lambda ()
+			       (define-key python-mode-map "\C-m" 'newline-and-indent)))
 
 
 ;; Lambda
