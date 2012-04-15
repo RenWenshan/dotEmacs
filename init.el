@@ -44,6 +44,10 @@
 ;; Support trash
 (setq delete-by-moving-to-trash t)
 
+(setq-default indent-tabs-mode nil)
+(setq-default tab-width 4)
+(setq indent-line-function 'insert-tab)
+
 ;; ---- Nicer end ----
 
 
@@ -59,7 +63,7 @@
 (autopair-global-mode 1)
 (setq autopair-autowrap t)
 
-;; == flymake ==
+;; ;; == flymake ==
 (require 'flymake)
 (global-set-key [f3] 'flymake-display-err-menu-for-current-line)
 (global-set-key [f4] 'flymake-goto-next-error)
@@ -91,11 +95,11 @@
 (pymacs-load "ropemacs" "rope-")
 (setq ropemacs-enable-autoimport t)
 
-;; Initialize Yasnippet
-;Don't map TAB to yasnippet
-;In fact, set it to something we'll never use because
-;we'll only ever trigger it indirectly.
-;; (setq yas/trigger-key (kbd "C-c <kp-multiply>"))
+;; ;; Initialize Yasnippet
+;; ;Don't map TAB to yasnippet
+;; ;In fact, set it to something we'll never use because
+;; ;we'll only ever trigger it indirectly.
+;; ;; (setq yas/trigger-key (kbd "C-c <kp-multiply>"))
 (yas/initialize)
 (yas/load-directory "~/.emacs.d/site-lisp/yasnippet-0.5.9/snippets")
 
