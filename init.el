@@ -72,7 +72,6 @@
 
 
 ;; == flymake ==
->>>>>>> ac02780edfc913c9109bed150d71bdbca5674ff7
 (require 'flymake)
 (global-set-key [f3] 'flymake-display-err-menu-for-current-line)
 (global-set-key [f4] 'flymake-goto-next-error)
@@ -82,7 +81,6 @@
 
 ;; == C ==
 
-<<<<<<< HEAD
 ;; == Python ==
 (add-to-list 'load-path "~/.emacs.d/site-lisp")
 (progn (cd "~/.emacs.d/site-lisp")
