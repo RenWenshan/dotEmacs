@@ -111,7 +111,6 @@
 (yas/initialize)
 (yas/load-directory "~/.emacs.d/site-lisp/yasnippet-0.5.9/snippets")
 
-=======
 ;; ;; == Python ==
 
 ;; (progn (cd "~/.emacs.d/site-lisp")
@@ -202,7 +201,6 @@
 ;;   (interactive)
 ;;   (if (eql (ac-start) 0)
 ;;       (indent-for-tab-command)))
->>>>>>> ac02780edfc913c9109bed150d71bdbca5674ff7
 
 ;; (defadvice ac-start (before advice-turn-on-auto-start activate)
 ;;   (set (make-local-variable 'ac-auto-start) t))
