@@ -1,10 +1,41 @@
 (add-to-list 'load-path "~/.emacs.d/site-lisp")
 
-; ---- Nicer ----
+;; ---- Chinese input ----
+(require 'ibus)
+(add-hook 'after-init-hook 'ibus-mode-on)
+(ibus-define-common-key ?\C-/ nil)
+(setq ibus-cursor-color '("red" "blue" "limegreen"))
+
+;; ---- Chinese input end ---
+;; ---- Org mode ---
+(setq load-path (cons "~/.emacs.d/site-lisp/org-mode/lisp" load-path))
+(setq load-path (cons "~/.emacs.d/site-lisp/org-mode/contrib/lisp" load-path))
+(require 'org-install)
+
+;; ---- End Org mode ---
+
+;; ---- Blog posting ---
+(require 'xml-rpc)
+(setq load-path (cons "~/.emacs.d/site-lisp/org2blog" load-path))
+(require 'org2blog-autoloads)
+(setq org2blog/wp-blog-alist
+      '(("wordpress"
+         :url "http://wenshanren.wordpress.com/xmlrpc.php"
+         :username "wenshanren"
+         :default-title "Hello World"
+         :default-categories ("Hack" "Android")
+         :tags-as-categories nil)
+        ))
+
+;; ---- End Blog posting ---
+
+;; ---- Nicer ----
 (setq backup-directory-alist
       `((".*" . ,"~/.emacs.d/backup")))
 (setq auto-save-file-name-transforms
       `((".*" ,"~/.emacs.d/backup" t)))
+
+(set-language-environment 'English)
 
 ;; Color theme
 (color-theme-initialize)
@@ -55,13 +86,11 @@
 
 ;; ---- Programming ----
 (add-to-list 'load-path "~/.emacs.d/site-lisp/yasnippet-0.5.9")
-
 (require 'yasnippet)
 ;; Initialize Yasnippet
-;Don't map TAB to yasnippet
-;In fact, set it to something we'll never use because
-;we'll only ever trigger it indirectly.
-;; (setq yas/trigger-key (kbd "C-c <kp-multiply>"))
+;;Don't map TAB to yasnippet
+;;In fact, set it to something we'll never use because
+;;we'll only ever trigger it indirectly.
 (yas/initialize)
 (yas/load-directory "~/.emacs.d/site-lisp/yasnippet-0.5.9/snippets")
 
@@ -77,17 +106,10 @@
 (global-set-key [f4] 'flymake-goto-next-error)
 ;; == flymake ==
 
-;; == C ==
-
-;; == C ==
-
-;; == Python ==
-(add-to-list 'load-path "~/.emacs.d/site-lisp")
 (progn (cd "~/.emacs.d/site-lisp")
 	(normal-top-level-add-subdirs-to-load-path))
 (require 'python)
 (require 'auto-complete)
-(require 'yasnippet)
 
 (autoload 'python-mode "python-mode" "Python Mode." t)
 (add-to-list 'auto-mode-alist '("\\.py\\'" . python-mode))
@@ -103,119 +125,9 @@
 (pymacs-load "ropemacs" "rope-")
 (setq ropemacs-enable-autoimport t)
 
-;; ;; Initialize Yasnippet
-;; ;Don't map TAB to yasnippet
-;; ;In fact, set it to something we'll never use because
-;; ;we'll only ever trigger it indirectly.
-;; ;; (setq yas/trigger-key (kbd "C-c <kp-multiply>"))
-(yas/initialize)
-(yas/load-directory "~/.emacs.d/site-lisp/yasnippet-0.5.9/snippets")
-
-;; ;; == Python ==
-
-;; (progn (cd "~/.emacs.d/site-lisp")
-;; 	(normal-top-level-add-subdirs-to-load-path))
-;; (require 'python)
-;; (require 'auto-complete)
-
-;; (autoload 'python-mode "python-mode" "Python Mode." t)
-;; (add-to-list 'auto-mode-alist '("\\.py\\'" . python-mode))
-;; (add-to-list 'interpreter-mode-alist '("python" . python-mode))
-
-;; ;; Initialize Pymacs
-;; (autoload 'pymacs-apply "pymacs")
-;; (autoload 'pymacs-call "pymacs")
-;; (autoload 'pymacs-eval "pymacs" nil t)
-;; (autoload 'pymacs-exec "pymacs" nil t)
-;; (autoload 'pymacs-load "pymacs" nil t)
-;; ;; Initialize Rope
-;; (pymacs-load "ropemacs" "rope-")
-;; (setq ropemacs-enable-autoimport t)
-
-
-
-
-
-;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; ;;; Auto-completion
-;; ;;;  Integrates:
-;; ;;;   1) Rope
-;; ;;;   2) Yasnippet
-;; ;;;   all with AutoComplete.el
-;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; (defun prefix-list-elements (list prefix)
-;;   (let (value)
-;;     (nreverse
-;;      (dolist (element list value)
-;;       (setq value (cons (format "%s%s" prefix element) value))))))
-;; (defvar ac-source-rope
-;;   '((candidates
-;;      . (lambda ()
-;;          (prefix-list-elements (rope-completions) ac-target))))
-;;   "Source for Rope")
-;; (defun ac-python-find ()
-;;   "Python `ac-find-function'."
-;;   (require 'thingatpt)
-;;   (let ((symbol (car-safe (bounds-of-thing-at-point 'symbol))))
-;;     (if (null symbol)
-;;         (if (string= "." (buffer-substring (- (point) 1) (point)))
-;;             (point)
-;;           nil)
-;;       symbol)))
-;; (defun ac-python-candidate ()
-;;   "Python `ac-candidates-function'"
-;;   (let (candidates)
-;;     (dolist (source ac-sources)
-;;       (if (symbolp source)
-;;           (setq source (symbol-value source)))
-;;       (let* ((ac-limit (or (cdr-safe (assq 'limit source)) ac-limit))
-;;              (requires (cdr-safe (assq 'requires source)))
-;;              cand)
-;;         (if (or (null requires)
-;;                 (>= (length ac-target) requires))
-;;             (setq cand
-;;                   (delq nil
-;;                         (mapcar (lambda (candidate)
-;;                                   (propertize candidate 'source source))
-;;                                 (funcall (cdr (assq 'candidates source)))))))
-;;         (if (and (> ac-limit 1)
-;;                  (> (length cand) ac-limit))
-;;             (setcdr (nthcdr (1- ac-limit) cand) nil))
-;;         (setq candidates (append candidates cand))))
-;;     (delete-dups candidates)))
-;; (add-hook 'python-mode-hook
-;;           (lambda ()
-;;                  (auto-complete-mode 1)
-;;                  (set (make-local-variable 'ac-sources)
-;;                       (append ac-sources '(ac-source-rope) '(ac-source-yasnippet)))
-;;                  (set (make-local-variable 'ac-find-function) 'ac-python-find)
-;;                  (set (make-local-variable 'ac-candidate-function) 'ac-python-candidate)
-;;                  (set (make-local-variable 'ac-auto-start) nil)))
-
-;; ;;Ryan's python specific tab completion
-;; (defun ryan-python-tab ()
-;;   ; Try the following:
-;;   ; 1) Do a yasnippet expansion
-;;   ; 2) Do a Rope code completion
-;;   ; 3) Do an indent
-;;   (interactive)
-;;   (if (eql (ac-start) 0)
-;;       (indent-for-tab-command)))
-
-;; (defadvice ac-start (before advice-turn-on-auto-start activate)
-;;   (set (make-local-variable 'ac-auto-start) t))
-;; (defadvice ac-cleanup (after advice-turn-off-auto-start activate)
-;;   (set (make-local-variable 'ac-auto-start) nil))
-
-;; (define-key python-mode-map "\t" 'ryan-python-tab)
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; End Auto Completion
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
 ;; bind RET to py-newline-and-indent
 (add-hook 'python-mode-hook '(lambda ()
-			       (define-key python-mode-map "\C-m" 'newline-and-indent)))
-
+                               (define-key python-mode-map "\C-m" 'newline-and-indent)))
 
 ;; Lambda
 (require 'lambda-mode)
@@ -223,40 +135,96 @@
 (setq lambda-symbol (string (make-char 'greek-iso8859-7 107)))
 
 
-;; ;; path to the python interpreter, e.g.: ~rw/python27/bin/python2.7
-;; (setq py-python-command "ipython")
-;; (autoload 'python-mode "python-mode" "Python editing mode." t)
+;; path to the python interpreter, e.g.: ~rw/python27/bin/python2.7
+(setq py-python-command "ipython")
+(autoload 'python-mode "python-mode" "Python editing mode." t)
 
 
-;; ;; pylookup
-;; ;; add pylookup to your loadpath, ex) ~/.emacs.d/pylookup
-;; (setq pylookup-dir "~/.emacs.d/site-lisp/pylookup")
-;; (add-to-list 'load-path pylookup-dir)
+;; pylookup
+;; Usage:
+;; C-c h term
+;;
+;; add pylookup to your loadpath, ex) ~/.emacs.d/pylookup
+(setq pylookup-dir "~/.emacs.d/site-lisp/pylookup")
+(add-to-list 'load-path pylookup-dir)
 
-;; ;; load pylookup when compile time
-;; (eval-when-compile (require 'pylookup))
+;; load pylookup when compile time
+(eval-when-compile (require 'pylookup))
 
-;; ;; set executable file and db file
-;; (setq pylookup-program (concat pylookup-dir "/pylookup.py"))
-;; (setq pylookup-db-file (concat pylookup-dir "/pylookup.db"))
+;; set executable file and db file
+(setq pylookup-program (concat pylookup-dir "/pylookup.py"))
+(setq pylookup-db-file (concat pylookup-dir "/pylookup.db"))
 
-;; ;; set search option if you want
-;; ;; (setq pylookup-search-options '("--insensitive" "0" "--desc" "0"))
+;; to speedup, just load it on demand
+(autoload 'pylookup-lookup "pylookup"
+  "Lookup SEARCH-TERM in the Python HTML indexes." t)
 
-
-;; ;; to speedup, just load it on demand
-;; (autoload 'pylookup-lookup "pylookup"
-;;   "Lookup SEARCH-TERM in the Python HTML indexes." t)
-
-;; (autoload 'pylookup-update "pylookup"
-;;   "Run pylookup-update and create the database at `pylookup-db-file'." t)
-;; (global-set-key "\C-ch" 'pylookup-lookup)
-
-;; (require 'python-pep8)
-;; (require 'python-pylint)
+(autoload 'pylookup-update "pylookup"
+  "Run pylookup-update and create the database at `pylookup-db-file'." t)
+(global-set-key "\C-ch" 'pylookup-lookup)
 
 ;; == Python ==
 
+
+;; == BEGIN Perl ==
+(mapc
+ (lambda (pair)
+   (if (eq (cdr pair) 'perl-mode)
+       (setcdr pair 'cperl-mode)))
+ (append auto-mode-alist interpreter-mode-alist))
+
+; Outline-minor-mode key map
+(define-prefix-command 'cm-map nil "Outline-")
+; HIDE
+(define-key cm-map "q" 'hide-sublevels)    ; Hide everything but the top-level headings
+(define-key cm-map "t" 'hide-body)         ; Hide everything but headings (all body lines)
+(define-key cm-map "o" 'hide-other)        ; Hide other branches
+(define-key cm-map "c" 'hide-entry)        ; Hide this entry's body
+(define-key cm-map "l" 'hide-leaves)       ; Hide body lines in this entry and sub-entries
+(define-key cm-map "d" 'hide-subtree)      ; Hide everything in this entry and sub-entries
+; SHOW
+(define-key cm-map "a" 'show-all)          ; Show (expand) everything
+(define-key cm-map "e" 'show-entry)        ; Show this heading's body
+(define-key cm-map "i" 'show-children)     ; Show this heading's immediate child sub-headings
+(define-key cm-map "k" 'show-branches)     ; Show all sub-headings under this heading
+(define-key cm-map "s" 'show-subtree)      ; Show (expand) everything in this heading & below
+; MOVE
+(define-key cm-map "u" 'outline-up-heading)                ; Up
+(define-key cm-map "n" 'outline-next-visible-heading)      ; Next
+(define-key cm-map "p" 'outline-previous-visible-heading)  ; Previous
+(define-key cm-map "f" 'outline-forward-same-level)        ; Forward - same level
+(define-key cm-map "b" 'outline-backward-same-level)       ; Backward - same level
+(global-set-key "\M-o" cm-map)
+
+(setq cperl-mode-hook 'my-cperl-customizations)
+
+(defun my-cperl-customizations ()
+  "cperl-mode customizations that must be done after cperl-mode loads"
+  (outline-minor-mode)
+  (abbrev-mode)
+
+  (defun cperl-outline-level ()
+    (looking-at outline-regexp)
+    (let ((match (match-string 1)))
+      (cond
+       ((eq match "=head1" ) 1)
+       ((eq match "package") 2)
+       ((eq match "=head2" ) 3)
+       ((eq match "=item"  ) 4)
+       ((eq match "sub"    ) 5)
+       (t 7)
+       )))
+
+  (setq cperl-outline-regexp  my-cperl-outline-regexp)
+  (setq outline-regexp        cperl-outline-regexp)
+  (setq outline-level        'cperl-outline-level)
+)
+
+
+(eval-after-load 'pde-load
+  '(add-hook 'cperl-mode-hook (lambda ()
+                                (outline-minor-mode 1))))
+;; == END Perl ==
 ;; ---- Programming end ----
 
 
