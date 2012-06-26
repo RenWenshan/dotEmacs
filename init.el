@@ -41,6 +41,14 @@
 
 (set-language-environment 'English)
 
+;; C-w to backward kill a word
+(global-set-key "\C-w" 'backward-kill-word)
+(global-set-key "\C-x\C-k" 'kill-region)
+(global-set-key "\C-c\C-k" 'kill-region)
+
+;; bind call last keyboard marco to a convinent key
+(global-set-key [f5] 'call-last-kbd-macro)
+
 ;; Color theme
 (color-theme-initialize)
 (color-theme-subtle-hacker)
@@ -98,12 +106,18 @@
 ;; line width (fixed to 80)
 (setq-default fill-column 80)
 
+;; Ctrl-x Ctrl-m to invoke M-x sequence
+(global-set-key "\C-x\C-m" 'execute-extended-command)
+(global-set-key "\C-c\C-m" 'execute-extended-command)
+
 ;; ---- Nicer end ----
 
 
 ;; ---- Programming ----
 (add-to-list 'load-path "~/.emacs.d/site-lisp/yasnippet-0.5.9")
 (require 'yasnippet)
+(require 'auto-complete)
+
 ;; Initialize Yasnippet
 ;;Don't map TAB to yasnippet
 ;;In fact, set it to something we'll never use because
@@ -128,7 +142,7 @@
 (progn (cd "~/.emacs.d/site-lisp")
 	(normal-top-level-add-subdirs-to-load-path))
 (require 'python)
-(require 'auto-complete)
+
 
 (autoload 'python-mode "python-mode" "Python Mode." t)
 (add-to-list 'auto-mode-alist '("\\.py\\'" . python-mode))
