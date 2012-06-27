@@ -114,6 +114,9 @@
 
 
 ;; ---- Programming ----
+(progn (cd "~/.emacs.d/site-lisp")
+	(normal-top-level-add-subdirs-to-load-path))
+
 (add-to-list 'load-path "~/.emacs.d/site-lisp/yasnippet-0.5.9")
 (require 'yasnippet)
 (require 'auto-complete)
@@ -138,9 +141,14 @@
 (global-set-key [f4] 'flymake-goto-next-error)
 ;; == flymake ==
 
+
+;; == BEGIN go ==
+(add-to-list 'load-path "~/.emacs.d/site-lisp/go")
+(require 'go-mode-load)
+
+;; == END go ==
+
 ;; == Python ==
-(progn (cd "~/.emacs.d/site-lisp")
-	(normal-top-level-add-subdirs-to-load-path))
 (require 'python)
 
 
