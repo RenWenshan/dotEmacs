@@ -117,6 +117,10 @@
 (progn (cd "~/.emacs.d/site-lisp")
 	(normal-top-level-add-subdirs-to-load-path))
 
+;; == BEGIN git ==
+(require 'magit)
+;; == END git ==
+
 (add-to-list 'load-path "~/.emacs.d/site-lisp/yasnippet-0.5.9")
 (require 'yasnippet)
 (require 'auto-complete)
