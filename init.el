@@ -121,52 +121,39 @@
 (require 'magit)
 ;; == END git ==
 
+;; == BEGIN yasnippet ==
 (add-to-list 'load-path "~/.emacs.d/site-lisp/yasnippet-0.5.9")
 (require 'yasnippet)
-(require 'auto-complete)
-
-;; Initialize Yasnippet
-;;Don't map TAB to yasnippet
-;;In fact, set it to something we'll never use because
-;;we'll only ever trigger it indirectly.
-
 (yas/initialize)
 (yas/load-directory "~/.emacs.d/site-lisp/yasnippet-0.5.9/snippets")
+;; == END yasnippet ==
 
 
+;; == BEGIN auto-complete ==
+(add-to-list 'load-path "~/.emacs.d/site-lisp/auto-complete-1.3.1")
+(require 'auto-complete-config)
+(add-to-list 'load-path "~/.emacs.d/site-lisp/auto-complete-1.3.1")
+(ac-config-default)
+;; == END auto-complete ==
+
+
+;; == BEGIN autopair ==
 (require 'autopair)
 (autopair-global-mode 1)
 (setq autopair-autowrap t)
-
-
-;; == flymake ==
-(require 'flymake)
-(global-set-key [f3] 'flymake-display-err-menu-for-current-line)
-(global-set-key [f4] 'flymake-goto-next-error)
-;; == flymake ==
-
+;; == END autopair ==
 
 ;; == BEGIN go ==
 (add-to-list 'load-path "~/.emacs.d/site-lisp/go")
 (require 'go-mode-load)
-
 ;; == END go ==
 
-;; == Python ==
-(require 'python)
+;; == BEGIN Python ==
+;; pymacs
+(add-to-list 'load-path "~/.emacs.d/site-lisp/python/Pymacs")
+(require 'pymacs)
 
-
-(autoload 'python-mode "python-mode" "Python Mode." t)
-(add-to-list 'auto-mode-alist '("\\.py\\'" . python-mode))
-(add-to-list 'interpreter-mode-alist '("python" . python-mode))
-
-;; Initialize Pymacs
-(autoload 'pymacs-apply "pymacs")
-(autoload 'pymacs-call "pymacs")
-(autoload 'pymacs-eval "pymacs" nil t)
-(autoload 'pymacs-exec "pymacs" nil t)
-(autoload 'pymacs-load "pymacs" nil t)
-;; Initialize Rope
+;; rope
 (pymacs-load "ropemacs" "rope-")
 (setq ropemacs-enable-autoimport t)
 
@@ -178,12 +165,6 @@
 (require 'lambda-mode)
 (add-hook 'python-mode-hook #'lambda-mode 1)
 (setq lambda-symbol (string (make-char 'greek-iso8859-7 107)))
-
-
-;; path to the python interpreter, e.g.: ~rw/python27/bin/python2.7
-(setq py-python-command "ipython")
-(autoload 'python-mode "python-mode" "Python editing mode." t)
-
 
 ;; pylookup
 ;; Usage:
@@ -207,6 +188,28 @@
 (autoload 'pylookup-update "pylookup"
   "Run pylookup-update and create the database at `pylookup-db-file'." t)
 (global-set-key "\C-ch" 'pylookup-lookup)
+
+
+;; pyflakes, M-x python-check
+(setq python-check-command "pyflakes")
+
+;; flymake for python
+(add-to-list 'load-path "~/.emacs.d/site-lisp")
+
+(add-hook 'find-file-hook 'flymake-find-file-hook)
+(when (load "flymake" t)
+  (defun flymake-pyflakes-init ()
+    (let* ((temp-file (flymake-init-create-temp-buffer-copy
+               'flymake-create-temp-inplace))
+       (local-file (file-relative-name
+            temp-file
+            (file-name-directory buffer-file-name))))
+      (list "pycheckers"  (list local-file))))
+   (add-to-list 'flymake-allowed-file-name-masks
+             '("\\.py\\'" flymake-pyflakes-init)))
+(load-library "flymake-cursor")
+(global-set-key [f10] 'flymake-goto-prev-error)
+(global-set-key [f11] 'flymake-goto-next-error)
 
 ;; == END Python ==
 
@@ -307,6 +310,19 @@
       (flymake-display-current-error))
 
 ;; == END Perl ==
+
+;; == BEGIN Octave ==
+(autoload 'octave-mode "octave-mod" nil t)
+(setq auto-mode-alist
+      (cons '("\\.m$" . octave-mode) auto-mode-alist))
+(add-hook 'octave-mode-hook
+          (lambda ()
+            (abbrev-mode 1)
+            (auto-fill-mode 1)
+            (if (eq window-system 'x)
+                (font-lock-mode 1))))
+
+;; == END Octave ==
 ;; ---- Programming end ----
 
 
@@ -338,8 +354,21 @@
 (setq twittering-initial-timeline-spec-string `(":home@sina"))
 ;; ---- END Microblog
 
+;; ---- BEGIN IRC ----
+(require 'erc)
+;; ---- End IRC ----
 
-;; ---- Email ----
-
+;; ---- BEGIN Email ----
 ;; external editor of thunderbird
 (require 'tbemail)
+;; ---- END Email
+
+;; ---- BEGIN web browser ---
+(require 'w3m)
+(require 'mime-w3m)
+;; ---- END web browser ---
+
+;; ---- BEGIN Chrome ---
+(require 'edit-server)
+(edit-server-start)
+;; ---- END Chrome ---
