@@ -323,6 +323,18 @@
                 (font-lock-mode 1))))
 
 ;; == END Octave ==
+
+;; == BEGIN Web Dev ==
+(setq load-path (cons "~/.emacs.d/site-lisp/multi-web-mode" load-path))
+(require 'multi-web-mode)
+(setq mweb-default-major-mode 'html-mode)
+(setq mweb-tags '((php-mode "<\\?php\\|<\\? \\|<\\?=" "\\?>")
+                  (js-mode "<script +\\(type=\"text/javascript\"\\|language=\"javascript\"\\)[^>]*>" "</script>")
+                  (css-mode "<style +type=\"text/css\"[^>]*>" "</style>")))
+(setq mweb-filename-extensions '("php" "htm" "html" "ctp" "phtml" "php4" "php5"))
+(multi-web-global-mode 1)
+;; == END Web Dev ==
+
 ;; ---- Programming end ----
 
 
@@ -343,7 +355,6 @@
 
 
 ;; ---- Microblog ---
-(add-to-list 'load-path "~/.emacs.d/site-lisp/twitter-mode")
 (require 'twittering-mode)
 (setq twittering-use-master-password t)
 (setq twittering-allow-insecure-server-cert t)
