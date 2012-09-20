@@ -1,24 +1,16 @@
-(add-to-list 'load-path "~/.emacs.d/site-lisp")
+(add-to-list 'load-path "~/.emacs.d/dotEmacs")
 ;; start server, used for emacsclient
 (server-start)
 
-;; ---- Chinese input ----
-(require 'ibus)
-(add-hook 'after-init-hook 'ibus-mode-on)
-(ibus-define-common-key ?\C-/ nil)
-(setq ibus-cursor-color '("red" "blue" "limegreen"))
-;; ---- Chinese input end ---
-
 ;; ---- Org mode ---
-(setq load-path (cons "~/.emacs.d/site-lisp/org-mode/lisp" load-path))
-(setq load-path (cons "~/.emacs.d/site-lisp/org-mode/contrib/lisp" load-path))
+(setq load-path (cons "~/.emacs.d/dotEmacs/org-mode/lisp" load-path))
+(setq load-path (cons "~/.emacs.d/dotEmacs/org-mode/contrib/lisp" load-path))
 (require 'org-install)
-
 ;; ---- End Org mode ---
 
 ;; ---- Blog posting ---
 (require 'xml-rpc)
-(setq load-path (cons "~/.emacs.d/site-lisp/org2blog" load-path))
+(setq load-path (cons "~/.emacs.d/dotEmacs/org2blog" load-path))
 (require 'org2blog-autoloads)
 (setq org2blog/wp-blog-alist
       '(("wordpress"
@@ -88,6 +80,7 @@
 ;; Support trash
 (setq delete-by-moving-to-trash t)
 
+;; tabs
 (setq-default indent-tabs-mode nil)
 (setq-default tab-width 4)
 (setq indent-line-function 'insert-tab)
@@ -114,7 +107,7 @@
 
 
 ;; ---- Programming ----
-(progn (cd "~/.emacs.d/site-lisp")
+(progn (cd "~/.emacs.d/dotEmacs")
 	(normal-top-level-add-subdirs-to-load-path))
 
 ;; == BEGIN git ==
@@ -122,17 +115,17 @@
 ;; == END git ==
 
 ;; == BEGIN yasnippet ==
-(add-to-list 'load-path "~/.emacs.d/site-lisp/yasnippet-0.5.9")
+(add-to-list 'load-path "~/.emacs.d/dotEmacs/yasnippet-0.5.9")
 (require 'yasnippet)
 (yas/initialize)
-(yas/load-directory "~/.emacs.d/site-lisp/yasnippet-0.5.9/snippets")
+(yas/load-directory "~/.emacs.d/dotEmacs/yasnippet-0.5.9/snippets")
 ;; == END yasnippet ==
 
 
 ;; == BEGIN auto-complete ==
-(add-to-list 'load-path "~/.emacs.d/site-lisp/auto-complete-1.3.1")
+(add-to-list 'load-path "~/.emacs.d/dotEmacs/auto-complete-1.3.1")
 (require 'auto-complete-config)
-(add-to-list 'load-path "~/.emacs.d/site-lisp/auto-complete-1.3.1")
+(add-to-list 'load-path "~/.emacs.d/dotEmacs/auto-complete-1.3.1")
 (ac-config-default)
 ;; == END auto-complete ==
 
@@ -144,74 +137,74 @@
 ;; == END autopair ==
 
 ;; == BEGIN go ==
-(add-to-list 'load-path "~/.emacs.d/site-lisp/go")
+(add-to-list 'load-path "~/.emacs.d/dotEmacs/go")
 (require 'go-mode-load)
 ;; == END go ==
 
-;; == BEGIN Python ==
-;; pymacs
-(add-to-list 'load-path "~/.emacs.d/site-lisp/python/Pymacs")
-(require 'pymacs)
+;; ;; == BEGIN Python ==
+;; ;; pymacs
+;; (add-to-list 'load-path "~/.emacs.d/dotEmacs/python/Pymacs")
+;; (require 'pymacs)
 
-;; rope
-(pymacs-load "ropemacs" "rope-")
-(setq ropemacs-enable-autoimport t)
+;; ;; rope
+;; (pymacs-load "ropemacs" "rope-")
+;; (setq ropemacs-enable-autoimport t)
 
-;; bind RET to py-newline-and-indent
-(add-hook 'python-mode-hook '(lambda ()
-                               (define-key python-mode-map "\C-m" 'newline-and-indent)))
+;; ;; bind RET to py-newline-and-indent
+;; (add-hook 'python-mode-hook '(lambda ()
+;;                                (define-key python-mode-map "\C-m" 'newline-and-indent)))
 
-;; Lambda
-(require 'lambda-mode)
-(add-hook 'python-mode-hook #'lambda-mode 1)
-(setq lambda-symbol (string (make-char 'greek-iso8859-7 107)))
+;; ;; Lambda
+;; (require 'lambda-mode)
+;; (add-hook 'python-mode-hook #'lambda-mode 1)
+;; (setq lambda-symbol (string (make-char 'greek-iso8859-7 107)))
 
-;; pylookup
-;; Usage:
-;; C-c h term
-;;
-;; add pylookup to your loadpath, ex) ~/.emacs.d/pylookup
-(setq pylookup-dir "~/.emacs.d/site-lisp/pylookup")
-(add-to-list 'load-path pylookup-dir)
+;; ;; pylookup
+;; ;; Usage:
+;; ;; C-c h term
+;; ;;
+;; ;; add pylookup to your loadpath, ex) ~/.emacs.d/pylookup
+;; (setq pylookup-dir "~/.emacs.d/dotEmacs/pylookup")
+;; (add-to-list 'load-path pylookup-dir)
 
-;; load pylookup when compile time
-(eval-when-compile (require 'pylookup))
+;; ;; load pylookup when compile time
+;; (eval-when-compile (require 'pylookup))
 
-;; set executable file and db file
-(setq pylookup-program (concat pylookup-dir "/pylookup.py"))
-(setq pylookup-db-file (concat pylookup-dir "/pylookup.db"))
+;; ;; set executable file and db file
+;; (setq pylookup-program (concat pylookup-dir "/pylookup.py"))
+;; (setq pylookup-db-file (concat pylookup-dir "/pylookup.db"))
 
-;; to speedup, just load it on demand
-(autoload 'pylookup-lookup "pylookup"
-  "Lookup SEARCH-TERM in the Python HTML indexes." t)
+;; ;; to speedup, just load it on demand
+;; (autoload 'pylookup-lookup "pylookup"
+;;   "Lookup SEARCH-TERM in the Python HTML indexes." t)
 
-(autoload 'pylookup-update "pylookup"
-  "Run pylookup-update and create the database at `pylookup-db-file'." t)
-(global-set-key "\C-ch" 'pylookup-lookup)
+;; (autoload 'pylookup-update "pylookup"
+;;   "Run pylookup-update and create the database at `pylookup-db-file'." t)
+;; (global-set-key "\C-ch" 'pylookup-lookup)
 
 
-;; pyflakes, M-x python-check
-(setq python-check-command "pyflakes")
+;; ;; pyflakes, M-x python-check
+;; (setq python-check-command "pyflakes")
 
-;; flymake for python
-(add-to-list 'load-path "~/.emacs.d/site-lisp")
+;; ;; flymake for python
+;; (add-to-list 'load-path "~/.emacs.d/dotEmacs")
 
-(add-hook 'find-file-hook 'flymake-find-file-hook)
-(when (load "flymake" t)
-  (defun flymake-pyflakes-init ()
-    (let* ((temp-file (flymake-init-create-temp-buffer-copy
-               'flymake-create-temp-inplace))
-       (local-file (file-relative-name
-            temp-file
-            (file-name-directory buffer-file-name))))
-      (list "pycheckers"  (list local-file))))
-   (add-to-list 'flymake-allowed-file-name-masks
-             '("\\.py\\'" flymake-pyflakes-init)))
-(load-library "flymake-cursor")
-(global-set-key [f10] 'flymake-goto-prev-error)
-(global-set-key [f11] 'flymake-goto-next-error)
+;; (add-hook 'find-file-hook 'flymake-find-file-hook)
+;; (when (load "flymake" t)
+;;   (defun flymake-pyflakes-init ()
+;;     (let* ((temp-file (flymake-init-create-temp-buffer-copy
+;;                'flymake-create-temp-inplace))
+;;        (local-file (file-relative-name
+;;             temp-file
+;;             (file-name-directory buffer-file-name))))
+;;       (list "pycheckers"  (list local-file))))
+;;    (add-to-list 'flymake-allowed-file-name-masks
+;;              '("\\.py\\'" flymake-pyflakes-init)))
+;; (load-library "flymake-cursor")
+;; (global-set-key [f10] 'flymake-goto-prev-error)
+;; (global-set-key [f11] 'flymake-goto-next-error)
 
-;; == END Python ==
+;; ;; == END Python ==
 
 
 ;; == BEGIN Perl ==
@@ -325,7 +318,7 @@
 ;; == END Octave ==
 
 ;; == BEGIN Web Dev ==
-(setq load-path (cons "~/.emacs.d/site-lisp/multi-web-mode" load-path))
+(setq load-path (cons "~/.emacs.d/dotEmacs/multi-web-mode" load-path))
 (require 'multi-web-mode)
 (setq mweb-default-major-mode 'html-mode)
 (setq mweb-tags '((php-mode "<\\?php\\|<\\? \\|<\\?=" "\\?>")
@@ -373,11 +366,6 @@
 ;; external editor of thunderbird
 (require 'tbemail)
 ;; ---- END Email
-
-;; ---- BEGIN web browser ---
-(require 'w3m)
-(require 'mime-w3m)
-;; ---- END web browser ---
 
 ;; ---- BEGIN Chrome ---
 (require 'edit-server)
