@@ -2,6 +2,23 @@
 ;; start server, used for emacsclient
 (server-start)
 
+;; ---- Spelling Checker for Mac ---
+(add-to-list 'exec-path "/usr/local/bin")
+(setq ispell-program-name "aspell"
+      ispell-dictionary "english"
+      ispell-dictionary-alist
+      (let ((default '("[A-Za-z]" "[^A-Za-z]" "[']" nil
+                       ("-B" "-d" "english" "--dict-dir"
+                        "/Library/Application Support/cocoAspell/aspell6-en-6.0-0")
+                       nil iso-8859-1)))
+        `((nil ,@default)
+          ("english" ,@default))))
+;; ---- END Spelling Checker for Mac ---
+
+;; ---- GPG ---
+(add-to-list 'exec-path "/usr/local/bin")
+;; ---- END GPG ---
+
 ;; ---- Org mode ---
 (setq load-path (cons "~/.emacs.d/dotEmacs/org-mode/lisp" load-path))
 (setq load-path (cons "~/.emacs.d/dotEmacs/org-mode/contrib/lisp" load-path))
@@ -41,9 +58,9 @@
 ;; bind call last keyboard marco to a convinent key
 (global-set-key [f5] 'call-last-kbd-macro)
 
-;; Color theme
-(color-theme-initialize)
-(color-theme-subtle-hacker)
+;; ;; Color theme
+;; (color-theme-initialize)
+;; (color-theme-subtle-hacker)
 
 ;; Don't show start up sceen
 (setq inhibit-startup-message t)
@@ -103,6 +120,7 @@
 (global-set-key "\C-x\C-m" 'execute-extended-command)
 (global-set-key "\C-c\C-m" 'execute-extended-command)
 
+
 ;; ---- Nicer end ----
 
 
@@ -110,9 +128,9 @@
 (progn (cd "~/.emacs.d/dotEmacs")
 	(normal-top-level-add-subdirs-to-load-path))
 
-;; == BEGIN git ==
-(require 'magit)
-;; == END git ==
+;; ;; == BEGIN git ==
+;; (require 'magit)
+;; ;; == END git ==
 
 ;; == BEGIN yasnippet ==
 (add-to-list 'load-path "~/.emacs.d/dotEmacs/yasnippet-0.5.9")
@@ -371,3 +389,7 @@
 (require 'edit-server)
 (edit-server-start)
 ;; ---- END Chrome ---
+
+;; ---- BEGIN Default directory ---
+(setq default-directory "~/Dropbox" )
+;; ---- END Default directory ---
