@@ -121,6 +121,9 @@
 (global-set-key "\C-c\C-m" 'execute-extended-command)
 
 
+;; display white spaces
+(require 'blank-mode)
+
 ;; ---- Nicer end ----
 
 
