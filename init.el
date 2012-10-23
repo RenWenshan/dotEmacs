@@ -2,22 +2,29 @@
 ;; start server, used for emacsclient
 (server-start)
 
-;; ---- Spelling Checker for Mac ---
-(add-to-list 'exec-path "/usr/local/bin")
-(setq ispell-program-name "aspell"
-      ispell-dictionary "english"
-      ispell-dictionary-alist
-      (let ((default '("[A-Za-z]" "[^A-Za-z]" "[']" nil
-                       ("-B" "-d" "english" "--dict-dir"
-                        "/Library/Application Support/cocoAspell/aspell6-en-6.0-0")
-                       nil iso-8859-1)))
-        `((nil ,@default)
-          ("english" ,@default))))
-;; ---- END Spelling Checker for Mac ---
+;; ---- Chinese input ----
+(require 'ibus)
+(add-hook 'after-init-hook 'ibus-mode-on)
+(ibus-define-common-key ?\C-/ nil)
+(setq ibus-cursor-color '("red" "blue" "limegreen"))
+;; ---- Chinese input end ---
 
-;; ---- GPG ---
-(add-to-list 'exec-path "/usr/local/bin")
-;; ---- END GPG ---
+;; ;; ---- Spelling Checker for Mac ---
+;; (add-to-list 'exec-path "/usr/local/bin")
+;; (setq ispell-program-name "aspell"
+;;       ispell-dictionary "english"
+;;       ispell-dictionary-alist
+;;       (let ((default '("[A-Za-z]" "[^A-Za-z]" "[']" nil
+;;                        ("-B" "-d" "english" "--dict-dir"
+;;                         "/Library/Application Support/cocoAspell/aspell6-en-6.0-0")
+;;                        nil iso-8859-1)))
+;;         `((nil ,@default)
+;;           ("english" ,@default))))
+;; ;; ---- END Spelling Checker for Mac ---
+
+;; ---- GPG for Mac ---
+;; (add-to-list 'exec-path "/usr/local/bin")
+;; ---- END GPG for Mac---
 
 ;; ---- Org mode ---
 (setq load-path (cons "~/.emacs.d/dotEmacs/org-mode/lisp" load-path))
@@ -120,6 +127,11 @@
 (global-set-key "\C-x\C-m" 'execute-extended-command)
 (global-set-key "\C-c\C-m" 'execute-extended-command)
 
+;; nicer buffers switching
+(global-set-key (kbd "C-x <up>") 'windmove-up)
+(global-set-key (kbd "C-x <down>") 'windmove-down)
+(global-set-key (kbd "C-x <right>") 'windmove-right)
+(global-set-key (kbd "C-x <left>") 'windmove-left)
 
 ;; ---- Nicer end ----
 
@@ -391,5 +403,5 @@
 ;; ---- END Chrome ---
 
 ;; ---- BEGIN Default directory ---
-(setq default-directory "~/Dropbox" )
+(setq default-directory "/mnt/hgfs/wenshan/Dropbox" )
 ;; ---- END Default directory ---
