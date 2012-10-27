@@ -2,28 +2,28 @@
 ;; start server, used for emacsclient
 (server-start)
 
-;; ---- Chinese input ----
-(require 'ibus)
-(add-hook 'after-init-hook 'ibus-mode-on)
-(ibus-define-common-key ?\C-/ nil)
-(setq ibus-cursor-color '("red" "blue" "limegreen"))
-;; ---- Chinese input end ---
+;; ;; ---- Chinese input ----
+;; (require 'ibus)
+;; (add-hook 'after-init-hook 'ibus-mode-on)
+;; (ibus-define-common-key ?\C-/ nil)
+;; (setq ibus-cursor-color '("red" "blue" "limegreen"))
+;; ;; ---- Chinese input end ---
 
-;; ;; ---- Spelling Checker for Mac ---
-;; (add-to-list 'exec-path "/usr/local/bin")
-;; (setq ispell-program-name "aspell"
-;;       ispell-dictionary "english"
-;;       ispell-dictionary-alist
-;;       (let ((default '("[A-Za-z]" "[^A-Za-z]" "[']" nil
-;;                        ("-B" "-d" "english" "--dict-dir"
-;;                         "/Library/Application Support/cocoAspell/aspell6-en-6.0-0")
-;;                        nil iso-8859-1)))
-;;         `((nil ,@default)
-;;           ("english" ,@default))))
-;; ;; ---- END Spelling Checker for Mac ---
+;; ---- Spelling Checker for Mac ---
+(add-to-list 'exec-path "/usr/local/bin")
+(setq ispell-program-name "aspell"
+      ispell-dictionary "english"
+      ispell-dictionary-alist
+      (let ((default '("[A-Za-z]" "[^A-Za-z]" "[']" nil
+                       ("-B" "-d" "english" "--dict-dir"
+                        "/Library/Application Support/cocoAspell/aspell6-en-6.0-0")
+                       nil iso-8859-1)))
+        `((nil ,@default)
+          ("english" ,@default))))
+;; ---- END Spelling Checker for Mac ---
 
 ;; ---- GPG for Mac ---
-;; (add-to-list 'exec-path "/usr/local/bin")
+(add-to-list 'exec-path "/usr/local/bin")
 ;; ---- END GPG for Mac---
 
 ;; ---- Org mode ---
@@ -144,7 +144,9 @@
 	(normal-top-level-add-subdirs-to-load-path))
 
 ;; ;; == BEGIN git ==
-;; (require 'magit)
+;; this path should be changed along with magit installation
+(add-to-list 'load-path "/usr/local/share/emacs/site-lisp/")
+(require 'magit)
 ;; ;; == END git ==
 
 ;; == BEGIN yasnippet ==
@@ -406,5 +408,5 @@
 ;; ---- END Chrome ---
 
 ;; ---- BEGIN Default directory ---
-(setq default-directory "/mnt/hgfs/wenshan/Dropbox" )
+(setq default-directory "~/Dropbox" )
 ;; ---- END Default directory ---
