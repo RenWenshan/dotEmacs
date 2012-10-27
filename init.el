@@ -33,20 +33,20 @@
 ;; ---- End Org mode ---
 
 ;; ---- Blog posting ---
+;; use xml-rpc to post blogs on my English wordpress blog on OpenShift
 (require 'xml-rpc)
 (setq load-path (cons "~/.emacs.d/dotEmacs/org2blog" load-path))
 (require 'org2blog-autoloads)
 (setq org2blog/wp-blog-alist
       '(("wordpress"
-         :url "http://wenshanren.wordpress.com/xmlrpc.php"
-         :username "wenshanren"
+         :url "http://blog-wenshan.rhcloud.com/xmlrpc.php"
+         :username "admin"
          :default-title "Hello World"
-         :default-categories ("Hack" "Android")
+         :default-categories ("Linux")
          :tags-as-categories nil
          :wp-code nil
          :keep-new-lines t)
         ))
-
 ;; ---- End Blog posting ---
 
 ;; ---- Nicer ----
