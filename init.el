@@ -136,6 +136,9 @@
 ;; display white spaces
 (require 'blank-mode)
 
+;; avoid eshell cycle completions
+(setq eshell-cmpl-cycle-completions nil)
+
 ;; ---- Nicer end ----
 
 
