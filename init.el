@@ -3,28 +3,28 @@
 (server-start)
 
 ;; ;; ---- Chinese input ----
-;; (require 'ibus)
-;; (add-hook 'after-init-hook 'ibus-mode-on)
-;; (ibus-define-common-key ?\C-/ nil)
-;; (setq ibus-cursor-color '("red" "blue" "limegreen"))
+(require 'ibus)
+(add-hook 'after-init-hook 'ibus-mode-on)
+(ibus-define-common-key ?\C-/ nil)
+(setq ibus-cursor-color '("red" "blue" "limegreen"))
 ;; ;; ---- Chinese input end ---
 
-;; ---- Spelling Checker for Mac ---
-(add-to-list 'exec-path "/usr/local/bin")
-(setq ispell-program-name "aspell"
-      ispell-dictionary "english"
-      ispell-dictionary-alist
-      (let ((default '("[A-Za-z]" "[^A-Za-z]" "[']" nil
-                       ("-B" "-d" "english" "--dict-dir"
-                        "/Library/Application Support/cocoAspell/aspell6-en-6.0-0")
-                       nil iso-8859-1)))
-        `((nil ,@default)
-          ("english" ,@default))))
-;; ---- END Spelling Checker for Mac ---
+;; ;; ---- Spelling Checker for Mac ---
+;; (add-to-list 'exec-path "/usr/local/bin")
+;; (setq ispell-program-name "aspell"
+;;       ispell-dictionary "english"
+;;       ispell-dictionary-alist
+;;       (let ((default '("[A-Za-z]" "[^A-Za-z]" "[']" nil
+;;                        ("-B" "-d" "english" "--dict-dir"
+;;                         "/Library/Application Support/cocoAspell/aspell6-en-6.0-0")
+;;                        nil iso-8859-1)))
+;;         `((nil ,@default)
+;;           ("english" ,@default))))
+;; ;; ---- END Spelling Checker for Mac ---
 
-;; ---- GPG for Mac ---
-(add-to-list 'exec-path "/usr/local/bin")
-;; ---- END GPG for Mac---
+;; ;; ---- GPG for Mac ---
+;; (add-to-list 'exec-path "/usr/local/bin")
+;; ;; ---- END GPG for Mac---
 
 ;; ---- Org mode ---
 (setq load-path (cons "~/.emacs.d/dotEmacs/org-mode/lisp" load-path))
