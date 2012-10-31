@@ -2,29 +2,29 @@
 ;; start server, used for emacsclient
 (server-start)
 
-;; ---- Chinese input ----
-(require 'ibus)
-(add-hook 'after-init-hook 'ibus-mode-on)
-(ibus-define-common-key ?\C-/ nil)
-(setq ibus-cursor-color '("red" "blue" "limegreen"))
-;; ---- Chinese input end ---
+;; ;; ---- Chinese input ----
+;; (require 'ibus)
+;; (add-hook 'after-init-hook 'ibus-mode-on)
+;; (ibus-define-common-key ?\C-/ nil)
+;; (setq ibus-cursor-color '("red" "blue" "limegreen"))
+;; ;; ---- Chinese input end ---
 
-;; ;; ---- Spelling Checker for Mac ---
-;; (add-to-list 'exec-path "/usr/local/bin")
-;; (setq ispell-program-name "aspell"
-;;       ispell-dictionary "english"
-;;       ispell-dictionary-alist
-;;       (let ((default '("[A-Za-z]" "[^A-Za-z]" "[']" nil
-;;                        ("-B" "-d" "english" "--dict-dir"
-;;                         "/Library/Application Support/cocoAspell/aspell6-en-6.0-0")
-;;                        nil iso-8859-1)))
-;;         `((nil ,@default)
-;;           ("english" ,@default))))
-;; ;; ---- END Spelling Checker for Mac ---
+;; ---- Spelling Checker for Mac ---
+(add-to-list 'exec-path "/usr/local/bin")
+(setq ispell-program-name "aspell"
+      ispell-dictionary "english"
+      ispell-dictionary-alist
+      (let ((default '("[A-Za-z]" "[^A-Za-z]" "[']" nil
+                       ("-B" "-d" "english" "--dict-dir"
+                        "/Library/Application Support/cocoAspell/aspell6-en-6.0-0")
+                       nil iso-8859-1)))
+        `((nil ,@default)
+          ("english" ,@default))))
+;; ---- END Spelling Checker for Mac ---
 
-;; ;; ---- GPG for Mac ---
-;; (add-to-list 'exec-path "/usr/local/bin")
-;; ;; ---- END GPG for Mac---
+;; ---- GPG for Mac ---
+(add-to-list 'exec-path "/usr/local/bin")
+;; ---- END GPG for Mac---
 
 ;; ---- Org mode ---
 (setq load-path (cons "~/.emacs.d/dotEmacs/org-mode/lisp" load-path))
@@ -138,10 +138,6 @@
 
 ;; avoid eshell cycle completions
 (setq eshell-cmpl-cycle-completions nil)
-
-;; eighty column rule
-(require 'whitespace)
-(setq whitespace-style '(face empty tabs lines-tail trailing))
 
 ;; ---- Nicer end ----
 
@@ -259,40 +255,24 @@
 ; Outline-minor-mode key map
 (define-prefix-command 'cm-map nil "Outline-")
 ; HIDE
-; Hide everything but the top-level headings
-(define-key cm-map "q" 'hide-sublevels)
-; Hide everything but headings (all body lines)
-(define-key cm-map "t" 'hide-body)
-; Hide other branches
-(define-key cm-map "o" 'hide-other)
-; Hide this entry's body
-(define-key cm-map "c" 'hide-entry)
-; Hide body lines in this entry and sub-entries
-(define-key cm-map "l" 'hide-leaves)
-; Hide everything in this entry and sub-entries
-(define-key cm-map "d" 'hide-subtree)
+(define-key cm-map "q" 'hide-sublevels)    ; Hide everything but the top-level headings
+(define-key cm-map "t" 'hide-body)         ; Hide everything but headings (all body lines)
+(define-key cm-map "o" 'hide-other)        ; Hide other branches
+(define-key cm-map "c" 'hide-entry)        ; Hide this entry's body
+(define-key cm-map "l" 'hide-leaves)       ; Hide body lines in this entry and sub-entries
+(define-key cm-map "d" 'hide-subtree)      ; Hide everything in this entry and sub-entries
 ; SHOW
-; Show (expand) everything
-(define-key cm-map "a" 'show-all)
-; Show this heading's body
-(define-key cm-map "e" 'show-entry)
-; Show this heading's immediate child sub-headings
-(define-key cm-map "i" 'show-children)
-; Show all sub-headings under this heading
-(define-key cm-map "k" 'show-branches)
-; Show (expand) everything in this heading & below
-(define-key cm-map "s" 'show-subtree)
+(define-key cm-map "a" 'show-all)          ; Show (expand) everything
+(define-key cm-map "e" 'show-entry)        ; Show this heading's body
+(define-key cm-map "i" 'show-children)     ; Show this heading's immediate child sub-headings
+(define-key cm-map "k" 'show-branches)     ; Show all sub-headings under this heading
+(define-key cm-map "s" 'show-subtree)      ; Show (expand) everything in this heading & below
 ; MOVE
-; Up
-(define-key cm-map "u" 'outline-up-heading)
-; Next
-(define-key cm-map "n" 'outline-next-visible-heading)
-; Previous
-(define-key cm-map "p" 'outline-previous-visible-heading)
-; Forward - same level
-(define-key cm-map "f" 'outline-forward-same-level)
-; Backward - same level
-(define-key cm-map "b" 'outline-backward-same-level)
+(define-key cm-map "u" 'outline-up-heading)                ; Up
+(define-key cm-map "n" 'outline-next-visible-heading)      ; Next
+(define-key cm-map "p" 'outline-previous-visible-heading)  ; Previous
+(define-key cm-map "f" 'outline-forward-same-level)        ; Forward - same level
+(define-key cm-map "b" 'outline-backward-same-level)       ; Backward - same level
 (global-set-key "\M-o" cm-map)
 
 (setq cperl-mode-hook 'my-cperl-customizations)
@@ -380,12 +360,9 @@
 (require 'multi-web-mode)
 (setq mweb-default-major-mode 'html-mode)
 (setq mweb-tags '((php-mode "<\\?php\\|<\\? \\|<\\?=" "\\?>")
-                  (js-mode
-                   (concat "<script +\\(type=\"text/javascript\"\\|language=\"j"
-                           "avascript\"\\)[^>]*>" "</script>")
+                  (js-mode "<script +\\(type=\"text/javascript\"\\|language=\"javascript\"\\)[^>]*>" "</script>")
                   (css-mode "<style +type=\"text/css\"[^>]*>" "</style>")))
-(setq mweb-filename-extensions
-      '("php" "htm" "html" "ctp" "phtml" "php4" "php5"))
+(setq mweb-filename-extensions '("php" "htm" "html" "ctp" "phtml" "php4" "php5"))
 (multi-web-global-mode 1)
 ;; == END Web Dev ==
 
@@ -432,3 +409,7 @@
 (require 'edit-server)
 (edit-server-start)
 ;; ---- END Chrome ---
+
+;; ---- BEGIN Default directory ---
+(setq default-directory "~/Dropbox" )
+;; ---- END Default directory ---
