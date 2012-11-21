@@ -1,60 +1,27 @@
+;; This is the main configuration file of Emacs
+
+;; set load-path
 (add-to-list 'load-path "~/.emacs.d/dotEmacs")
+(progn (cd "~/.emacs.d/dotEmacs")
+	(normal-top-level-add-subdirs-to-load-path))
+
 ;; start server, used for emacsclient
 (server-start)
 
-;; ;; ---- Chinese input ----
-(require 'ibus)
-(add-hook 'after-init-hook 'ibus-mode-on)
-(ibus-define-common-key ?\C-/ nil)
-(setq ibus-cursor-color '("red" "blue" "limegreen"))
-;; ;; ---- Chinese input end ---
 
-;; ;; ---- Spelling Checker for Mac ---
-;; (add-to-list 'exec-path "/usr/local/bin")
-;; (setq ispell-program-name "aspell"
-;;       ispell-dictionary "english"
-;;       ispell-dictionary-alist
-;;       (let ((default '("[A-Za-z]" "[^A-Za-z]" "[']" nil
-;;                        ("-B" "-d" "english" "--dict-dir"
-;;                         "/Library/Application Support/cocoAspell/aspell6-en-6.0-0")
-;;                        nil iso-8859-1)))
-;;         `((nil ,@default)
-;;           ("english" ,@default))))
-;; ;; ---- END Spelling Checker for Mac ---
+;;----------------------------------------------------------
+;; ---- BEGIN nicer Emacs ----
+;;----------------------------------------------------------
+;;
+;; this part is for making Emacs easier to use
 
-;; ;; ---- GPG for Mac ---
-;; (add-to-list 'exec-path "/usr/local/bin")
-;; ;; ---- END GPG for Mac---
-
-;; ---- Org mode ---
-(setq load-path (cons "~/.emacs.d/dotEmacs/org-mode/lisp" load-path))
-(setq load-path (cons "~/.emacs.d/dotEmacs/org-mode/contrib/lisp" load-path))
-(require 'org-install)
-;; ---- End Org mode ---
-
-;; ---- Blog posting ---
-;; use xml-rpc to post blogs on my English wordpress blog on OpenShift
-(require 'xml-rpc)
-(setq load-path (cons "~/.emacs.d/dotEmacs/org2blog" load-path))
-(require 'org2blog-autoloads)
-(setq org2blog/wp-blog-alist
-      '(("wordpress"
-         :url "http://blog-wenshan.rhcloud.com/xmlrpc.php"
-         :username "admin"
-         :default-title "Hello World"
-         :default-categories ("Linux")
-         :tags-as-categories nil
-         :wp-code nil
-         :keep-new-lines t)
-        ))
-;; ---- End Blog posting ---
-
-;; ---- Nicer ----
+;; avoid creating backup files in the same folder
 (setq backup-directory-alist
       `((".*" . ,"~/.emacs.d/backup")))
 (setq auto-save-file-name-transforms
       `((".*" ,"~/.emacs.d/backup" t)))
 
+;; force English Emacs environment
 (set-language-environment 'English)
 
 ;; C-w to backward kill a word
@@ -65,46 +32,42 @@
 ;; bind call last keyboard marco to a convinent key
 (global-set-key [f5] 'call-last-kbd-macro)
 
-;; ;; Color theme
-;; (color-theme-initialize)
-;; (color-theme-subtle-hacker)
-
-;; Don't show start up sceen
+;; don't show start up sceen
 (setq inhibit-startup-message t)
 
 ;; "y or n" instead of "yes or no"
 (fset 'yes-or-no-p 'y-or-n-p)
 
-;; Highlight regions and add special behaviors to regions
+;; highlight regions and add special behaviors to regions
 (setq transient-mark-mode t)
 
-;; Display line and column numbers
+;; display line and column numbers
 (setq line-number-mode t)
 (setq column-number-mode t)
 
-;; Explicitly show the end of a buffer
+;; explicitly show the end of a buffer
 (set-default 'indicate-empty-lines t)
 
-;; Line-wrapping
+;; line-wrapping
 (set-default 'fill-column 80)
 
-;; Prevent beep
+;; prevent beep
 (setq visible-bell t)
 
-;; See matching parens
+;; see matching parens
 (show-paren-mode t)
 
-;; Don't truncate lines
+;; don't truncate lines
 (setq truncate-lines t)
 (setq truncate-partial-width-windows nil)
 
-;; Trailing whitespace is unnecessary
+;; trailing whitespace is unnecessary
 (add-hook 'before-save-hook (lambda () (delete-trailing-whitespace)))
 
-;; Support trash
+;; support trash
 (setq delete-by-moving-to-trash t)
 
-;; tabs
+;; insert space as tab
 (setq-default indent-tabs-mode nil)
 (setq-default tab-width 4)
 (setq indent-line-function 'insert-tab)
@@ -133,116 +96,248 @@
 (global-set-key (kbd "C-x <right>") 'windmove-right)
 (global-set-key (kbd "C-x <left>") 'windmove-left)
 
+;; ibuffer
+(global-set-key (kbd "C-x C-b") 'ibuffer)
+(add-hook 'ibuffer-mode-hook
+          '(lambda ()
+             (ibuffer-auto-mode 1)))
+;; kill unmodified buffers without prompt
+(setq ibuffer-expert t)
+
 ;; display white spaces
 (require 'blank-mode)
 
-;; ---- Nicer end ----
+;; auto closing pairs
+(require 'autopair)
+(autopair-global-mode 1)
+(setq autopair-autowrap t)
+
+;; show line numbers by default
+(global-linum-mode 1)
+
+;; highlight a symbol
+(require 'highlight-symbol)
+(global-set-key [(control f3)] 'highlight-symbol-at-point)
+(global-set-key [f3] 'highlight-symbol-next)
+(global-set-key [(shift f3)] 'highlight-symbol-prev)
+(global-set-key [(meta f3)] 'highlight-symbol-prev)
+
+;; color theme tango-dark (Emacs24)
+(require 'tango-dark-theme)
+
+;; indentation guide
+(require 'highlight-indentation)
+
+;; code folding with C-tab
+(defun aj-toggle-fold ()
+  "Toggle fold all lines larger than indentation on current line"
+  (interactive)
+  (let ((col 1))
+    (save-excursion
+      (back-to-indentation)
+      (setq col (+ 1 (current-column)))
+      (set-selective-display
+       (if selective-display nil (or col 1))))))
+(global-set-key [C-tab] 'aj-toggle-fold)
+
+;;----------------------------------------------------------
+;; ---- END nicer ----
+;;----------------------------------------------------------
 
 
-;; ---- Programming ----
-(progn (cd "~/.emacs.d/dotEmacs")
-	(normal-top-level-add-subdirs-to-load-path))
 
-;; ;; == BEGIN git ==
+;;----------------------------------------------------------
+;; ---- BEGIN Chinese input for Linux ----
+;;----------------------------------------------------------
+
+(require 'ibus)
+(add-hook 'after-init-hook 'ibus-mode-on)
+(ibus-define-common-key ?\C-/ nil)
+(setq ibus-cursor-color '("red" "blue" "limegreen"))
+
+;;----------------------------------------------------------
+;; ---- END Chinese input for Linux ----
+;;----------------------------------------------------------
+
+
+
+;;----------------------------------------------------------
+;; ---- BEGIN org-mode ----
+;;----------------------------------------------------------
+
+(setq load-path (cons "~/.emacs.d/dotEmacs/org-mode/lisp" load-path))
+(setq load-path (cons "~/.emacs.d/dotEmacs/org-mode/contrib/lisp" load-path))
+(require 'org-install)
+
+;;----------------------------------------------------------
+;; ---- END org-mode ----
+;;----------------------------------------------------------
+
+
+
+;;----------------------------------------------------------
+;; ---- BEGIN blogging ----
+;;----------------------------------------------------------
+
+;; use xml-rpc to post blogs on my English wordpress blog on OpenShift
+(require 'xml-rpc)
+(setq load-path (cons "~/.emacs.d/dotEmacs/org2blog" load-path))
+(require 'org2blog-autoloads)
+(setq org2blog/wp-blog-alist
+      '(("wenshanren.org"
+         :url "http://wenshanren.org/xmlrpc.php"
+         :username "wenshan"
+         :default-title "Hello World"
+         :default-categories ("Linux")
+         :tags-as-categories nil
+         :wp-code nil
+         :keep-new-lines t)
+        )
+      )
+
+;;----------------------------------------------------------
+;; ---- END blogging ----
+;;----------------------------------------------------------
+
+
+
+;;----------------------------------------------------------
+;; ---- BEGIN magit ----
+;;----------------------------------------------------------
+
 ;; this path should be changed along with magit installation
 (add-to-list 'load-path "/usr/local/share/emacs/site-lisp/")
 (require 'magit)
-;; ;; == END git ==
 
-;; == BEGIN yasnippet ==
+;;----------------------------------------------------------
+;; ---- END magit ---
+;;----------------------------------------------------------
+
+
+
+;;----------------------------------------------------------
+;; ---- BEGIN yasnippet ----
+;;----------------------------------------------------------
+
 (add-to-list 'load-path "~/.emacs.d/dotEmacs/yasnippet-0.5.9")
 (require 'yasnippet)
 (yas/initialize)
 (yas/load-directory "~/.emacs.d/dotEmacs/yasnippet-0.5.9/snippets")
-;; == END yasnippet ==
+
+;;----------------------------------------------------------
+;; ---- END yasnippet ----
+;;----------------------------------------------------------
 
 
-;; == BEGIN auto-complete ==
+
+;;----------------------------------------------------------
+;; ---- BEGIN auto-complete ----
+;;----------------------------------------------------------
+
 (add-to-list 'load-path "~/.emacs.d/dotEmacs/auto-complete-1.3.1")
 (require 'auto-complete-config)
 (add-to-list 'load-path "~/.emacs.d/dotEmacs/auto-complete-1.3.1")
 (ac-config-default)
-;; == END auto-complete ==
+
+;;----------------------------------------------------------
+;; ---- END auto-complete ----
+;;----------------------------------------------------------
 
 
-;; == BEGIN autopair ==
-(require 'autopair)
-(autopair-global-mode 1)
-(setq autopair-autowrap t)
-;; == END autopair ==
 
-;; == BEGIN go ==
+;;----------------------------------------------------------
+;; ---- BEGIN go lang ----
+;;----------------------------------------------------------
+
 (add-to-list 'load-path "~/.emacs.d/dotEmacs/go")
 (require 'go-mode-load)
-;; == END go ==
 
-;; ;; == BEGIN Python ==
-;; ;; pymacs
-;; (add-to-list 'load-path "~/.emacs.d/dotEmacs/python/Pymacs")
-;; (require 'pymacs)
-
-;; ;; rope
-;; (pymacs-load "ropemacs" "rope-")
-;; (setq ropemacs-enable-autoimport t)
-
-;; ;; bind RET to py-newline-and-indent
-;; (add-hook 'python-mode-hook '(lambda ()
-;;                                (define-key python-mode-map "\C-m" 'newline-and-indent)))
-
-;; ;; Lambda
-;; (require 'lambda-mode)
-;; (add-hook 'python-mode-hook #'lambda-mode 1)
-;; (setq lambda-symbol (string (make-char 'greek-iso8859-7 107)))
-
-;; ;; pylookup
-;; ;; Usage:
-;; ;; C-c h term
-;; ;;
-;; ;; add pylookup to your loadpath, ex) ~/.emacs.d/pylookup
-;; (setq pylookup-dir "~/.emacs.d/dotEmacs/pylookup")
-;; (add-to-list 'load-path pylookup-dir)
-
-;; ;; load pylookup when compile time
-;; (eval-when-compile (require 'pylookup))
-
-;; ;; set executable file and db file
-;; (setq pylookup-program (concat pylookup-dir "/pylookup.py"))
-;; (setq pylookup-db-file (concat pylookup-dir "/pylookup.db"))
-
-;; ;; to speedup, just load it on demand
-;; (autoload 'pylookup-lookup "pylookup"
-;;   "Lookup SEARCH-TERM in the Python HTML indexes." t)
-
-;; (autoload 'pylookup-update "pylookup"
-;;   "Run pylookup-update and create the database at `pylookup-db-file'." t)
-;; (global-set-key "\C-ch" 'pylookup-lookup)
+;;----------------------------------------------------------
+;; ---- END go lang ----
+;;----------------------------------------------------------
 
 
-;; ;; pyflakes, M-x python-check
-;; (setq python-check-command "pyflakes")
 
-;; ;; flymake for python
-;; (add-to-list 'load-path "~/.emacs.d/dotEmacs")
+;;----------------------------------------------------------
+;; ----  BEGIN Python ----
+;;----------------------------------------------------------
 
-;; (add-hook 'find-file-hook 'flymake-find-file-hook)
-;; (when (load "flymake" t)
-;;   (defun flymake-pyflakes-init ()
-;;     (let* ((temp-file (flymake-init-create-temp-buffer-copy
-;;                'flymake-create-temp-inplace))
-;;        (local-file (file-relative-name
-;;             temp-file
-;;             (file-name-directory buffer-file-name))))
-;;       (list "pycheckers"  (list local-file))))
-;;    (add-to-list 'flymake-allowed-file-name-masks
-;;              '("\\.py\\'" flymake-pyflakes-init)))
-;; (load-library "flymake-cursor")
-;; (global-set-key [f10] 'flymake-goto-prev-error)
-;; (global-set-key [f11] 'flymake-goto-next-error)
+;; use ipython
+(setq python-shell-interpreter "/usr/bin/ipython")
 
-;; ;; == END Python ==
+;; load indentation guide by default
+(add-hook 'python-mode-hook
+          '(lambda ()
+             (highlight-indentation-mode t)
+             ))
+
+;; auto-complete
+(defvar ac-source-python
+  '((candidates .
+                (lambda ()
+                  (mapcar '(lambda (completion)
+                             (first (last (split-string completion "\\." t))))
+                          (python-symbol-completions (python-partial-symbol)))))))
+(add-hook 'python-mode-hook
+          (lambda() (setq ac-sources '(ac-source-python))))
+
+;; bind RET to py-newline-and-indent
+(add-hook 'python-mode-hook '(lambda ()
+                               (define-key python-mode-map "\C-m" 'newline-and-indent)))
+
+;; display lambda for python
+(require 'lambda-mode)
+(add-hook 'python-mode-hook #'lambda-mode 1)
+(setq lambda-symbol (string (make-char 'greek-iso8859-7 107)))
+
+;; pylookup
+;; Usage:
+;; C-c h term
+;;
+;; add pylookup to your loadpath, ex) ~/.emacs.d/pylookup
+(setq pylookup-dir "~/.emacs.d/dotEmacs/pylookup")
+(add-to-list 'load-path pylookup-dir)
+
+;; load pylookup when compile time
+(eval-when-compile (require 'pylookup))
+
+;; set executable file and db file
+(setq pylookup-program (concat pylookup-dir "/pylookup.py"))
+(setq pylookup-db-file (concat pylookup-dir "/pylookup.db"))
+
+;; to speedup, just load it on demand
+(autoload 'pylookup-lookup "pylookup"
+  "Lookup SEARCH-TERM in the Python HTML indexes." t)
+
+(autoload 'pylookup-update "pylookup"
+  "Run pylookup-update and create the database at `pylookup-db-file'." t)
+(global-set-key "\C-ch" 'pylookup-lookup)
+
+;; flymake for python, need create a script named pycheckers
+(add-hook 'find-file-hook 'flymake-find-file-hook)
+(when (load "flymake" t)
+  (defun flymake-pyflakes-init ()
+    (let* ((temp-file (flymake-init-create-temp-buffer-copy
+               'flymake-create-temp-inplace))
+       (local-file (file-relative-name
+            temp-file
+            (file-name-directory buffer-file-name))))
+      (list "pycheckers"  (list local-file))))
+   (add-to-list 'flymake-allowed-file-name-masks
+             '("\\.py\\'" flymake-pyflakes-init)))
+(load-library "flymake-cursor")
+(global-set-key [f10] 'flymake-goto-prev-error)
+(global-set-key [f11] 'flymake-goto-next-error)
+
+;;----------------------------------------------------------
+;; ---- End Python ----
+;;----------------------------------------------------------
 
 
-;; == BEGIN Perl ==
+
+;;----------------------------------------------------------
+;; ---- BEGIN Perl ----
+;;----------------------------------------------------------
 (mapc
  (lambda (pair)
    (if (eq (cdr pair) 'perl-mode)
@@ -337,9 +432,15 @@
       (flymake-goto-prev-error)
       (flymake-display-current-error))
 
-;; == END Perl ==
+;;----------------------------------------------------------
+;; ---- END Perl ----
+;;----------------------------------------------------------
 
-;; == BEGIN Octave ==
+
+
+;;----------------------------------------------------------
+;; ---- BEGIN Octave ----
+;;----------------------------------------------------------
 (autoload 'octave-mode "octave-mod" nil t)
 (setq auto-mode-alist
       (cons '("\\.m$" . octave-mode) auto-mode-alist))
@@ -350,9 +451,17 @@
             (if (eq window-system 'x)
                 (font-lock-mode 1))))
 
-;; == END Octave ==
+;;----------------------------------------------------------
+;; ---- END Octave ----
+;;----------------------------------------------------------
 
-;; == BEGIN Web Dev ==
+
+
+;;----------------------------------------------------------
+;; ---- BEGIN web development ----
+;;----------------------------------------------------------
+
+;; multiple web dev mode, handy for quick web hacks
 (setq load-path (cons "~/.emacs.d/dotEmacs/multi-web-mode" load-path))
 (require 'multi-web-mode)
 (setq mweb-default-major-mode 'html-mode)
@@ -361,28 +470,32 @@
                   (css-mode "<style +type=\"text/css\"[^>]*>" "</style>")))
 (setq mweb-filename-extensions '("php" "htm" "html" "ctp" "phtml" "php4" "php5"))
 (multi-web-global-mode 1)
-;; == END Web Dev ==
 
-;; ---- Programming end ----
+;; xml editing
+;; associate xml, xsd, etc with nxml-mode
+(add-to-list 'auto-mode-alist (cons (concat "\\." (regexp-opt '("xml" "xsd" "rng" "xslt" "xsl") t) "\\'") 'nxml-mode))
+
+;; auto close tag after </
+(setq nxml-slash-auto-complete-flag t)
+
+;; rename a tag and its closing tag at the same time
+(require 'rename-sgml-tag)
+(defun nxml-mode-additional-keys ()
+  "Key bindings to add to `nxml-mode'."
+  (define-key nxml-mode-map (kbd "C-c C-r") 'rename-sgml-tag)
+  )
+(add-hook 'nxml-mode-hook 'nxml-mode-additional-keys)
+
+;;----------------------------------------------------------
+;; ---- END web development ----
+;;----------------------------------------------------------
 
 
 
-;; ---- Code Reading ----
-;; (require 'xcscope)
-;; (require 'ecb)
-;; (require 'ede)
+;;----------------------------------------------------------
+;; ---- BEGIN microblog ----
+;;----------------------------------------------------------
 
-
-(require 'highlight-symbol)
-(global-set-key [(control f3)] 'highlight-symbol-at-point)
-(global-set-key [f3] 'highlight-symbol-next)
-(global-set-key [(shift f3)] 'highlight-symbol-prev)
-(global-set-key [(meta f3)] 'highlight-symbol-prev)
-
-;; ---- Code Reading end ----
-
-
-;; ---- Microblog ---
 (require 'twittering-mode)
 (setq twittering-use-master-password t)
 (setq twittering-allow-insecure-server-cert t)
@@ -391,22 +504,45 @@
 (twittering-enable-unread-status-notifier)
 (setq-default twittering-icon-mode t)
 (setq twittering-initial-timeline-spec-string `(":home@sina"))
-;; ---- END Microblog
 
+;;----------------------------------------------------------
+;; ---- END microblog ----
+;;----------------------------------------------------------
+
+
+
+;;----------------------------------------------------------
 ;; ---- BEGIN IRC ----
+;;----------------------------------------------------------
+
 (require 'erc)
-;; ---- End IRC ----
 
-;; ---- BEGIN Email ----
-;; external editor of thunderbird
-(require 'tbemail)
-;; ---- END Email
+;;----------------------------------------------------------
+;; ---- END IRC ----
+;;----------------------------------------------------------
 
-;; ---- BEGIN Chrome ---
+
+
+;;----------------------------------------------------------
+;; ---- BEGIN Chrome edit ----
+;;----------------------------------------------------------
+
+;; this is used for "Edit with Emacs" Chrome extension
 (require 'edit-server)
 (edit-server-start)
-;; ---- END Chrome ---
 
-;; ---- BEGIN Default directory ---
-(setq default-directory "~/Dropbox" )
-;; ---- END Default directory ---
+;;----------------------------------------------------------
+;; ---- END Chrome edit ----
+;;----------------------------------------------------------
+
+
+
+;;----------------------------------------------------------
+;; ---- BEGIN default directory ---
+;;----------------------------------------------------------
+
+(cd "~/Dropbox" )
+
+;;----------------------------------------------------------
+;; ---- END default directory ---
+;;----------------------------------------------------------
