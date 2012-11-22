@@ -471,8 +471,8 @@
 ;; ---- BEGIN web development ----
 ;;----------------------------------------------------------
 
-;; multiple web dev mode, handy for quick web hacks
-(setq load-path (cons "~/.emacs.d/dotEmacs/multi-web-mode" load-path))
+;; multiple web dev mode
+(require 'php-mode)
 (require 'multi-web-mode)
 (setq mweb-default-major-mode 'html-mode)
 (setq mweb-tags '((php-mode "<\\?php\\|<\\? \\|<\\?=" "\\?>")
