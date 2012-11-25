@@ -75,10 +75,9 @@
 ;; ido-mode
 (ido-mode 1)
 
-;; turn off tool bar, scroll bar and menu bar
+;; turn off tool bar, scroll bar
 (if (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
 (if (fboundp 'tool-bar-mode) (tool-bar-mode -1))
-(if (fboundp 'menu-bar-mode) (menu-bar-mode -1))
 
 ;; copy-paste
 (setq x-select-enable-clipboard t)
@@ -149,6 +148,12 @@
       (set-selective-display
        (if selective-display nil (or col 1))))))
 (global-set-key [C-tab] 'aj-toggle-fold)
+
+;; enter for new line and indent
+(local-set-key (kbd "RET") 'newline-and-indent)
+
+;; speedbar that can be fired up in the same frame
+(require 'sr-speedbar)
 
 ;;----------------------------------------------------------
 ;; ---- END nicer ----
@@ -471,15 +476,15 @@
 ;; ---- BEGIN web development ----
 ;;----------------------------------------------------------
 
-;; multiple web dev mode
-(require 'php-mode)
-(require 'multi-web-mode)
-(setq mweb-default-major-mode 'html-mode)
-(setq mweb-tags '((php-mode "<\\?php\\|<\\? \\|<\\?=" "\\?>")
-                  (js-mode "<script +\\(type=\"text/javascript\"\\|language=\"javascript\"\\)[^>]*>" "</script>")
-                  (css-mode "<style +type=\"text/css\"[^>]*>" "</style>")))
-(setq mweb-filename-extensions '("php" "htm" "html" "ctp" "phtml" "php4" "php5"))
-(multi-web-global-mode 1)
+(load "~/.emacs.d/dotEmacs/nxhtml/autostart.el")
+
+;; (require 'multi-web-mode)
+;; (setq mweb-default-major-mode 'html-mode)
+;; (setq mweb-tags '((php-mode "<\\?php\\|<\\? \\|<\\?=" "\\?>")
+;;                   (js-mode "<script +\\(type=\"text/javascript\"\\|language=\"javascript\"\\)[^>]*>" "</script>")
+;;                   (css-mode "<style +type=\"text/css\"[^>]*>" "</style>")))
+;; (setq mweb-filename-extensions '("php" "htm" "html" "ctp" "phtml" "php4" "php5"))
+;; (multi-web-global-mode 1)
 
 ;; xml editing
 ;; associate xml, xsd, etc with nxml-mode
