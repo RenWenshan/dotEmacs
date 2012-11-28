@@ -95,6 +95,14 @@
 (global-set-key (kbd "C-x <right>") 'windmove-right)
 (global-set-key (kbd "C-x <left>") 'windmove-left)
 
+;; nicer zoom and window enlarge/decrese
+(global-set-key (kbd "C->") 'text-scale-increase)
+(global-set-key (kbd "C-<") 'text-scale-decrease)
+
+(global-set-key (kbd "C-}") 'enlarge-window-horizontally)
+(global-set-key (kbd "C-{") 'shrink-window-horizontally)
+(global-set-key (kbd "C-^") 'enlarge-window)
+
 ;; clear the buffer in eshell
 (defun eshell/clear ()
   "clear the eshell buffer."
@@ -277,8 +285,20 @@
 ;; ----  BEGIN Python ----
 ;;----------------------------------------------------------
 
+;; load python.el
+(require 'python)
+
 ;; use ipython
-(setq python-shell-interpreter "/usr/bin/ipython")
+(setq
+ python-shell-interpreter "ipython"
+ python-shell-interpreter-args ""
+ python-shell-prompt-regexp "In \\[[0-9]+\\]: "
+ python-shell-prompt-output-regexp "Out\\[[0-9]+\\]: "
+ python-shell-completion-setup-code
+ "from IPython.core.completerlib import module_completion"
+ python-shell-completion-string-code
+ "';'.join(__IP.complete('''%s'''p))\n"
+ python-shell-completion-module-string-code "")
 
 ;; load indentation guide by default
 (add-hook 'python-mode-hook
@@ -343,6 +363,23 @@
 (load-library "flymake-cursor")
 (global-set-key [f10] 'flymake-goto-prev-error)
 (global-set-key [f11] 'flymake-goto-next-error)
+
+;; highlight breakpoint(s)
+(defun annotate-pdb ()
+  (interactive)
+  (highlight-lines-matching-regexp "import pdb")
+  (highlight-lines-matching-regexp "pdb.set_trace()"))
+
+(add-hook 'python-mode-hook 'annotate-pdb)
+
+;; add a breakpoint with C-c C-t
+(defun python-add-breakpoint ()
+  (interactive)
+  (newline-and-indent)
+  (insert "import ipdb; ipdb.set_trace()")
+  (highlight-lines-matching-regexp "^[ ]*import ipdb; ipdb.set_trace()"))
+
+(define-key python-mode-map (kbd "C-c C-t") 'python-add-breakpoint)
 
 ;;----------------------------------------------------------
 ;; ---- End Python ----
