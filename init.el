@@ -3,7 +3,7 @@
 ;; set load-path
 (add-to-list 'load-path "~/.emacs.d/dotEmacs")
 (progn (cd "~/.emacs.d/dotEmacs")
-	(normal-top-level-add-subdirs-to-load-path))
+       (normal-top-level-add-subdirs-to-load-path))
 
 ;; start server, used for emacsclient
 (server-start)
@@ -165,6 +165,22 @@
 
 ;;----------------------------------------------------------
 ;; ---- END nicer ----
+;;----------------------------------------------------------
+
+
+
+;;----------------------------------------------------------
+;; ---- BEGIN Emacs Lisp ----
+;;----------------------------------------------------------
+
+;; load indentation guide by default
+(add-hook 'emacs-lisp-mode-hook
+          '(lambda ()
+             (highlight-indentation-mode t)
+             ))
+
+;;----------------------------------------------------------
+;; ---- END Emacs Lisp ----
 ;;----------------------------------------------------------
 
 
@@ -353,13 +369,13 @@
 (when (load "flymake" t)
   (defun flymake-pyflakes-init ()
     (let* ((temp-file (flymake-init-create-temp-buffer-copy
-               'flymake-create-temp-inplace))
-       (local-file (file-relative-name
-            temp-file
-            (file-name-directory buffer-file-name))))
+                       'flymake-create-temp-inplace))
+           (local-file (file-relative-name
+                        temp-file
+                        (file-name-directory buffer-file-name))))
       (list "pycheckers"  (list local-file))))
-   (add-to-list 'flymake-allowed-file-name-masks
-             '("\\.py\\'" flymake-pyflakes-init)))
+  (add-to-list 'flymake-allowed-file-name-masks
+               '("\\.py\\'" flymake-pyflakes-init)))
 (load-library "flymake-cursor")
 (global-set-key [f10] 'flymake-goto-prev-error)
 (global-set-key [f11] 'flymake-goto-next-error)
@@ -397,22 +413,22 @@
        (setcdr pair 'cperl-mode)))
  (append auto-mode-alist interpreter-mode-alist))
 
-; Outline-minor-mode key map
+                                        ; Outline-minor-mode key map
 (define-prefix-command 'cm-map nil "Outline-")
-; HIDE
+                                        ; HIDE
 (define-key cm-map "q" 'hide-sublevels)    ; Hide everything but the top-level headings
 (define-key cm-map "t" 'hide-body)         ; Hide everything but headings (all body lines)
 (define-key cm-map "o" 'hide-other)        ; Hide other branches
 (define-key cm-map "c" 'hide-entry)        ; Hide this entry's body
 (define-key cm-map "l" 'hide-leaves)       ; Hide body lines in this entry and sub-entries
 (define-key cm-map "d" 'hide-subtree)      ; Hide everything in this entry and sub-entries
-; SHOW
+                                        ; SHOW
 (define-key cm-map "a" 'show-all)          ; Show (expand) everything
 (define-key cm-map "e" 'show-entry)        ; Show this heading's body
 (define-key cm-map "i" 'show-children)     ; Show this heading's immediate child sub-headings
 (define-key cm-map "k" 'show-branches)     ; Show all sub-headings under this heading
 (define-key cm-map "s" 'show-subtree)      ; Show (expand) everything in this heading & below
-; MOVE
+                                        ; MOVE
 (define-key cm-map "u" 'outline-up-heading)                ; Up
 (define-key cm-map "n" 'outline-next-visible-heading)      ; Next
 (define-key cm-map "p" 'outline-previous-visible-heading)  ; Previous
@@ -442,7 +458,7 @@
   (setq cperl-outline-regexp  my-cperl-outline-regexp)
   (setq outline-regexp        cperl-outline-regexp)
   (setq outline-level        'cperl-outline-level)
-)
+  )
 
 
 (eval-after-load 'pde-load
@@ -450,40 +466,40 @@
                                 (outline-minor-mode 1))))
 
 (defun perl-eval () "Run selected region as Perl code" (interactive)
-   (shell-command-on-region (mark) (point) "perl "))
+  (shell-command-on-region (mark) (point) "perl "))
 (global-set-key (kbd "<f9>") 'perl-eval)
 
 
 (defun pde-perl-mode-hook ()
-   ;; chmod when saving
+  ;; chmod when saving
   (when (and buffer-file-name
-        (not (string-match "\\.\\(pm\\|pod\\)$" (buffer-file-name))))
-      (add-hook 'after-save-hook 'executable-chmod nil t))
+             (not (string-match "\\.\\(pm\\|pod\\)$" (buffer-file-name))))
+    (add-hook 'after-save-hook 'executable-chmod nil t))
   (set (make-local-variable 'compile-dwim-check-tools) nil))
 
 (defun flymake-display-current-error ()
-          "Display errors/warnings under cursor."
-      (interactive)
-      (let ((ovs (overlays-in (point) (1+ (point)))))
-        (catch 'found
-          (dolist (ov ovs)
-            (when (flymake-overlay-p ov)
-              (message (overlay-get ov 'help-echo))
-              (throw 'found t))))))
+  "Display errors/warnings under cursor."
+  (interactive)
+  (let ((ovs (overlays-in (point) (1+ (point)))))
+    (catch 'found
+      (dolist (ov ovs)
+        (when (flymake-overlay-p ov)
+          (message (overlay-get ov 'help-echo))
+          (throw 'found t))))))
 (global-set-key (kbd "<f5>") 'flymake-display-current-error)
 
-    (defun flymake-goto-next-error-disp ()
-      "Go to next error in err ring, then display error/warning."
-      (interactive)
-      (flymake-goto-next-error)
-      (flymake-display-current-error))
+(defun flymake-goto-next-error-disp ()
+  "Go to next error in err ring, then display error/warning."
+  (interactive)
+  (flymake-goto-next-error)
+  (flymake-display-current-error))
 
 (global-set-key (kbd "<f8>") 'flymake-display-current-error)
-    (defun flymake-goto-prev-error-disp ()
-      "Go to previous error in err ring, then display error/warning."
-      (interactive)
-      (flymake-goto-prev-error)
-      (flymake-display-current-error))
+(defun flymake-goto-prev-error-disp ()
+  "Go to previous error in err ring, then display error/warning."
+  (interactive)
+  (flymake-goto-prev-error)
+  (flymake-display-current-error))
 
 ;;----------------------------------------------------------
 ;; ---- END Perl ----
