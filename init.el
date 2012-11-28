@@ -9,6 +9,7 @@
 (server-start)
 
 
+
 ;;----------------------------------------------------------
 ;; ---- BEGIN nicer Emacs ----
 ;;----------------------------------------------------------
@@ -71,6 +72,10 @@
 (setq-default indent-tabs-mode nil)
 (setq-default tab-width 4)
 (setq indent-line-function 'insert-tab)
+
+;; displaying the lambda symbol
+(require 'lambda-mode)
+(setq lambda-symbol (string (make-char 'greek-iso8859-7 107)))
 
 ;; ido-mode
 (ido-mode 1)
@@ -174,10 +179,11 @@
 ;;----------------------------------------------------------
 
 ;; load indentation guide by default
+;; load lambda mode by default, showing "lambda" as the lambda symbol
 (add-hook 'emacs-lisp-mode-hook
-          '(lambda ()
-             (highlight-indentation-mode t)
-             ))
+          (highlight-indentation-mode t))
+
+(add-hook 'emacs-lisp-mode-hook #'lambda-mode 1)
 
 ;;----------------------------------------------------------
 ;; ---- END Emacs Lisp ----
@@ -258,10 +264,9 @@
 ;; ---- BEGIN yasnippet ----
 ;;----------------------------------------------------------
 
-(add-to-list 'load-path "~/.emacs.d/dotEmacs/yasnippet-0.5.9")
+(add-to-list 'load-path "~/.emacs.d/dotEmacs/yasnippet")
 (require 'yasnippet)
-(yas/initialize)
-(yas/load-directory "~/.emacs.d/dotEmacs/yasnippet-0.5.9/snippets")
+(yas-global-mode 1)
 
 ;;----------------------------------------------------------
 ;; ---- END yasnippet ----
@@ -273,9 +278,9 @@
 ;; ---- BEGIN auto-complete ----
 ;;----------------------------------------------------------
 
-(add-to-list 'load-path "~/.emacs.d/dotEmacs/auto-complete-1.3.1")
+(add-to-list 'load-path "~/.emacs.d/dotEmacs/auto-complete")
 (require 'auto-complete-config)
-(add-to-list 'load-path "~/.emacs.d/dotEmacs/auto-complete-1.3.1")
+(add-to-list 'ac-dictionary-directories "~/.emacs.d/dotEmacs/auto-complete/dict")
 (ac-config-default)
 
 ;;----------------------------------------------------------
@@ -337,9 +342,7 @@
                                (define-key python-mode-map "\C-m" 'newline-and-indent)))
 
 ;; display lambda for python
-(require 'lambda-mode)
 (add-hook 'python-mode-hook #'lambda-mode 1)
-(setq lambda-symbol (string (make-char 'greek-iso8859-7 107)))
 
 ;; pylookup
 ;; Usage:
