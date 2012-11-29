@@ -77,8 +77,8 @@
 (require 'lambda-mode)
 (setq lambda-symbol (string (make-char 'greek-iso8859-7 107)))
 
-;; ;; ido-mode
-;; (ido-mode 1)
+;; ido-mode
+(ido-mode 1)
 
 ;; turn off tool bar, scroll bar
 (if (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
@@ -173,6 +173,9 @@
   (interactive)
   (insert (format-time-string "%Y-%m-%d %a")))
 
+;; shortcut for (eval-print-last-sexp)
+(global-set-key (kbd "C-j") 'eval-print-last-sexp)
+
 ;;----------------------------------------------------------
 ;; ---- END nicer ----
 ;;----------------------------------------------------------
@@ -218,6 +221,8 @@
 (setq load-path (cons "~/.emacs.d/dotEmacs/org-mode/lisp" load-path))
 (setq load-path (cons "~/.emacs.d/dotEmacs/org-mode/contrib/lisp" load-path))
 (require 'org-install)
+(add-hook 'org-mode-hook '(lambda ()
+                            (define-key org-mode-map (kdb "C-j") 'eval-print-last-sexp)))
 
 ;;----------------------------------------------------------
 ;; ---- END org-mode ----
