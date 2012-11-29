@@ -1,0 +1,9 @@
+# -*- mode: snippet -*-
+# name: ** <date> Expect: Total: TODO:
+# key: org-journal
+# --
+* <`(insert-org-date)`>
+  Expect:
+  Total:
+
+** TODO $0 ()

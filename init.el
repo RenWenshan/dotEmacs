@@ -168,6 +168,11 @@
 ;; speedbar that can be fired up in the same frame
 (require 'sr-speedbar)
 
+;; insert current date, will be used by org-mode
+(defun insert-org-date ()
+  (interactive)
+  (insert (format-time-string "%Y-%m-%d %a")))
+
 ;;----------------------------------------------------------
 ;; ---- END nicer ----
 ;;----------------------------------------------------------
