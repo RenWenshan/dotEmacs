@@ -168,6 +168,12 @@
 ;; speedbar that can be fired up in the same frame
 (require 'sr-speedbar)
 
+;; show all files and disable speedbar auto-refresh
+(add-hook 'speedbar-mode-hook
+          (lambda ()
+            (speedbar-toggle-show-all-files)
+            (speedbar-disable-update)))
+
 ;; insert current date, will be used by org-mode
 (defun insert-org-date ()
   (interactive)
@@ -222,7 +228,7 @@
 (setq load-path (cons "~/.emacs.d/dotEmacs/org-mode/contrib/lisp" load-path))
 (require 'org-install)
 (add-hook 'org-mode-hook '(lambda ()
-                            (define-key org-mode-map (kdb "C-j") 'eval-print-last-sexp)))
+                            (define-key org-mode-map (kbd "C-j") 'eval-print-last-sexp)))
 
 ;;----------------------------------------------------------
 ;; ---- END org-mode ----
