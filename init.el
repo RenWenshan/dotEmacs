@@ -199,11 +199,15 @@
 ;; ---- BEGIN Emacs Lisp ----
 ;;----------------------------------------------------------
 
-;; load indentation guide by default
-;; load lambda mode by default, showing "lambda" as the lambda symbol
 (add-hook 'emacs-lisp-mode-hook
-          (highlight-indentation-mode t))
+          (lambda ()
+            ;; turn on flyspell
+            (flyspell-mode 1)
+            ;; turn on indentation guide by default
+            (highlight-indentation-mode t)
+            ))
 
+;; turn on lambda mode by default, showing "lambda" as the lambda symbol
 (add-hook 'emacs-lisp-mode-hook #'lambda-mode 1)
 
 ;;----------------------------------------------------------
@@ -368,9 +372,6 @@
                                  anything-c-source-emacs-lisp-toplevels
                                  anything-c-source-emacs-functions-with-abbrevs
                                  anything-c-source-info-emacs))))
-            ;; turn on flyspell
-            (flyspell-mode 1)
-            (highlight-indentation-mode t)
             )
           )
 
