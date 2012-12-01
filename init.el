@@ -234,8 +234,12 @@
 (setq load-path (cons "~/.emacs.d/dotEmacs/org-mode/lisp" load-path))
 (setq load-path (cons "~/.emacs.d/dotEmacs/org-mode/contrib/lisp" load-path))
 (require 'org-install)
+
 (add-hook 'org-mode-hook '(lambda ()
-                            (define-key org-mode-map (kbd "C-j") 'eval-print-last-sexp)))
+                            ;; use C-j to eval elisp expressions in org-mode
+                            (define-key org-mode-map (kbd "C-j") 'eval-print-last-sexp)
+                            ;; turn on flyspell-mode by default
+                            (flyspell-mode 1)))
 
 ;;----------------------------------------------------------
 ;; ---- END org-mode ----
@@ -363,7 +367,9 @@
                                  anything-c-source-emacs-lisp-expectations
                                  anything-c-source-emacs-lisp-toplevels
                                  anything-c-source-emacs-functions-with-abbrevs
-                                 anything-c-source-info-emacs))))))
+                                 anything-c-source-info-emacs)))))
+          ;; turn on flyspell
+          (flyspell-mode 1))
 
 ;;----------------------------------------------------------
 ;; ---- END anything ----
