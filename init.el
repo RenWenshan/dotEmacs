@@ -367,9 +367,12 @@
                                  anything-c-source-emacs-lisp-expectations
                                  anything-c-source-emacs-lisp-toplevels
                                  anything-c-source-emacs-functions-with-abbrevs
-                                 anything-c-source-info-emacs)))))
-          ;; turn on flyspell
-          (flyspell-mode 1))
+                                 anything-c-source-info-emacs))))
+            ;; turn on flyspell
+            (flyspell-mode 1)
+            (highlight-indentation-mode t)
+            )
+          )
 
 ;;----------------------------------------------------------
 ;; ---- END anything ----
@@ -658,6 +661,19 @@
 ;;----------------------------------------------------------
 
 (require 'erc)
+
+
+;; ;; login as Meatball_py
+;; (defun meatball-erc()
+;;   (erc :server "irc.freenode.net" :port "6667" :nick "Meatball_py"))
+
+
+;; bind to key
+;; (global-set-key (kbd "") 'meatball-erc)
+
+;; invoke fly-spell by default
+(add-hook 'erc-mode-hook (lambda ()
+                           (flyspell-mode 1)))
 
 ;;----------------------------------------------------------
 ;; ---- END IRC ----
