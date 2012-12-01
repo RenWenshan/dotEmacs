@@ -698,11 +698,11 @@
   (interactive)
   (let
       ((password-cache nil))
-       (erc
-    :server "irc.freenode.net"
-    :port "6667"
-    :nick "Meatball_py"
-    :password (password-read (format "password for Meatball at freenode?")))))
+    (erc
+     :server "irc.freenode.net"
+     :port "6667"
+     :nick "Meatball_py"
+     :password (password-read (format "password for Meatball at freenode?")))))
 
 ;; invoke fly-spell by default
 (add-hook 'erc-mode-hook (lambda ()
