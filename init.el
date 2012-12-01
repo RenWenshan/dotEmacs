@@ -182,6 +182,9 @@
 ;; shortcut for (eval-print-last-sexp)
 (global-set-key (kbd "C-j") 'eval-print-last-sexp)
 
+;; name completion for describe function, variable, etc
+(icomplete-mode 1)
+
 ;;----------------------------------------------------------
 ;; ---- END nicer ----
 ;;----------------------------------------------------------
