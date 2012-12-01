@@ -108,6 +108,10 @@
 (global-set-key (kbd "C-{") 'shrink-window-horizontally)
 (global-set-key (kbd "C-^") 'enlarge-window)
 
+;; easier open/close file, F5 and F6 are labeled "Open" and "Close" respectively on Microsoft Natural 4000 keyboard
+(global-set-key (kbd "<f5>") 'find-file)
+(global-set-key (kbd "<f6>") 'kill-this-buffer)
+
 ;; clear the buffer in eshell
 (defun eshell/clear ()
   "clear the eshell buffer."
@@ -557,17 +561,6 @@
              (not (string-match "\\.\\(pm\\|pod\\)$" (buffer-file-name))))
     (add-hook 'after-save-hook 'executable-chmod nil t))
   (set (make-local-variable 'compile-dwim-check-tools) nil))
-
-(defun flymake-display-current-error ()
-  "Display errors/warnings under cursor."
-  (interactive)
-  (let ((ovs (overlays-in (point) (1+ (point)))))
-    (catch 'found
-      (dolist (ov ovs)
-        (when (flymake-overlay-p ov)
-          (message (overlay-get ov 'help-echo))
-          (throw 'found t))))))
-(global-set-key (kbd "<f5>") 'flymake-display-current-error)
 
 (defun flymake-goto-next-error-disp ()
   "Go to next error in err ring, then display error/warning."
