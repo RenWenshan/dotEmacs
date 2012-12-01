@@ -8,6 +8,21 @@
 ;; start server, used for emacsclient
 (server-start)
 
+;; customized variables
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(erc-modules (quote (autojoin button completion fill irccontrols list log match menu move-to-prompt netsplit networks noncommands readonly ring smiley stamp track))))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
+
+
 
 
 ;;----------------------------------------------------------
@@ -663,14 +678,31 @@
 
 (require 'erc)
 
+;; hide time-stamp
+(setq erc-hide-timestamps t)
 
-;; ;; login as Meatball_py
-;; (defun meatball-erc()
-;;   (erc :server "irc.freenode.net" :port "6667" :nick "Meatball_py"))
+;; highlight nicknames
+(and
+ (load-library "erc-highlight-nicknames")
+ (add-to-list 'erc-modules 'highlight-nicknames)
+ (erc-update-modules))
+
+;; save logs
+(setq erc-log-channels-directory "~/.erc/logs/")
+;; log files automatically written when part a channel or quit
+(setq erc-save-buffer-on-part t)
 
 
-;; bind to key
-;; (global-set-key (kbd "") 'meatball-erc)
+;; login as Meatball_py
+(defun myerc ()
+  (interactive)
+  (let
+      ((password-cache nil))
+       (erc
+    :server "irc.freenode.net"
+    :port "6667"
+    :nick "Meatball_py"
+    :password (password-read (format "password for Meatball at freenode?")))))
 
 ;; invoke fly-spell by default
 (add-hook 'erc-mode-hook (lambda ()
