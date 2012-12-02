@@ -211,6 +211,33 @@
 
 
 ;;----------------------------------------------------------
+;; ---- BEGIN flymake ----
+;;----------------------------------------------------------
+
+(load-library "flymake-cursor")
+
+;; tex files checking, replaced texify with chktex
+(defun flymake-get-tex-args (file-name)
+    (list "chktex" (list "-q" "-v0" file-name)))
+
+;; xml/html files checking, default setting not work
+(defun flymake-xml-init ()
+  (list "xmlstarlet"
+        (list "val" "-e" "-q"
+              (flymake-init-create-temp-buffer-copy
+               'flymake-create-temp-inplace))))
+
+;; f7 to go to previous error, f8 to jump to next error
+(global-set-key [f7] 'flymake-goto-prev-error)
+(global-set-key [f8] 'flymake-goto-next-error)
+
+;;----------------------------------------------------------
+;; ---- END flymake ----
+;;----------------------------------------------------------
+
+
+
+;;----------------------------------------------------------
 ;; ---- BEGIN Emacs Lisp ----
 ;;----------------------------------------------------------
 
@@ -488,9 +515,6 @@
       (list "pycheckers"  (list local-file))))
   (add-to-list 'flymake-allowed-file-name-masks
                '("\\.py\\'" flymake-pyflakes-init)))
-(load-library "flymake-cursor")
-(global-set-key [f10] 'flymake-goto-prev-error)
-(global-set-key [f11] 'flymake-goto-next-error)
 
 ;; highlight breakpoint(s)
 (defun annotate-pdb ()
@@ -595,7 +619,6 @@
   (flymake-goto-next-error)
   (flymake-display-current-error))
 
-(global-set-key (kbd "<f8>") 'flymake-display-current-error)
 (defun flymake-goto-prev-error-disp ()
   "Go to previous error in err ring, then display error/warning."
   (interactive)
