@@ -285,9 +285,7 @@
                             ;; use C-j to eval elisp expressions in org-mode
                             (define-key org-mode-map (kbd "C-j") 'eval-print-last-sexp)
                             ;; turn on flyspell-mode by default
-                            (flyspell-mode 1)
-                            ;; use cleaner outline view
-                            (org-indent-mode 1)))
+                            (flyspell-mode 1)))
 
 ;;----------------------------------------------------------
 ;; ---- END org-mode ----
