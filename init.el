@@ -444,6 +444,7 @@
 (require 'python)
 
 ;; use ipython
+(setq python-command "ipython")
 (setq
  python-shell-interpreter "ipython"
  python-shell-interpreter-args ""
