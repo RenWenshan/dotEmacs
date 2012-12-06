@@ -462,15 +462,10 @@
              (highlight-indentation-mode t)
              ))
 
-;; auto-complete
-(defvar ac-source-python
-  '((candidates .
-                (lambda ()
-                  (mapcar '(lambda (completion)
-                             (first (last (split-string completion "\\." t))))
-                          (python-symbol-completions (python-partial-symbol)))))))
-(add-hook 'python-mode-hook
-          (lambda() (setq ac-sources '(ac-source-python))))
+;; completion
+(require 'pymacs)
+(pymacs-load "ropemacs" "rope-")
+(setq ropemacs-enable-autoimport t)
 
 ;; bind RET to py-newline-and-indent
 (add-hook 'python-mode-hook '(lambda ()
@@ -748,6 +743,19 @@
 
 ;;----------------------------------------------------------
 ;; ---- END Chrome edit ----
+;;----------------------------------------------------------
+
+
+
+;;----------------------------------------------------------
+;; ---- BEGIN Markdown support ----
+;;----------------------------------------------------------
+
+(autoload 'markdown-mode "markdown-mode.el" "Major mode for editing Markdown files" t)
+(setq auto-mode-alist (cons '("\\.md" . markdown-mode) auto-mode-alist))
+
+;;----------------------------------------------------------
+;; ---- END Markdown support ----
 ;;----------------------------------------------------------
 
 

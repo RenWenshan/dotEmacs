@@ -1,0 +1,29 @@
+Wenshan's Emacs configuration
+
+* Python
+** Dependencies
+   ipython
+   pyflakes
+   pylint
+   pymacs
+   rope
+   ropemacs
+
+*** Debian
+    sudo easy_install rope
+    sudo easy_install ropemacs
+    sudo aptitude install ipython pyflakes pylint pymacs
+
+    create a bash file under PATH, and make sure everyone can execute it:
+
+    sudo cat >> /usr/local/bin/pycheckers << EOF
+    #!/bin/bash
+    # this script is used by Emacs for python syntax checking with pyflakes
+
+    epylint "$1" 2>/dev/null
+    pyflakes "$1"
+    pep8 --ignore=E221,E701,E202 --repeat "$1"
+    true
+    EOF
+
+    sudo chmod a+x /usr/local/bin/pycheckers
