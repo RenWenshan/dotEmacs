@@ -218,7 +218,7 @@
 
 ;; tex files checking, replaced texify with chktex
 (defun flymake-get-tex-args (file-name)
-    (list "chktex" (list "-q" "-v0" file-name)))
+  (list "chktex" (list "-q" "-v0" file-name)))
 
 ;; xml/html files checking, default setting not work
 (defun flymake-xml-init ()
