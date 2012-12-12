@@ -204,6 +204,8 @@
 ;; name completion for describe function, variable, etc
 (icomplete-mode 1)
 
+;; capture image
+(require 'capture-image)
 ;;----------------------------------------------------------
 ;; ---- END nicer ----
 ;;----------------------------------------------------------
@@ -526,6 +528,15 @@
   (highlight-lines-matching-regexp "^[ ]*import ipdb; ipdb.set_trace()"))
 
 (define-key python-mode-map (kbd "C-c C-t") 'python-add-breakpoint)
+
+;; add a log print statement with C-c C-d
+(defun python-add-log-print ()
+  (interactive)
+  (newline-and-indent)
+  (insert "if DEBUG: print '----- wenshan log -----'")
+  (highlight-lines-matching-regexp "^[ ]*if DEBUG: print '----- wenshan log -----"))
+
+(define-key python-mode-map (kbd "C-c C-d"))
 
 ;;----------------------------------------------------------
 ;; ---- End Python ----
