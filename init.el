@@ -206,6 +206,11 @@
 
 ;; capture image
 (require 'capture-image)
+
+;; remember last few window configurations, C-c left/right to switch
+(when (fboundp 'winner-mode)
+  (winner-mode 1))
+
 ;;----------------------------------------------------------
 ;; ---- END nicer ----
 ;;----------------------------------------------------------
