@@ -211,6 +211,9 @@
 (when (fboundp 'winner-mode)
   (winner-mode 1))
 
+;; automatically refresh buffers
+(global-auto-revert-mode t)
+
 ;;----------------------------------------------------------
 ;; ---- END nicer ----
 ;;----------------------------------------------------------
@@ -469,10 +472,10 @@
              (highlight-indentation-mode t)
              ))
 
-;; completion
-(require 'pymacs)
-(pymacs-load "ropemacs" "rope-")
-(setq ropemacs-enable-autoimport t)
+;; ;; completion
+;; (require 'pymacs)
+;; (pymacs-load "ropemacs" "rope-")
+;; (setq ropemacs-enable-autoimport t)
 
 ;; bind RET to py-newline-and-indent
 (add-hook 'python-mode-hook '(lambda ()
@@ -541,7 +544,7 @@
   (insert "if DEBUG: print '----- wenshan log -----'")
   (highlight-lines-matching-regexp "^[ ]*if DEBUG: print '----- wenshan log -----"))
 
-(define-key python-mode-map (kbd "C-c C-d"))
+(define-key python-mode-map (kbd "C-c C-d") 'python-add-log-print)
 
 ;;----------------------------------------------------------
 ;; ---- End Python ----
