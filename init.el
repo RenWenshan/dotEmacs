@@ -214,6 +214,12 @@
 ;; automatically refresh buffers
 (global-auto-revert-mode t)
 
+;; auto insert
+(auto-insert-mode)  ;;; Adds hook to find-files-hook
+(setq auto-insert-directory "~/.emacs.d/dotEmacs/templates")
+(setq auto-insert-query nil) ; turn of prompt
+(define-auto-insert "\.py" "python-template.py")
+
 ;;----------------------------------------------------------
 ;; ---- END nicer ----
 ;;----------------------------------------------------------
