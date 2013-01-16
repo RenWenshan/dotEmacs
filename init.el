@@ -137,6 +137,9 @@
 ;; stop eshell cycle completion
 (setq eshell-cmpl-cycle-completions nil)
 
+;; max-specpdl-size
+(setq max-specpdl-size 65525)
+
 ;; ibuffer
 (global-set-key (kbd "C-x C-b") 'ibuffer)
 (add-hook 'ibuffer-mode-hook
@@ -244,8 +247,8 @@
                'flymake-create-temp-inplace))))
 
 ;; f7 to go to previous error, f8 to jump to next error
-(global-set-key [f7] 'flymake-goto-prev-error)
-(global-set-key [f8] 'flymake-goto-next-error)
+;; (global-set-key [f7] 'flymake-goto-prev-error)
+;; (global-set-key [f8] 'flymake-goto-next-error)
 
 ;;----------------------------------------------------------
 ;; ---- END flymake ----
@@ -435,6 +438,25 @@
 
 ;;----------------------------------------------------------
 ;; ---- END anything ----
+;;----------------------------------------------------------
+
+
+
+;;----------------------------------------------------------
+;; ---- BEGIN EMMS (Emacs MultiMedia System ) ----
+;;----------------------------------------------------------
+
+(add-to-list 'load-path "~/.emacs.d/dotEmacs/emms/")
+(require 'emms-setup)
+(emms-standard)
+(emms-default-players)
+(setq emms-player-list '(emms-player-mplayer))
+(global-set-key (kbd "C-5") 'emms-pause)
+(global-set-key (kbd "C-6") 'emms-seek-backward)
+(global-set-key (kbd "C-7") 'emms-seek-foward)
+
+;;----------------------------------------------------------
+;; ---- END EMMS (Emacs MultiMedia System)----
 ;;----------------------------------------------------------
 
 
