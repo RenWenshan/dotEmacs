@@ -11,8 +11,19 @@
 ;;
 ;;
 ;; Prerequisites:
-;;  magit
-;;  pycheckers
+;;  1. magit
+;;     Download and compile
+;;
+;;  2. pycheckers
+;;     Write your own script and make it executable
+;;
+;;  3. epc
+;;     $ sudo pip install epc
+;;     In Emacs, M-x el-get-install epc
+;;
+;;  4. argparse
+;;     $ sudo pip install argparse
+;;
 
 ;; set load-path
 (add-to-list 'load-path "~/.emacs.d/dotEmacs")
@@ -242,15 +253,8 @@
 ;;----------------------------------------------------------
 ;; ---- BEGIN el-get ----
 ;;----------------------------------------------------------
-(add-to-list 'load-path "~/.emacs.d/dotEmacs/el-get/el-get")
-
-(unless (require 'el-get nil 'noerror)
-  (with-current-buffer
-      (url-retrieve-synchronously
-       "https://raw.github.com/dimitri/el-get/master/el-get-install.el")
-    (goto-char (point-max))
-    (eval-print-last-sexp)))
-
+(add-to-list 'load-path "~/.emacs.d/el-get/el-get")
+(require 'el-get)
 (el-get 'sync)
 ;;----------------------------------------------------------
 ;; ---- END el-get ----
@@ -480,8 +484,8 @@
 (emms-standard)
 (emms-default-players)
 (setq emms-player-list '(emms-player-mplayer))
-(global-set-key (kbd "f7") 'emms-seek-backward)
-(global-set-key (kbd "f8") 'emms-pause)
+(global-set-key (kbd "<f7>") 'emms-seek-backward)
+(global-set-key (kbd "<f8>") 'emms-pause)
 
 
 ;;----------------------------------------------------------
@@ -597,6 +601,10 @@
   (highlight-lines-matching-regexp "^[ ]*if DEBUG: print '----- wenshan log -----"))
 
 (define-key python-mode-map (kbd "C-c C-d") 'python-add-log-print)
+
+;; jedi for auto-completion
+(add-hook 'python-mode-hook 'jedi:setup)
+(setq jedi:setup-keys t)
 
 ;;----------------------------------------------------------
 ;; ---- End Python ----
