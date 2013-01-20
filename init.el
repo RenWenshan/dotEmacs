@@ -1,4 +1,18 @@
-;; This is the main configuration file of Emacs
+;; This is the main configuration file of GNU Emacs
+;;
+;; Author: Wenshan Ren (renws1990@gmail.com)
+;; Blog: wenshanren.org
+;;
+;; Keybindings:
+;; F5        call last kmacro
+;; F6        close current buffer
+;; F7        emms seek backward
+;; F8        emms pause
+;;
+;;
+;; Prerequisites:
+;;  magit
+;;  pycheckers
 
 ;; set load-path
 (add-to-list 'load-path "~/.emacs.d/dotEmacs")
@@ -39,11 +53,6 @@
 
 ;; force English Emacs environment
 (set-language-environment 'English)
-
-;; C-w to backward kill a word
-(global-set-key "\C-w" 'backward-kill-word)
-(global-set-key "\C-x\C-k" 'kill-region)
-(global-set-key "\C-c\C-k" 'kill-region)
 
 ;; bind call last keyboard marco to a convinent key
 (global-set-key [f5] 'call-last-kbd-macro)
@@ -123,8 +132,8 @@
 (global-set-key (kbd "C-{") 'shrink-window-horizontally)
 (global-set-key (kbd "C-^") 'enlarge-window)
 
-;; easier open/close file, F5 and F6 are labeled "Open" and "Close" respectively on Microsoft Natural 4000 keyboard
-(global-set-key (kbd "<f5>") 'find-file)
+;; easier close file, F6 is labeled Close" respectively on Microsoft Natural
+;; 4000 keyboard
 (global-set-key (kbd "<f6>") 'kill-this-buffer)
 
 ;; clear the buffer in eshell
@@ -161,13 +170,14 @@
 
 ;; highlight a symbol
 (require 'highlight-symbol)
-(global-set-key [(control f3)] 'highlight-symbol-at-point)
-(global-set-key [f3] 'highlight-symbol-next)
-(global-set-key [(shift f3)] 'highlight-symbol-prev)
-(global-set-key [(meta f3)] 'highlight-symbol-prev)
+(global-set-key [(control f8)] 'highlight-symbol-at-point)
+(global-set-key [f8] 'highlight-symbol-next)
+(global-set-key [(shift f8)] 'highlight-symbol-prev)
+(global-set-key [(meta f8)] 'highlight-symbol-prev)
 
 ;; color theme tango-dark (Emacs24)
-(require 'tango-dark-theme)
+(add-to-list 'custom-theme-load-path "~/.emacs.d/dotEmacs/")
+(load-theme 'tango-dark t)
 
 ;; indentation guide
 (require 'highlight-indentation)
@@ -225,6 +235,25 @@
 
 ;;----------------------------------------------------------
 ;; ---- END nicer ----
+;;----------------------------------------------------------
+
+
+
+;;----------------------------------------------------------
+;; ---- BEGIN el-get ----
+;;----------------------------------------------------------
+(add-to-list 'load-path "~/.emacs.d/dotEmacs/el-get/el-get")
+
+(unless (require 'el-get nil 'noerror)
+  (with-current-buffer
+      (url-retrieve-synchronously
+       "https://raw.github.com/dimitri/el-get/master/el-get-install.el")
+    (goto-char (point-max))
+    (eval-print-last-sexp)))
+
+(el-get 'sync)
+;;----------------------------------------------------------
+;; ---- END el-get ----
 ;;----------------------------------------------------------
 
 
@@ -451,9 +480,9 @@
 (emms-standard)
 (emms-default-players)
 (setq emms-player-list '(emms-player-mplayer))
-(global-set-key (kbd "C-5") 'emms-pause)
-(global-set-key (kbd "C-6") 'emms-seek-backward)
-(global-set-key (kbd "C-7") 'emms-seek-foward)
+(global-set-key (kbd "f7") 'emms-seek-backward)
+(global-set-key (kbd "f8") 'emms-pause)
+
 
 ;;----------------------------------------------------------
 ;; ---- END EMMS (Emacs MultiMedia System)----
@@ -499,11 +528,6 @@
           '(lambda ()
              (highlight-indentation-mode t)
              ))
-
-;; ;; completion
-;; (require 'pymacs)
-;; (pymacs-load "ropemacs" "rope-")
-;; (setq ropemacs-enable-autoimport t)
 
 ;; bind RET to py-newline-and-indent
 (add-hook 'python-mode-hook '(lambda ()
@@ -696,12 +720,6 @@
 ;; ---- BEGIN web development ----
 ;;----------------------------------------------------------
 
-(load "~/.emacs.d/dotEmacs/nxhtml/autostart.el")
-
-;; xml editing
-;; associate xml, xsd, etc with nxml-mode
-(add-to-list 'auto-mode-alist (cons (concat "\\." (regexp-opt '("xml" "xsd" "rng" "xslt" "xsl") t) "\\'") 'nxml-mode))
-
 ;; auto close tag after </
 (setq nxml-slash-auto-complete-flag t)
 
@@ -815,4 +833,22 @@
 
 ;;----------------------------------------------------------
 ;; ---- END default directory ---
+;;----------------------------------------------------------
+
+
+
+;;----------------------------------------------------------
+;; ---- BEGIN MISC ---
+;;----------------------------------------------------------
+
+;; ;; script for retrieving el-get, comment this out once finished
+;; (url-retrieve
+;;  "https://raw.github.com/dimitri/el-get/master/el-get-install.el"
+;;  (lambda (s)
+;;    (let (el-get-master-branch)
+;;      (goto-char (point-max))
+;;      (eval-print-last-sexp))))
+
+;;----------------------------------------------------------
+;; ---- BEGIN MISC ---
 ;;----------------------------------------------------------
