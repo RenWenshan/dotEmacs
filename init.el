@@ -24,6 +24,11 @@
 ;;  4. argparse
 ;;     $ sudo pip install argparse
 ;;
+;;  5. jedi
+;;     M-x el-get-install jedi
+;;
+;;  6. power-line
+;;     M-x el-get-install power-line
 
 ;; set load-path
 (add-to-list 'load-path "~/.emacs.d/dotEmacs")
