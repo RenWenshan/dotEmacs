@@ -29,6 +29,9 @@
 ;;
 ;;  6. power-line
 ;;     M-x el-get-install power-line
+;;
+;;  7. mu4e (the email client)
+;;     Download the latest stable version
 
 ;; set load-path
 (add-to-list 'load-path "~/.emacs.d/dotEmacs")
