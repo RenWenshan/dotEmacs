@@ -1,29 +1,89 @@
-Wenshan's Emacs configuration
+This is my own init file for GNU Emacs 24.
+
+It is mostly intended to be used on Linux especially Debian and CentOS.
+
+* Author Information
+  Name: 任文山 (Wenshan Ren)
+  Email: renws1990@gmail.com
+  Blog: wenshanren.org
+  Douban: http://www.douban.com/people/renws/
+
+* Prerequisites
+** el-get
+
+** magit
+   An Emacs git plugin.
+
+   Download and compile it.
+
+** argparse
+   $ sudo pip install argparse
+
+** epc
+   - $ sudo pip install epc
+   - In Emacs, M-x el-get-install epc
+
+** jedi
+   Python code completion plugin.
+
+   In Emacs, M-x el-get-install RED jedi
+
+** power-line
+   Eye candy
+
+   In Emacs, M-x el-get-install power-line
+
+** emacs-w3m
+   Web browser, the snapshot version works in Emacs 24.
+
+   $ sudo apt-get install w3m emacs-w3m-snapshot
+
+** mu4e
+   Email client for Emacs
+
+** newsticker
+   RSS reader
+
+
+* Key-bindings
+  | Keystrokes | Function                             | Note                                                |
+  |------------+--------------------------------------+-----------------------------------------------------|
+  | F3         | kmacro-start-macro-or-insert-counter | start defining keyboard macro                       |
+  | F4         | kmacro-end-or-call-macro             | end defining keyboard macro, or call the last macro |
+  | F5         | emms-pause                           | start/pause emms                                    |
+  | F6         | kill-this-buffer                     | close current buffer                                |
+  | F7         | emms-seek-backward                   | emms backward 5 seconds                             |
+  | F8         | emms-seek-forward                    | emms forward 5 seconds                              |
+  | C-x up     | windmove-up                          | window move up                                      |
+  | C-x down   | windmove-down                        | window move down                                    |
+  | C-x left   | windmove-left                        | window move left                                    |
+  | C-x right  | windmove-right                       | window move right                                   |
+  | C->        | text-scale-increase                  | text zoom in                                        |
+  | C-<        | text-scale-decrease                  | text zoom out                                       |
+  | C-}        | enlarge-window-horizontally          | as its function name                                |
+  | C-{        | shrink-window-horizontally           | as its name                                         |
+  | C-^        | enlarge-window                       | enlarge current window vertically                   |
+  | C-x C-b    | ibuffer                              | enhanced dired-like buffer switching                |
+  | C-x b      | anonymous                            | call anything for buffer switching                  |
+  | C-tab      | aj-toogle-fold                       | toggle fold all lines larger than current line      |
+
+* mu4e (Email client)
+
+* newsticker (RSS reader)
+
+* org2blog (Wordpress blogging)
+
+* EMMS (Media Player)
+
+* capture screen-shot
+
+* Microblog
+
+* ERC (IRC client)
+
 
 * Python
-** Dependencies
-   ipython
-   pyflakes
-   pylint
-   pymacs
-   rope
-   ropemacs
 
-*** Debian
-    sudo easy_install rope
-    sudo easy_install ropemacs
-    sudo aptitude install ipython pyflakes pylint pymacs
+* Java
 
-    create a bash file under PATH, and make sure everyone can execute it:
-
-    sudo cat >> /usr/local/bin/pycheckers << EOF
-    #!/bin/bash
-    # this script is used by Emacs for python syntax checking with pyflakes
-
-    epylint "$1" 2>/dev/null
-    pyflakes "$1"
-    pep8 --ignore=E221,E701,E202 --repeat "$1"
-    true
-    EOF
-
-    sudo chmod a+x /usr/local/bin/pycheckers
+* Elisp

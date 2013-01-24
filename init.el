@@ -2,43 +2,6 @@
 ;;
 ;; Author: Wenshan Ren (renws1990@gmail.com)
 ;; Blog: wenshanren.org
-;;
-;; Keybindings:
-;; F5        call last kmacro
-;; F6        close current buffer
-;; F7        emms seek backward
-;; F8        emms pause
-;;
-;;
-;; Prerequisites:
-;;  * magit
-;;    Download and compile
-;;
-;;  * pycheckers
-;;    Write your own script and make it executable
-;;
-;;  * epc
-;;    $ sudo pip install epc
-;;    In Emacs, M-x el-get-install epc
-;;
-;;  * argparse
-;;    $ sudo pip install argparse
-;;
-;;  * jedi
-;;    M-x el-get-install jedi
-;;
-;;  * power-line
-;;    M-x el-get-install power-line
-;;
-;;  * mu4e (the email client)
-;;    Download the latest stable version
-;;
-;;  * newsticker (the RSS reader)
-;;    M-x el-get-install newsticker
-;;
-;;  * emacs-w3m
-;;    $ sudo apt-get install emacs-w3m-snapshot
-
 
 ;; set load-path
 (add-to-list 'load-path "~/.emacs.d/dotEmacs")
@@ -79,9 +42,6 @@
 
 ;; force English Emacs environment
 (set-language-environment 'English)
-
-;; bind call last keyboard marco to a convinent key
-(global-set-key [f5] 'call-last-kbd-macro)
 
 ;; don't show start up sceen
 (setq inhibit-startup-message t)
@@ -499,8 +459,9 @@
 (emms-standard)
 (emms-default-players)
 (setq emms-player-list '(emms-player-mplayer))
+(global-set-key (kbd "<f5>") 'emms-pause)
 (global-set-key (kbd "<f7>") 'emms-seek-backward)
-(global-set-key (kbd "<f8>") 'emms-pause)
+(global-set-key (kbd "<f8>") 'emms-seek-forward)
 
 
 ;;----------------------------------------------------------
