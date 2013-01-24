@@ -3,10 +3,10 @@ This is my own init file for GNU Emacs 24.
 It is mostly intended to be used on Linux especially Debian and CentOS.
 
 * Author Information
-  Name: 任文山 (Wenshan Ren)
-  Email: renws1990@gmail.com
-  Blog: wenshanren.org
-  Douban: http://www.douban.com/people/renws/
+  - Name: 任文山 (Wenshan Ren)
+  - Email: renws1990@gmail.com
+  - Blog: wenshanren.org
+  - Douban: http://www.douban.com/people/renws/
 
 * Prerequisites
 ** el-get
@@ -44,7 +44,6 @@ It is mostly intended to be used on Linux especially Debian and CentOS.
 ** newsticker
    RSS reader
 
-
 * Key-bindings
   | Keystrokes | Function                             | Note                                                |
   |------------+--------------------------------------+-----------------------------------------------------|
@@ -80,7 +79,6 @@ It is mostly intended to be used on Linux especially Debian and CentOS.
 * Microblog
 
 * ERC (IRC client)
-
 
 * Python
 
