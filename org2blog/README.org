@@ -81,6 +81,7 @@
 
     Then, use these details, as shown below.
 
+    : (require 'netrc) ;; or nothing if already in the load-path
     : (setq blog (netrc-machine (netrc-parse "~/.netrc") "myblog" t))
     : (setq org2blog/wp-blog-alist
     :       '(("my-blog"
@@ -110,6 +111,27 @@
      - The Permalink of a post can be set using =#+PERMALINK=.
      - The parent for a page can be specified using =#+PARENT=.  *C-c
        t* again provides completion for the page name.
+
+*** Using post templates
+    Custom post templates can be specified by modifying variables
+    =org2blog/wp-buffer-template= and =org2blog/wp-buffer-format-function=.
+
+    For example:
+
+    : (setq org2blog/wp-buffer-template
+    :  "-----------------------
+    : #+TITLE: %s
+    : #+DATE: %s
+    : -----------------------\n")
+    :
+    : (defun my-format-function (format-string)
+    :    (format format-string
+    :            org2blog/wp-default-title
+    :            (format-time-string "%d-%m-%Y" (current-time)))))
+    : (setq org2blog/wp-buffer-format-function 'my-format-function)
+
+    =org2blog/wp-new-entry= will now create buffers begining with a default
+    title and the current date.
 
 *** Updating an existing post
     To update a blog post, you can simply edit the content of the org
@@ -143,13 +165,14 @@
     Babel source blocks or example code is automatically posted in
     =<pre>= tags.  You can ask =org2blog= to use Wordpress's
     sourcecode shortcode blocks.  To use this, you need to set the
-    variable =org2blog/wp-use-sourcecode-shortcode=.  Wordpress's
-    sourcecode shortcode blocks can be given various [[http://en.support.wordpress.com/code/posting-source-code/#configuration-parameters][configuration
-    parameters]].  These can be passed to the exported sourcecode
-    shortcode blocks, by passing them to the babel blocks using
-    =:syntaxhl= parameter.  You could also modify the default
-    arguments passed to sourcecode shortcode blocks by customizing the
-    =org2blog/wp-sourcecode-default-params= variable.
+    variable =org2blog/wp-use-sourcecode-shortcode= and also add
+    =htmlize.el= (available in org-mode's =contrib/lisp=) to your
+    =load-path=.  Wordpress's sourcecode shortcode blocks can be given
+    various [[http://en.support.wordpress.com/code/posting-source-code/#configuration-parameters][configuration parameters]].  These can be passed to the
+    exported sourcecode shortcode blocks, by passing them to the babel
+    blocks using =:syntaxhl= parameter.  You could also modify the
+    default arguments passed to sourcecode shortcode blocks by
+    customizing the =org2blog/wp-sourcecode-default-params= variable.
 *** Delete an entry or a page
     - If you are in the buffer of the entry/page, with =#+POSTID=
       present on the page, use:
@@ -227,7 +250,7 @@
     Set the relevant (~:default-title~) variable in the
     ~org2blog/wp-blog-alist~ variable.
 
-  - I donot use tags. I wish to use them as categories. How?
+  - I do not use tags. I wish to use them as categories. How?
 
     Setting the ~org2blog/wp-use-tags-as-categories~ variable will do
     that for all the blogs.

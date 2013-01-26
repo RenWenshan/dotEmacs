@@ -346,7 +346,7 @@ title of the post, post contents, list of categories, and date respectively."
 
 (defun metaweblog-get-post (blog-xmlrpc user-name password post-id)
   "Retrieves a post from the weblog. POST-ID is the id of the post
-which is to be returned"
+which is to be returned.  Can be used with pages as well."
   (xml-rpc-method-call blog-xmlrpc
 		       "metaWeblog.getPost"
 		       post-id
@@ -383,14 +383,17 @@ no. of posts that should be returned."
 		       number-of-posts))
 
 (defun get-file-properties (file)
-  "Gets the properties of a file."
+  "Gets the properties of a file. Returns an assoc list with
+name - file name
+bits - data of the file as a base64 encoded string
+type - mimetype of file deduced from extension."
   (let* (base64-str type name)
     (save-excursion
       (save-restriction
-	(with-current-buffer (find-file-noselect file)
+	(with-current-buffer (find-file-noselect file nil t)
           (fundamental-mode)
 	  (setq name (file-name-nondirectory file))
-	  (setq base64-str (base64-encode-string (buffer-string)))
+	  (setq base64-str (base64-encode-string (encode-coding-string (buffer-string) 'binary)))
 	  (setq type (mailcap-extension-to-mime (file-name-extension file)))
           (kill-buffer)
 	  (setq file-props `(("name" . ,name)

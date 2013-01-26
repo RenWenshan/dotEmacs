@@ -1,0 +1,853 @@
+
+autopair.el,4045
+(defvar autopair-pair-criteria 'help-balanceautopair-pair-criteria181,7015
+(defvar autopair-skip-criteria 'help-balanceautopair-skip-criteria187,7214
+(defvar autopair-emulation-alist nilautopair-emulation-alist193,7414
+(defvar autopair-dont-activate nilautopair-dont-activate197,7531
+(defvar autopair-extra-pairs nilautopair-extra-pairs206,7902
+(defvar autopair-dont-pair `(:string (?') :comment  (?'))autopair-dont-pair240,8937
+(defvar autopair-action nilautopair-action263,9841
+(defvar autopair-wrap-action nilautopair-wrap-action275,10296
+(defvar autopair-handle-action-fns '()autopair-handle-action-fns286,10692
+(defvar autopair-handle-wrap-action-fns '()autopair-handle-wrap-action-fns300,11299
+(defvar autopair-inserted nilautopair-inserted314,11949
+(defun autopair-calculate-inserted ()autopair-calculate-inserted319,12109
+(define-globalized-minor-mode autopair-global-mode autopair-mode autopair-on)autopair-global-mode327,12319
+(defun autopair-on () (unless (or buffer-read-onlyautopair-on329,12398
+(define-minor-mode autopair-modeautopair-mode335,12709
+(defun autopair-syntax-ppss ()autopair-syntax-ppss403,16427
+(defun autopair-find-pair (delim &optional closing)autopair-find-pair438,17751
+(defun autopair-calculate-wrap-action ()autopair-calculate-wrap-action458,18724
+(defun autopair-original-binding ()autopair-original-binding476,19538
+(defun autopair-fallback (&optional fallback-keys)autopair-fallback481,19700
+(defvar autopair-autowrap 'help-balanceautopair-autowrap498,20456
+(defvar autopair-skip-whitespace nilautopair-skip-whitespace504,20690
+(defvar autopair-blink (if (boundp 'blink-matching-paren)autopair-blink510,20904
+(defvar autopair-blink-delay 0.1autopair-blink-delay515,21092
+(defun autopair-document-bindings (&optional fallback-keys)autopair-document-bindings518,21169
+(defun autopair-escaped-p (syntax-info)autopair-escaped-p530,21646
+(defun autopair-exception-p (where-sym exception-where-sym blacklist &optional fn)autopair-exception-p533,21710
+(defun autopair-up-list (syntax-info &optional closing)autopair-up-list541,22070
+(defun autopair-insert-or-skip-quote ()autopair-insert-or-skip-quote575,23474
+(defun autopair-in-unterminated-string-p (autopair-triplet)autopair-in-unterminated-string-p642,26747
+(defun autopair-insert-opening ()autopair-insert-opening647,26978
+(defun autopair-skip-close-maybe ()autopair-skip-close-maybe657,27407
+(defun autopair-backspace ()autopair-backspace667,27828
+(defun autopair-newline ()autopair-newline677,28257
+(defun autopair-skip-p ()autopair-skip-p692,28923
+(defun autopair-pair-p ()autopair-pair-p724,30318
+(defun autopair-post-command-handler ()autopair-post-command-handler792,34172
+(defun autopair-blink-matching-open ()autopair-blink-matching-open822,35504
+(defun autopair-blink (&optional pos)autopair-blink828,35701
+(defun autopair-default-handle-action (action pair pos-before)autopair-default-handle-action836,35907
+(defun autopair-default-handle-wrap-action (action pair pos-before region-before)autopair-default-handle-wrap-action887,38174
+(defun autopair-python-triple-quote-action (action pair pos-before)autopair-python-triple-quote-action919,39331
+(defun autopair-latex-mode-paired-delimiter-action (action pair pos-before)autopair-latex-mode-paired-delimiter-action945,40354
+(defun autopair-extra-insert-opening ()autopair-extra-insert-opening972,41470
+(defun autopair-extra-skip-close-maybe ()autopair-extra-skip-close-maybe982,41928
+(defun autopair-extra-pair-p ()autopair-extra-pair-p992,42358
+(defun autopair-extra-skip-p ()autopair-extra-skip-p1000,42688
+(defun autopair-insert-or-skip-paired-delimiter ()autopair-insert-or-skip-paired-delimiter1021,43534
+(defun autopair-should-autowrap ()autopair-should-autowrap1051,44810
+(defadvice cua--pre-command-handler-1 (around autopair-override activate)cua--pre-command-handler-11058,45073
+(defadvice delete-selection-pre-hook (around autopair-override activate)delete-selection-pre-hook1062,45262
+
+blank-mode.el,4623
+(defgroup blank nilblank330,10670
+(defcustom blank-style '(mark color)blank-style338,10863
+(defcustom blank-charsblank-chars359,11358
+(defcustom blank-space 'blank-spaceblank-space422,13180
+(defface blank-spaceblank-space430,13343
+(defcustom blank-hspace 'blank-hspaceblank-hspace440,13644
+(defface blank-hspace			; 'nobreak-spaceblank-hspace448,13814
+(defcustom blank-tab 'blank-tabblank-tab458,14144
+(defface blank-tabblank-tab466,14301
+(defcustom blank-newline 'blank-newlineblank-newline476,14588
+(defface blank-newlineblank-newline487,14856
+(defcustom blank-trailing 'blank-trailingblank-trailing499,15215
+(defface blank-trailing			; 'trailing-whitespaceblank-trailing507,15393
+(defcustom blank-line 'blank-lineblank-line514,15625
+(defface blank-lineblank-line524,15821
+(defcustom blank-space-before-tab 'blank-space-before-tabblank-space-before-tab533,16043
+(defface blank-space-before-tabblank-space-before-tab541,16240
+(defcustom blank-indentation 'blank-indentationblank-indentation548,16458
+(defface blank-indentationblank-indentation556,16665
+(defcustom blank-empty 'blank-emptyblank-empty563,16894
+(defface blank-emptyblank-empty571,17097
+(defcustom blank-space-after-tab 'blank-space-after-tabblank-space-after-tab578,17328
+(defface blank-space-after-tabblank-space-after-tab586,17532
+(defcustom blank-hspace-regexpblank-hspace-regexp593,17754
+(defcustom blank-space-regexp "\\( +\\)"blank-space-regexp623,18658
+(defcustom blank-tab-regexp "\\(\t+\\)"blank-tab-regexp646,19394
+(defcustom blank-trailing-regexpblank-trailing-regexp669,20123
+(defcustom blank-space-before-tab-regexp "\\( +\\)\t"blank-space-before-tab-regexp690,20747
+(defcustom blank-indentation-regexp "^\t*\\(\\( \\{8\\}\\)+\\)[^\n\t]"blank-indentation-regexp706,21196
+(defcustom blank-empty-at-bob-regexp "\\`\\(\\([ \t]*\n\\)+\\)"blank-empty-at-bob-regexp722,21682
+(defcustom blank-empty-at-eob-regexp "^\\([ \t\n]+\\)\\'"blank-empty-at-eob-regexp738,22168
+(defcustom blank-space-after-tab-regexp "\t\\(\\( \\{8\\}\\)+\\)"blank-space-after-tab-regexp754,22636
+(defcustom blank-line-column 80blank-line-column770,23108
+(defcustom blank-display-mappingsblank-display-mappings780,23425
+(defcustom blank-global-modes tblank-global-modes838,25641
+(define-minor-mode blank-modeblank-mode869,26603
+(define-minor-mode global-blank-modeglobal-blank-mode893,27245
+(defun blank-turn-on-if-enabled ()blank-turn-on-if-enabled927,28382
+(defconst blank-chars-value-listblank-chars-value-list954,29281
+(defconst blank-style-value-listblank-style-value-list969,29500
+(defconst blank-toggle-option-alistblank-toggle-option-alist976,29601
+(defvar blank-active-chars nilblank-active-chars1006,30175
+(defvar blank-active-style nilblank-active-style1010,30303
+(defun blank-toggle-options (arg)blank-toggle-options1016,30447
+(defvar blank-toggle-chars nilblank-toggle-chars1074,32446
+(defvar blank-toggle-style nilblank-toggle-style1076,32529
+(defun global-blank-toggle-options (arg)global-blank-toggle-options1081,32629
+(defun blank-cleanup ()blank-cleanup1146,34854
+(defun blank-cleanup-region (start end)blank-cleanup-region1211,37170
+(defun blank-replace-spaces-by-tabs (rstart rend regexp)blank-replace-spaces-by-tabs1270,39218
+(defvar blank-font-lock-mode nilblank-font-lock-mode1290,39856
+(defvar blank-font-lock nilblank-font-lock1294,40010
+(defvar blank-font-lock-keywords nilblank-font-lock-keywords1298,40159
+(defconst blank-help-textblank-help-text1303,40307
+(defconst blank-help-buffer-name "*Blank Toggle Options*"blank-help-buffer-name1328,41045
+(defun blank-insert-option-mark (the-list the-value)blank-insert-option-mark1332,41152
+(defun blank-help-on (chars style)blank-help-on1341,41409
+(defun blank-help-off ()blank-help-off1365,42218
+(defun blank-interactive-char (local-p)blank-interactive-char1373,42441
+(defun blank-toggle-list (local-p arg the-list default-listblank-toggle-list1434,44298
+(defun blank-turn-on ()blank-turn-on1470,45393
+(defun blank-turn-off ()blank-turn-off1484,45790
+(defun blank-color-on ()blank-color-on1492,45987
+(defun blank-color-off ()blank-color-off1590,48592
+(defvar blank-display-table nilblank-display-table1606,49053
+(defvar blank-display-table-was-local nilblank-display-table-was-local1610,49177
+(defsubst blank-char-valid-p (char)blank-char-valid-p1615,49364
+(defun blank-legal-display-vector-p (vec)blank-legal-display-vector-p1621,49487
+(defun blank-display-char-on ()blank-display-char-on1630,49740
+(defun blank-display-char-off ()blank-display-char-off1676,51330
+
+capture-image.el,45
+(defun iyf-screenshot ()iyf-screenshot5,81
+
+edit-server.el,2805
+(defcustom edit-server-port 9292edit-server-port79,2583
+(defcustom edit-server-host niledit-server-host84,2700
+(defcustom edit-server-verbose niledit-server-verbose90,2889
+(defcustom edit-server-done-hook niledit-server-done-hook95,3033
+(defcustom edit-server-start-hook niledit-server-start-hook101,3255
+(defcustom edit-server-new-frame tedit-server-new-frame110,3516
+(defcustom edit-server-new-frame-alistedit-server-new-frame-alist115,3656
+(defcustom edit-server-default-major-modeedit-server-default-major-mode128,4085
+(defcustom edit-server-url-major-mode-alistedit-server-url-major-mode-alist135,4304
+(defcustom edit-server-new-frame-mode-line tedit-server-new-frame-mode-line146,4755
+(defconst edit-server-process-buffer-name " *edit-server*"edit-server-process-buffer-name153,4919
+(defconst edit-server-log-buffer-name "*edit-server-log*"edit-server-log-buffer-name156,5034
+(defconst edit-server-edit-buffer-name "TEXTAREA"edit-server-edit-buffer-name159,5148
+(defvar edit-server-clients ()edit-server-clients162,5259
+(defvar edit-server-proc niledit-server-proc172,5633
+(defvar edit-server-frame niledit-server-frame177,5808
+(defvar edit-server-phase niledit-server-phase182,5985
+(defvar edit-server-received niledit-server-received187,6170
+(defvar edit-server-request niledit-server-request193,6439
+(defvar edit-server-content-length niledit-server-content-length198,6618
+(defvar edit-server-url niledit-server-url203,6829
+(defvar edit-server-edit-mode-mapedit-server-edit-mode-map216,7283
+(define-minor-mode edit-server-edit-modeedit-server-edit-mode236,8010
+(defun turn-on-edit-server-edit-mode-if-server ()turn-on-edit-server-edit-mode-if-server247,8360
+(define-globalized-minor-mode global-edit-server-edit-modeglobal-edit-server-edit-mode252,8533
+(defun edit-server-start (&optional verbose)edit-server-start259,8720
+(defun edit-server-stop niledit-server-stop283,9561
+(defun edit-server-log (proc fmt &rest args)edit-server-log295,9993
+(defun edit-server-accept (server client msg)edit-server-accept315,10667
+(defun edit-server-filter (proc string)edit-server-filter334,11391
+(defun edit-server-create-frame(buffer)edit-server-create-frame400,14006
+(defun edit-server-choose-major-mode ()edit-server-choose-major-mode424,14777
+(defun edit-server-create-edit-buffer(proc)edit-server-create-edit-buffer438,15267
+(defun edit-server-send-response (proc &optional body close)edit-server-send-response463,16339
+(defun edit-server-kill-client (proc)edit-server-kill-client496,17620
+(defun edit-server-done (&optional abort nokill)edit-server-done504,17912
+(defun edit-server-save ()edit-server-save563,20207
+(defun edit-server-abort ()edit-server-abort572,20433
+(defun edit-server-abort* ()edit-server-abort*577,20570
+
+erc-highlight-nicknames.el,391
+(defface erc-highlight-nick-base-faceerc-highlight-nick-base-face84,3135
+(defvar erc-highlight-face-tableerc-highlight-face-table90,3291
+(defun hexcolor-luminance (color)hexcolor-luminance94,3419
+(defun invert-color (color)invert-color105,3859
+(defun erc-highlight-nicknames ()erc-highlight-nicknames114,4146
+(define-erc-module highlight-nicknames nilhighlight-nicknames142,5609
+
+flymake-cursor.el,1433
+(defgroup flymake-cursor nilflymake-cursor66,2762
+(defcustom flymake-cursor-error-display-delay 0.9flymake-cursor-error-display-delay70,2868
+(defcustom flymake-cursor-number-of-errors-to-display 1flymake-cursor-number-of-errors-to-display75,3045
+(defcustom flymake-cursor-auto-enable tflymake-cursor-auto-enable87,3507
+(defvar flymake-cursor-errors-at-point nilflymake-cursor-errors-at-point100,3941
+(defvar flymake-cursor-error-display-timer nilflymake-cursor-error-display-timer103,4026
+(define-minor-mode flymake-cursor-modeflymake-cursor-mode107,4156
+(defun flymake-cursor-get-errors-at-point ()flymake-cursor-get-errors-at-point127,4925
+(defun flymake-cursor-pyflake-determine-message (error)flymake-cursor-pyflake-determine-message134,5361
+(defun flymake-cursor-safe-to-display ()flymake-cursor-safe-to-display144,5837
+(defun flymake-cursor-show-stored-errors-now ()flymake-cursor-show-stored-errors-now150,6132
+(defun flymake-cursor-show-errors-at-point-now ()flymake-cursor-show-errors-at-point-now160,6581
+(defun flymake-cursor-cancel-error-display-timer ()flymake-cursor-cancel-error-display-timer176,7334
+(defun flymake-cursor-show-errors-at-point-pretty-soon ()flymake-cursor-show-errors-at-point-pretty-soon182,7586
+(defun flymake-cursor-follow-flymake-mode ()flymake-cursor-follow-flymake-mode200,8488
+(defun flymake-cursor-after-syntax-check ()flymake-cursor-after-syntax-check207,8737
+
+highlight-indentation.el,818
+(defgroup highlight-indentation nilhighlight-indentation23,914
+(defface highlight-indentation-facehighlight-indentation-face28,1035
+(defcustom highlight-indentation-offset 4highlight-indentation-offset34,1239
+(defvar highlight-indentation-current-regex nil)highlight-indentation-current-regex41,1536
+(define-minor-mode highlight-indentation-modehighlight-indentation-mode44,1601
+(defun highlight-indentation-set-offset (offset)highlight-indentation-set-offset80,3229
+(defface highlight-indentation-current-column-facehighlight-indentation-current-column-face101,4026
+(defvar highlight-indentation-current-column-regex nil)highlight-indentation-current-column-regex108,4289
+(defun highlight-indentation-current-column-post-command-hook ()highlight-indentation-current-column-post-command-hook128,5073
+
+highlight-symbol.el,1928
+(defgroup highlight-symbol nilhighlight-symbol89,3107
+(defface highlight-symbol-facehighlight-symbol-face94,3221
+(defvar highlight-symbol-timer nil)highlight-symbol-timer102,3462
+(defun highlight-symbol-update-timer (value)highlight-symbol-update-timer104,3499
+(defvar highlight-symbol-mode nil)highlight-symbol-mode111,3761
+(defun highlight-symbol-set (symbol value)highlight-symbol-set113,3797
+(defcustom highlight-symbol-idle-delay 1.5highlight-symbol-idle-delay118,3950
+(defcustom highlight-symbol-colorshighlight-symbol-colors127,4299
+(defcustom highlight-symbol-on-navigation-p nilhighlight-symbol-on-navigation-p135,4609
+(defvar highlight-symbol-color-index 0)highlight-symbol-color-index141,4812
+(defvar highlight-symbol nil)highlight-symbol144,4912
+(defvar highlight-symbol-list nil)highlight-symbol-list147,4990
+(defconst highlight-symbol-border-patternhighlight-symbol-border-pattern150,5078
+(define-minor-mode highlight-symbol-modehighlight-symbol-mode154,5208
+(defun highlight-symbol-at-point ()highlight-symbol-at-point170,5886
+(defun highlight-symbol-remove-all ()highlight-symbol-remove-all202,7185
+(defun highlight-symbol-next ()highlight-symbol-next209,7387
+(defun highlight-symbol-prev ()highlight-symbol-prev215,7554
+(defun highlight-symbol-next-in-defun ()highlight-symbol-next-in-defun221,7726
+(defun highlight-symbol-prev-in-defun ()highlight-symbol-prev-in-defun229,7944
+(defun highlight-symbol-query-replace (replacement)highlight-symbol-query-replace237,8167
+(defun highlight-symbol-get-symbol ()highlight-symbol-get-symbol251,8896
+(defun highlight-symbol-temp-highlight ()highlight-symbol-temp-highlight258,9219
+(defun highlight-symbol-mode-remove-temp ()highlight-symbol-mode-remove-temp269,9684
+(defun highlight-symbol-mode-post-command ()highlight-symbol-mode-post-command275,9879
+(defun highlight-symbol-jump (dir)highlight-symbol-jump286,10344
+
+ibus.el,17486
+(defconst ibus-mode-version "0.3.2")ibus-mode-version11,199
+(defgroup ibus nilibus165,5209
+(defgroup ibus-basic nilibus-basic171,5341
+(defcustom ibus-mode-local tibus-mode-local175,5447
+(defcustom ibus-imcontext-temporary-for-minibuffer tibus-imcontext-temporary-for-minibuffer182,5692
+(defun ibus-customize-isearch (var value)ibus-customize-isearch189,5973
+(defcustom ibus-use-in-isearch-window tibus-use-in-isearch-window195,6138
+(defun ibus-customize-key (var value)ibus-customize-key201,6312
+(defcustom ibus-common-function-key-listibus-common-function-key-list207,6489
+(defcustom ibus-preedit-function-key-listibus-preedit-function-key-list274,7991
+(defcustom ibus-use-kana-onbiki-key nilibus-use-kana-onbiki-key318,9040
+(defcustom ibus-simultaneous-pressing-time nilibus-simultaneous-pressing-time328,9376
+(defcustom ibus-undo-by-committed-string nilibus-undo-by-committed-string339,9810
+(defcustom ibus-clear-preedit-when-unexpected-event nilibus-clear-preedit-when-unexpected-event347,10103
+(defgroup ibus-appearance nilibus-appearance354,10359
+(defun ibus-customize-cursor-color (var value)ibus-customize-cursor-color358,10454
+(defcustom ibus-cursor-coloribus-cursor-color364,10630
+(defcustom ibus-isearch-cursor-typeibus-isearch-cursor-type392,11996
+(defcustom ibus-cursor-type-for-candidateibus-cursor-type-for-candidate412,12718
+(defcustom ibus-put-cursor-on-candidateibus-put-cursor-on-candidate433,13483
+(defcustom ibus-candidate-window-h-offsetibus-candidate-window-h-offset441,13743
+(defcustom ibus-prediction-window-h-offsetibus-prediction-window-h-offset447,13897
+(defcustom ibus-prediction-window-positionibus-prediction-window-position457,14320
+(defgroup ibus-expert nilibus-expert470,14883
+(defcustom ibus-agent-file-name "ibus-el-agent"ibus-agent-file-name474,14948
+(defcustom ibus-agent-search-pathsibus-agent-search-paths483,15382
+(defcustom ibus-python-shell-command-name "python"ibus-python-shell-command-name508,16120
+(defcustom ibus-focus-update-interval 0.3ibus-focus-update-interval516,16481
+(defcustom ibus-kana-onbiki-x-keysym "F24"ibus-kana-onbiki-x-keysym521,16633
+(defcustom ibus-kana-onbiki-key-symbol 'f24ibus-kana-onbiki-key-symbol532,17179
+(defcustom ibus-agent-timeout 3.0ibus-agent-timeout544,17716
+(defcustom ibus-agent-buffering-time 50ibus-agent-buffering-time551,17937
+(defcustom ibus-agent-start-ibus-daemon nilibus-agent-start-ibus-daemon558,18205
+(defvar ibus-debug nil)ibus-debug574,18942
+(defvar ibus-log-buffer "*ibus-mode log*")ibus-log-buffer575,18966
+(defvar ibus-agent-buffer-name " *IBus*")ibus-agent-buffer-name577,19010
+(defvar ibus-incompatible-major-modesibus-incompatible-major-modes579,19053
+(defvar ibus-preedit-incompatible-commandsibus-preedit-incompatible-commands584,19211
+(defvar ibus-inherit-im-functionsibus-inherit-im-functions588,19387
+(defvar ibus-modifier-alistsibus-modifier-alists599,19888
+(defvar ibus-alt-modifier-alistibus-alt-modifier-alist616,20138
+(defvar ibus-keyval-alistibus-keyval-alist626,20438
+(defcustom ibus-mode nilibus-mode918,28439
+(defvar ibus-version "0")ibus-version930,28755
+(defvar ibus-active-engine-list nil)ibus-active-engine-list931,28781
+(defvar ibus-engine-history nil)ibus-engine-history932,28818
+(defvar ibus-set-commit-string-hook nil)ibus-set-commit-string-hook935,28870
+(defvar ibus-commit-string-hook nil)ibus-commit-string-hook936,28911
+(defvar ibus-preedit-show-hook nil)ibus-preedit-show-hook937,28948
+(defvar ibus-meta-key-exist-p nil)ibus-meta-key-exist-p940,29008
+(defvar ibus-modifier-alist nil)ibus-modifier-alist941,29043
+(defvar ibus-mode-map nil)ibus-mode-map942,29076
+(defvar ibus-mode-preedit-map nil)ibus-mode-preedit-map943,29103
+(defvar ibus-mode-common-map nil)ibus-mode-common-map944,29138
+(defvar ibus-mode-kana-onbiki-map nil)ibus-mode-kana-onbiki-map945,29172
+(defvar ibus-mode-minimum-map nil)ibus-mode-minimum-map946,29211
+(defvar ibus-mode-map-alist nil)ibus-mode-map-alist947,29246
+(defvar ibus-mode-map-disabled nil)ibus-mode-map-disabled948,29279
+(defvar ibus-mode-map-prev-disabled nil)ibus-mode-map-prev-disabled950,29368
+(defvar ibus-kana-onbiki-prev-x-keysym nil)ibus-kana-onbiki-prev-x-keysym953,29521
+(defvar ibus-keyboard-layout nil)ibus-keyboard-layout954,29565
+(defvar ibus-keymap-overlay nil)ibus-keymap-overlay955,29599
+(defvar ibus-agent-process nil)ibus-agent-process958,29667
+(defvar ibus-agent-process-alist nil)ibus-agent-process-alist959,29699
+(defvar ibus-callback-queue nil)ibus-callback-queue960,29737
+(defvar ibus-agent-key-event-handled nil)ibus-agent-key-event-handled961,29770
+(defvar ibus-selected-display nil)ibus-selected-display962,29812
+(defvar ibus-last-command-event nil)ibus-last-command-event963,29847
+(defvar ibus-current-buffer nil)ibus-current-buffer964,29884
+(defvar ibus-selected-frame nil)ibus-selected-frame965,29917
+(defvar ibus-frame-focus nil)ibus-frame-focus966,29950
+(defvar ibus-focused-window-id nil)ibus-focused-window-id967,29980
+(defvar ibus-string-insertion-failed nil)ibus-string-insertion-failed968,30016
+(defvar ibus-last-rejected-event nil)ibus-last-rejected-event969,30058
+(defvar ibus-last-command nil)ibus-last-command970,30096
+(defvar ibus-cursor-prev-location nil)ibus-cursor-prev-location971,30127
+(defvar ibus-buffer-group nil)ibus-buffer-group974,30181
+(defvar ibus-buffer-group-alist nil)ibus-buffer-group-alist998,31089
+(defvar ibus-imcontext-id nil)ibus-imcontext-id999,31126
+(defvar ibus-imcontext-status nil)ibus-imcontext-status1000,31157
+(defvar ibus-preediting-p nil)ibus-preediting-p1001,31192
+(defvar ibus-preedit-point (make-marker))ibus-preedit-point1002,31223
+(defvar ibus-preedit-update nil)ibus-preedit-update1003,31265
+(defvar ibus-preedit-shown nil)ibus-preedit-shown1004,31298
+(defvar ibus-preedit-text "")ibus-preedit-text1005,31330
+(defvar ibus-preedit-prev-text "")ibus-preedit-prev-text1006,31360
+(defvar ibus-preedit-curpos 0)ibus-preedit-curpos1007,31395
+(defvar ibus-preedit-prev-curpos 0)ibus-preedit-prev-curpos1008,31426
+(defvar ibus-preedit-attributes nil)ibus-preedit-attributes1009,31462
+(defvar ibus-preedit-prev-attributes nil)ibus-preedit-prev-attributes1010,31499
+(defvar ibus-preedit-overlays nil)ibus-preedit-overlays1011,31541
+(defvar ibus-auxiliary-text "")ibus-auxiliary-text1012,31576
+(defvar ibus-auxiliary-shown nil)ibus-auxiliary-shown1013,31608
+(defvar ibus-surrounding-text-modified nil)ibus-surrounding-text-modified1014,31642
+(defvar ibus-cursor-type-saved 0)ibus-cursor-type-saved1015,31686
+(defvar ibus-parent-buffer-group nil)ibus-parent-buffer-group1019,31788
+(defvar ibus-force-inherit-im nil)ibus-force-inherit-im1020,31826
+(defvar ibus-isearch-buffer-group nil)ibus-isearch-buffer-group1021,31861
+(defvar ibus-isearch-minibuffer nil)ibus-isearch-minibuffer1022,31900
+(defun ibus-log1 (format-string args)ibus-log11028,32103
+(defun ibus-log (format-string &rest args)ibus-log1041,32541
+(defun ibus-log-undo-list (format-string &rest args)ibus-log-undo-list1046,32665
+(defun ibus-message (format-string &rest args)ibus-message1057,33140
+(defun ibus-decode-event (event)ibus-decode-event1065,33469
+(defun ibus-encode-event (keyval modmask)ibus-encode-event1095,34436
+(defun ibus-insert-and-modify-undo-list (str)ibus-insert-and-modify-undo-list1121,35378
+(defun ibus-defadvice-disable-for-preedit ()ibus-defadvice-disable-for-preedit1167,37299
+(defun ibus-activate-advices-disable-for-preedit (enable)ibus-activate-advices-disable-for-preedit1177,37631
+(defun ibus-set-mode-map-alist ()ibus-set-mode-map-alist1200,38328
+(defun ibus-set-keymap-parent ()ibus-set-keymap-parent1205,38488
+(defun ibus-update-meta-key-exist-p ()ibus-update-meta-key-exist-p1219,38894
+(defun ibus-set-modifier-alist ()ibus-set-modifier-alist1225,39127
+(defun ibus-enable-kana-onbiki-key (&optional keysym)ibus-enable-kana-onbiki-key1233,39378
+(defun ibus-disable-kana-onbiki-key (&optional keysym)ibus-disable-kana-onbiki-key1242,39768
+(defun ibus-get-keyboard-layout ()ibus-get-keyboard-layout1251,40163
+(defun ibus-update-kana-onbiki-key (&optional inhibit delayed)ibus-update-kana-onbiki-key1256,40352
+(defun ibus-switch-keymap (enable)ibus-switch-keymap1270,40842
+(defun ibus-enable-keymap ()ibus-enable-keymap1283,41211
+(defun ibus-disable-keymap ()ibus-disable-keymap1289,41340
+(defun ibus-check-major-mode ()ibus-check-major-mode1295,41470
+(defun ibus-make-keymap-internal (keys &optional parent &rest ranges)ibus-make-keymap-internal1299,41587
+(defun ibus-combine-modifiers (base modifiers)ibus-combine-modifiers1324,42407
+(defun ibus-make-minimum-map ()ibus-make-minimum-map1332,42639
+(defun ibus-make-kana-onbiki-map ()ibus-make-kana-onbiki-map1335,42733
+(defun ibus-make-common-map ()ibus-make-common-map1343,43007
+(defun ibus-make-preedit-map ()ibus-make-preedit-map1348,43128
+(defun ibus-update-key-bindings (&optional symbol)ibus-update-key-bindings1353,43264
+(defun ibus-define-key (symbol keys handle)ibus-define-key1398,45359
+(defun ibus-define-common-key (key handle)ibus-define-common-key1435,46888
+(defun ibus-define-preedit-key (key handle)ibus-define-preedit-key1448,47589
+(defadvice describe-keydescribe-key1462,48330
+(defun ibus-activate-advice-describe-key (enable)ibus-activate-advice-describe-key1526,50661
+(defun ibus-get-x-display ()ibus-get-x-display1536,51049
+(defun ibus-mode-line-string ()ibus-mode-line-string1544,51326
+(defun ibus-set-cursor-color (&optional single-frame)ibus-set-cursor-color1552,51559
+(defun ibus-update-cursor-color (&optional single-frame)ibus-update-cursor-color1618,53894
+(defun ibus-after-make-frame-function (frame)ibus-after-make-frame-function1623,54073
+(defun ibus-agent-update-frame-coordinates (&optional frame)ibus-agent-update-frame-coordinates1636,54427
+(defun ibus-compute-pixel-position (&optional pos window)ibus-compute-pixel-position1642,54662
+(defun ibus-set-cursor-location (&optional prediction)ibus-set-cursor-location1684,56278
+(defun ibus-agent-start-focus-observation ()ibus-agent-start-focus-observation1707,57190
+(defun ibus-start-focus-observation-cb (window-id)ibus-start-focus-observation-cb1722,57765
+(defun ibus-agent-stop-focus-observation ()ibus-agent-stop-focus-observation1725,57860
+(defun ibus-focus-changed-cb (window-id)ibus-focus-changed-cb1729,57989
+(defun ibus-redo-focus-in-cb ()ibus-redo-focus-in-cb1744,58494
+(defun ibus-change-x-display ()ibus-change-x-display1750,58648
+(defun ibus-change-focus (focus-in)ibus-change-focus1771,59501
+(defun ibus-check-frame-focus (&optional focus-in)ibus-check-frame-focus1775,59627
+(defun ibus-reset-imcontext ()ibus-reset-imcontext1821,61237
+(defun ibus-remove-preedit (&optional abort)ibus-remove-preedit1824,61308
+(defun ibus-cleanup-preedit (&optional abort)ibus-cleanup-preedit1885,63614
+(defun ibus-show-preedit (&optional resume)ibus-show-preedit1894,63856
+(defun ibus-do-update-preedit ()ibus-do-update-preedit2011,68328
+(defun ibus-abort-preedit ()ibus-abort-preedit2016,68570
+(defun ibus-before-change-function (&optional beg end)ibus-before-change-function2022,68752
+(defun ibus-agent-kill ()ibus-agent-kill2037,69337
+(defun ibus-agent-process-sentinel (proc stat)ibus-agent-process-sentinel2054,69896
+(defun ibus-agent-start-internal ()ibus-agent-start-internal2065,70262
+(defun ibus-agent-start ()ibus-agent-start2091,71272
+(defun ibus-agent-connect ()ibus-agent-connect2114,72258
+(defun ibus-agent-send (string &rest objects)ibus-agent-send2136,73027
+(defun ibus-agent-receive (&optional passive wait noerror)ibus-agent-receive2150,73573
+(defun ibus-agent-send-receive (string &rest objects)ibus-agent-send-receive2194,75146
+(defun ibus-agent-receive-passively (beg &optional end lng)ibus-agent-receive-passively2198,75278
+(defun ibus-exec-callback-1 (sexplist)ibus-exec-callback-12206,75568
+(defun ibus-exec-callback ()ibus-exec-callback2215,75842
+(defun ibus-process-signals (sexplist &optional passive)ibus-process-signals2244,77114
+(defun ibus-*table--cell-insert (string)ibus-*table--cell-insert2308,79421
+(defun ibus-commit-text-cb (id text)ibus-commit-text-cb2320,79854
+(defun ibus-hide-preedit-text-cb (id)ibus-hide-preedit-text-cb2365,81375
+(defun ibus-show-preedit-text-cb (id)ibus-show-preedit-text-cb2371,81572
+(defun ibus-update-preedit-text-cb (id text cursor-pos visible &rest attributes)ibus-update-preedit-text-cb2377,81767
+(defun ibus-hide-auxiliary-text-cb (id)ibus-hide-auxiliary-text-cb2386,82109
+(defun ibus-show-auxiliary-text-cb (id)ibus-show-auxiliary-text-cb2392,82310
+(defun ibus-update-auxiliary-text-cb (id text visible)ibus-update-auxiliary-text-cb2398,82509
+(defun ibus-hide-lookup-table-cb (id)ibus-hide-lookup-table-cb2405,82757
+(defun ibus-show-lookup-table-cb (id current-table &optional selection)ibus-show-lookup-table-cb2408,82813
+(defun ibus-*table--cell-delete-region (beg end)ibus-*table--cell-delete-region2416,83064
+(defun ibus-delete-surrounding-text-cb (id offset length)ibus-delete-surrounding-text-cb2421,83206
+(defun ibus-forward-key-event-cb (id keyval modmask &optional pressed)ibus-forward-key-event-cb2447,84013
+(defun ibus-get-surrounding-text ()ibus-get-surrounding-text2469,84939
+(defun ibus-get-anchor-position ()ibus-get-anchor-position2481,85336
+(defun ibus-escape-string (str)ibus-escape-string2492,85595
+(defun ibus-set-surrounding-text ()ibus-set-surrounding-text2506,85946
+(defun ibus-query-surrounding-text-cb (id keyval modmask backslash pressed)ibus-query-surrounding-text-cb2514,86236
+(defun ibus-agent-send-key-event (keyval modmask backslash pressed)ibus-agent-send-key-event2530,86956
+(defun ibus-process-key-event-cb (id handled)ibus-process-key-event-cb2560,88135
+(defun ibus-fallback-pre-function ()ibus-fallback-pre-function2644,91532
+(defun ibus-fallback-post-function ()ibus-fallback-post-function2649,91753
+(defun ibus-wait-following-key-event (prev-event keyval modmask backslash)ibus-wait-following-key-event2655,91982
+(defun ibus-process-key-event (event &optional arg)ibus-process-key-event2669,92629
+(defun ibus-handle-event (&optional arg)ibus-handle-event2720,94670
+(defun ibus-create-imcontext ()ibus-create-imcontext2732,95111
+(defun ibus-create-imcontext-cb (id)ibus-create-imcontext-cb2771,96682
+(defun ibus-destroy-imcontext ()ibus-destroy-imcontext2774,96751
+(defun ibus-enable (&optional engine-name)ibus-enable2803,97884
+(defun ibus-disable ()ibus-disable2818,98423
+(defun ibus-status-changed-cb (id status)ibus-status-changed-cb2831,98837
+(defun ibus-toggle ()ibus-toggle2848,99399
+(defun ibus-get-active-engine-list ()ibus-get-active-engine-list2858,99634
+(defun ibus-list-active-engines-cb (engines)ibus-list-active-engines-cb2871,100247
+(defun ibus-enable-specified-engine (&optional engine-name)ibus-enable-specified-engine2875,100379
+(defun ibus-buffer-group-identifier ()ibus-buffer-group-identifier2897,101226
+(defun ibus-buffer-group-suitable-p ()ibus-buffer-group-suitable-p2901,101319
+(defun ibus-check-current-buffer ()ibus-check-current-buffer2905,101420
+(defun ibus-kill-buffer-function ()ibus-kill-buffer-function3029,106121
+(defun ibus-exit-minibuffer-function ()ibus-exit-minibuffer-function3033,106247
+(defadvice anything-read-pattern-maybeanything-read-pattern-maybe3039,106397
+(defadvice anything-isearch-post-commandanything-isearch-post-command3044,106574
+(defun ibus-activate-advices-fix-post-command-hook (enable)ibus-activate-advices-fix-post-command-hook3051,106819
+(defun ibus-defadvice-inherit-imcontext ()ibus-defadvice-inherit-imcontext3061,107192
+(defun ibus-activate-advices-inherit-im (enable)ibus-activate-advices-inherit-im3077,107721
+(defun ibus-isearch-start ()ibus-isearch-start3089,108116
+(defun ibus-isearch-check-preedit ()ibus-isearch-check-preedit3098,108440
+(defun ibus-isearch-read-string-post-function ()ibus-isearch-read-string-post-function3103,108582
+(defun ibus-isearch-read-string-pre-function ()ibus-isearch-read-string-pre-function3112,108965
+(defun ibus-isearch-process-search-characters (last-char)ibus-isearch-process-search-characters3120,109347
+(defun ibus-isearch-other-control-char ()ibus-isearch-other-control-char3148,110606
+(defadvice isearch-printing-charisearch-printing-char3164,111173
+(defadvice isearch-other-control-charisearch-other-control-char3172,111383
+(defadvice isearch-message-prefixisearch-message-prefix3182,111774
+(defadvice isearch-toggle-specified-input-methodisearch-toggle-specified-input-method3198,112240
+(defadvice isearch-toggle-input-methodisearch-toggle-input-method3204,112413
+(defadvice isearch-process-search-multibyte-charactersisearch-process-search-multibyte-characters3210,112566
+(defun ibus-enable-isearch ()ibus-enable-isearch3224,113086
+(defun ibus-disable-isearch ()ibus-disable-isearch3231,113304
+(defun ibus-setup-isearch ()ibus-setup-isearch3238,113531
+(defun ibus-cleanup-variables ()ibus-cleanup-variables3247,113818
+(defun ibus-mode-on ()ibus-mode-on3264,114330
+(defun ibus-mode-quit ()ibus-mode-quit3323,116421
+(defun ibus-mode-off ()ibus-mode-off3355,117637
+(defun ibus-update-mode ()ibus-update-mode3374,118148
+(defun ibus-mode (&optional arg)ibus-mode3379,118235
+(define-key mode-line-mode-menu [ibus-mode]mode-line-mode-menu3406,119097
+
+init.el,2776
+(defun eshell/clear ()eshell/clear126,3626
+(defun aj-toggle-fold ()aj-toggle-fold172,4744
+(defun insert-org-date ()insert-org-date196,5471
+(define-auto-insert "\.py" "python-template.py")"\.py"220,6126
+(defun flymake-get-tex-args (file-name)flymake-get-tex-args247,6940
+(defun flymake-xml-init ()flymake-xml-init251,7081
+(defun annotate-pdb ()annotate-pdb556,17603
+(defun python-add-breakpoint ()python-add-breakpoint564,17824
+(define-key python-mode-map (kbd "C-c C-t") 'python-add-breakpoint)python-mode-map570,18013
+(defun python-add-log-print ()python-add-log-print573,18124
+(define-key python-mode-map (kbd "C-c C-d") 'python-add-log-print)python-mode-map579,18335
+(define-prefix-command 'cm-map nil "Outline-")cm-map602,19005
+(define-key cm-map "q" 'hide-sublevels)    ; Hide everything but the top-level headingscm-map604,19099
+(define-key cm-map "t" 'hide-body)         ; Hide everything but headings (all body lines)cm-map605,19187
+(define-key cm-map "o" 'hide-other)        ; Hide other branchescm-map606,19278
+(define-key cm-map "c" 'hide-entry)        ; Hide this entry's bodycm-map607,19343
+(define-key cm-map "l" 'hide-leaves)       ; Hide body lines in this entry and sub-entriescm-map608,19411
+(define-key cm-map "d" 'hide-subtree)      ; Hide everything in this entry and sub-entriescm-map609,19502
+(define-key cm-map "a" 'show-all)          ; Show (expand) everythingcm-map611,19640
+(define-key cm-map "e" 'show-entry)        ; Show this heading's bodycm-map612,19710
+(define-key cm-map "i" 'show-children)     ; Show this heading's immediate child sub-headingscm-map613,19780
+(define-key cm-map "k" 'show-branches)     ; Show all sub-headings under this headingcm-map614,19874
+(define-key cm-map "s" 'show-subtree)      ; Show (expand) everything in this heading & belowcm-map615,19960
+(define-key cm-map "u" 'outline-up-heading)                ; Upcm-map617,20101
+(define-key cm-map "n" 'outline-next-visible-heading)      ; Nextcm-map618,20165
+(define-key cm-map "p" 'outline-previous-visible-heading)  ; Previouscm-map619,20231
+(define-key cm-map "f" 'outline-forward-same-level)        ; Forward - same levelcm-map620,20301
+(define-key cm-map "b" 'outline-backward-same-level)       ; Backward - same levelcm-map621,20383
+(defun my-cperl-customizations ()my-cperl-customizations626,20547
+(defun perl-eval () "Run selected region as Perl code" (interactive)perl-eval653,21280
+(defun pde-perl-mode-hook ()pde-perl-mode-hook658,21444
+(defun flymake-goto-next-error-disp ()flymake-goto-next-error-disp665,21720
+(defun flymake-goto-prev-error-disp ()flymake-goto-prev-error-disp671,21901
+(defun nxml-mode-additional-keys ()nxml-mode-additional-keys712,23141
+(defun myerc ()myerc765,24663
+
+lambda-mode.el,307
+(defvar lambda-regex "lambda"lambda-regex27,985
+(defvar lambda-symbol (string 54091) "The symbol to use for lambdas")lambda-symbol30,1088
+(defun lambda-fontify (beg end)lambda-fontify32,1159
+(defun lambda-unfontify (beg end)lambda-unfontify46,1701
+(define-minor-mode lambda-modelambda-mode53,1879
+
+mark-multiple.el,1885
+(defvar mm/master nilmm/master111,4579
+(defvar mm/mirrors nilmm/mirrors114,4680
+(defvar mm/keymap (make-sparse-keymap))mm/keymap120,4849
+(define-key mm/keymap (kbd "C-g") 'mm/deactivate-region-or-clear-all)mm/keymap121,4889
+(define-key mm/keymap (kbd "C-m") 'mm/deactivate-region-and-clear-all)mm/keymap122,4959
+(define-key mm/keymap (kbd "<return>") 'mm/deactivate-region-and-clear-all)mm/keymap123,5030
+(defface mm/master-facemm/master-face125,5107
+(defface mm/mirror-facemm/mirror-face131,5299
+(defun mm/create-master (start end)mm/create-master137,5491
+(defun mm/add-mirror (start end)mm/add-mirror157,6327
+(defun mm/deactivate-region-or-clear-all ()mm/deactivate-region-or-clear-all167,6729
+(defun mm/deactivate-region-and-clear-all ()mm/deactivate-region-and-clear-all175,6923
+(defun mm/clear-all ()mm/clear-all182,7073
+(defun mm/master-start ()mm/master-start194,7416
+(defun mm/master-end ()mm/master-end197,7472
+(defun mm/point-is-outside-of-master ()mm/point-is-outside-of-master200,7524
+(defun mm/active-region-is-outside-of-master ()mm/active-region-is-outside-of-master206,7692
+(defun mm/post-command-handler ()mm/post-command-handler212,7893
+(defun mm/master-substring ()mm/master-substring218,8104
+(defun mm/on-master-modification (overlay after? beg end &optional length)mm/on-master-modification222,8238
+(defun mm/replace-mirror-substring (mirror substring)mm/replace-mirror-substring228,8470
+(defun mm/create-master-or-mirror (start end)mm/create-master-or-mirror236,8760
+(defun mm/remove-mirror (mirror)mm/remove-mirror242,8973
+(defun mm/furthest-mirror-before-master ()mm/furthest-mirror-before-master247,9114
+(defun mm/furthest-mirror-after-master ()mm/furthest-mirror-after-master259,9511
+(defun mm/first-overlay-start ()mm/first-overlay-start271,9890
+(defun mm/last-overlay-end ()mm/last-overlay-end279,10155
+
+markdown-mode.el,12074
+(defconst markdown-mode-version "1.8.1"markdown-mode-version396,17752
+(defconst markdown-output-buffer-name "*markdown-output*"markdown-output-buffer-name399,17828
+(defvar markdown-mode-hook nilmarkdown-mode-hook404,18027
+(defgroup markdown nilmarkdown407,18104
+(defcustom markdown-command "markdown"markdown-command413,18288
+(defcustom markdown-command-needs-filename nilmarkdown-command-needs-filename418,18393
+(defcustom markdown-hr-string "* * * * *"markdown-hr-string426,18717
+(defcustom markdown-bold-underscore nilmarkdown-bold-underscore431,18835
+(defcustom markdown-italic-underscore nilmarkdown-italic-underscore436,18972
+(defcustom markdown-indent-function 'markdown-indent-linemarkdown-indent-function441,19105
+(defcustom markdown-indent-on-enter tmarkdown-indent-on-enter446,19233
+(defcustom markdown-follow-wiki-link-on-enter tmarkdown-follow-wiki-link-on-enter451,19371
+(defcustom markdown-uri-typesmarkdown-uri-types456,19527
+(defcustom markdown-enable-math nilmarkdown-enable-math464,19861
+(defcustom markdown-css-path ""markdown-css-path470,20041
+(defcustom markdown-xhtml-header-content ""markdown-xhtml-header-content475,20162
+(defcustom markdown-xhtml-standalone-regexpmarkdown-xhtml-standalone-regexp480,20304
+(defvar markdown-italic-face 'markdown-italic-facemarkdown-italic-face490,20606
+(defvar markdown-bold-face 'markdown-bold-facemarkdown-bold-face493,20697
+(defvar markdown-header-face 'markdown-header-facemarkdown-header-face496,20782
+(defvar markdown-header-face-1 'markdown-header-face-1markdown-header-face-1499,20879
+(defvar markdown-header-face-2 'markdown-header-face-2markdown-header-face-2502,20978
+(defvar markdown-header-face-3 'markdown-header-face-3markdown-header-face-3505,21077
+(defvar markdown-header-face-4 'markdown-header-face-4markdown-header-face-4508,21176
+(defvar markdown-header-face-5 'markdown-header-face-5markdown-header-face-5511,21275
+(defvar markdown-header-face-6 'markdown-header-face-6markdown-header-face-6514,21374
+(defvar markdown-inline-code-face 'markdown-inline-code-facemarkdown-inline-code-face517,21473
+(defvar markdown-list-face 'markdown-list-facemarkdown-list-face520,21574
+(defvar markdown-blockquote-face 'markdown-blockquote-facemarkdown-blockquote-face523,21662
+(defvar markdown-pre-face 'markdown-pre-facemarkdown-pre-face526,21760
+(defvar markdown-link-face 'markdown-link-facemarkdown-link-face529,21851
+(defvar markdown-missing-link-face 'markdown-missing-link-facemarkdown-missing-link-face532,21932
+(defvar markdown-reference-face 'markdown-reference-facemarkdown-reference-face535,22066
+(defvar markdown-url-face 'markdown-url-facemarkdown-url-face538,22161
+(defvar markdown-link-title-face 'markdown-link-title-facemarkdown-link-title-face541,22239
+(defvar markdown-comment-face 'markdown-comment-facemarkdown-comment-face544,22348
+(defvar markdown-math-face 'markdown-math-facemarkdown-math-face547,22443
+(defgroup markdown-faces nilmarkdown-faces550,22536
+(defface markdown-italic-facemarkdown-italic-face555,22634
+(defface markdown-bold-facemarkdown-bold-face560,22774
+(defface markdown-header-facemarkdown-header-face565,22908
+(defface markdown-header-face-1markdown-header-face-1570,23052
+(defface markdown-header-face-2markdown-header-face-2575,23180
+(defface markdown-header-face-3markdown-header-face-3580,23308
+(defface markdown-header-face-4markdown-header-face-4585,23436
+(defface markdown-header-face-5markdown-header-face-5590,23564
+(defface markdown-header-face-6markdown-header-face-6595,23692
+(defface markdown-inline-code-facemarkdown-inline-code-face600,23820
+(defface markdown-list-facemarkdown-list-face605,23950
+(defface markdown-blockquote-facemarkdown-blockquote-face610,24078
+(defface markdown-pre-facemarkdown-pre-face615,24210
+(defface markdown-link-facemarkdown-link-face620,24338
+(defface markdown-missing-link-facemarkdown-missing-link-face625,24454
+(defface markdown-reference-facemarkdown-reference-face630,24586
+(defface markdown-url-facemarkdown-url-face635,24714
+(defface markdown-link-title-facemarkdown-link-title-face640,24827
+(defface markdown-comment-facemarkdown-comment-face645,24965
+(defface markdown-math-facemarkdown-math-face650,25092
+(defconst markdown-regex-link-inlinemarkdown-regex-link-inline655,25219
+(defconst markdown-regex-link-referencemarkdown-regex-link-reference659,25372
+(defconst markdown-regex-reference-definitionmarkdown-regex-reference-definition663,25517
+(defconst markdown-regex-header-1-atxmarkdown-regex-header-1-atx667,25693
+(defconst markdown-regex-header-2-atxmarkdown-regex-header-2-atx671,25836
+(defconst markdown-regex-header-3-atxmarkdown-regex-header-3-atx675,25980
+(defconst markdown-regex-header-4-atxmarkdown-regex-header-4-atx679,26125
+(defconst markdown-regex-header-5-atxmarkdown-regex-header-5-atx683,26271
+(defconst markdown-regex-header-6-atxmarkdown-regex-header-6-atx687,26418
+(defconst markdown-regex-header-1-setextmarkdown-regex-header-1-setext691,26566
+(defconst markdown-regex-header-2-setextmarkdown-regex-header-2-setext695,26705
+(defconst markdown-regex-hrmarkdown-regex-hr699,26844
+(defconst markdown-regex-codemarkdown-regex-code703,26999
+(defconst markdown-regex-premarkdown-regex-pre707,27179
+(defconst markdown-regex-listmarkdown-regex-list711,27298
+(defconst markdown-regex-boldmarkdown-regex-bold715,27420
+(defconst markdown-regex-italicmarkdown-regex-italic719,27570
+(defconst markdown-regex-blockquotemarkdown-regex-blockquote723,27739
+(defconst markdown-regex-line-breakmarkdown-regex-line-break727,27841
+(defconst markdown-regex-wiki-linkmarkdown-regex-wiki-link731,27936
+(defconst markdown-regex-urimarkdown-regex-uri739,28266
+(defconst markdown-regex-angle-urimarkdown-regex-angle-uri745,28441
+(defconst markdown-regex-emailmarkdown-regex-email752,28656
+(defconst markdown-regex-latex-expressionmarkdown-regex-latex-expression756,28807
+(defconst markdown-regex-latex-displaymarkdown-regex-latex-display760,29008
+(defconst markdown-regex-list-indentmarkdown-regex-list-indent764,29151
+(defvar markdown-mode-font-lock-keywords-basicmarkdown-mode-font-lock-keywords-basic768,29308
+(defconst markdown-mode-font-lock-keywords-latexmarkdown-mode-font-lock-keywords-latex802,30912
+(defvar markdown-mode-font-lock-keywordsmarkdown-mode-font-lock-keywords814,31394
+(defun markdown-cur-line-blank-p ()markdown-cur-line-blank-p825,31705
+(defun markdown-prev-line-blank-p ()markdown-prev-line-blank-p831,31898
+(defun markdown-prev-line-indent-p ()markdown-prev-line-indent-p840,32200
+(defun markdown-cur-line-indent ()markdown-cur-line-indent847,32433
+(defun markdown-prev-line-indent ()markdown-prev-line-indent854,32667
+(defun markdown-cur-non-list-indent ()markdown-cur-non-list-indent860,32854
+(defun markdown-prev-non-list-indent ()markdown-prev-non-list-indent867,33112
+(defun markdown--next-block ()markdown--next-block873,33301
+(defun markdown--end-of-level (level)markdown--end-of-level881,33555
+(defun markdown-match-comments (last)markdown-match-comments897,34109
+(defun markdown-match-pre-blocks (last)markdown-match-pre-blocks908,34475
+(defun markdown-font-lock-extend-region ()markdown-font-lock-extend-region982,37175
+(defvar markdown-mode-syntax-tablemarkdown-mode-syntax-table1002,37972
+(defun markdown-wrap-or-insert (s1 s2)markdown-wrap-or-insert1012,38282
+(defun markdown-insert-hr ()markdown-insert-hr1024,38666
+(defun markdown-insert-bold ()markdown-insert-bold1038,39072
+(defun markdown-insert-italic ()markdown-insert-italic1047,39370
+(defun markdown-insert-code ()markdown-insert-code1056,39673
+(defun markdown-insert-link ()markdown-insert-link1064,39907
+(defun markdown-insert-wiki-link ()markdown-insert-wiki-link1073,40154
+(defun markdown-insert-image ()markdown-insert-image1081,40397
+(defun markdown-insert-header-1 ()markdown-insert-header-11090,40664
+(defun markdown-insert-header-2 ()markdown-insert-header-21097,40885
+(defun markdown-insert-header-3 ()markdown-insert-header-31104,41107
+(defun markdown-insert-header-4 ()markdown-insert-header-41111,41328
+(defun markdown-insert-header-5 ()markdown-insert-header-51118,41550
+(defun markdown-insert-header-6 ()markdown-insert-header-61125,41771
+(defun markdown-insert-header (n)markdown-insert-header1132,41992
+(defun markdown-insert-title ()markdown-insert-title1148,42665
+(defun markdown-insert-section ()markdown-insert-section1166,43242
+(defun markdown-insert-blockquote ()markdown-insert-blockquote1184,43824
+(defun markdown-block-region (beg end prefix)markdown-block-region1193,44186
+(defun markdown-blockquote-region (beg end)markdown-blockquote-region1226,45380
+(defun markdown-insert-pre ()markdown-insert-pre1232,45580
+(defun markdown-pre-region (beg end)markdown-pre-region1241,45930
+(defun markdown-indent-find-next-position (cur-pos positions)markdown-indent-find-next-position1249,46228
+(defun markdown-indent-line ()markdown-indent-line1256,46498
+(defun markdown-calc-indents ()markdown-calc-indents1273,47255
+(defun markdown-do-normal-return ()markdown-do-normal-return1319,48782
+(defun markdown-enter-key ()markdown-enter-key1325,48959
+(defvar markdown-mode-mapmarkdown-mode-map1339,49414
+(defconst markdown-refcheck-buffermarkdown-refcheck-buffer1435,53359
+(defun markdown-has-reference-definition (reference)markdown-has-reference-definition1441,53588
+(defun markdown-get-undefined-refs ()markdown-get-undefined-refs1453,54072
+(defun markdown-add-missing-ref-definition (ref buffer &optional recheck)markdown-add-missing-ref-definition1480,55317
+(defun markdown-check-refs (&optional silent)markdown-check-refs1521,56980
+(defvar markdown-cycle-global-status 1)markdown-cycle-global-status1580,59364
+(defvar markdown-cycle-subtree-status nil)markdown-cycle-subtree-status1581,59404
+(defun markdown-end-of-subtree (&optional invisible-OK)markdown-end-of-subtree1584,59491
+(defun markdown-cycle (&optional arg)markdown-cycle1605,60225
+(defun markdown-shifttab ()markdown-shifttab1679,62935
+(defun markdown (&optional output-buffer-name)markdown1687,63154
+(defun markdown-output-standalone-p ()markdown-output-standalone-p1723,64579
+(defun markdown-add-xhtml-header-and-footer (title)markdown-add-xhtml-header-and-footer1732,64949
+(defun markdown-preview ()markdown-preview1754,65824
+(defun markdown-export-file-name ()markdown-export-file-name1760,66041
+(defun markdown-export ()markdown-export1767,66355
+(defun markdown-export-and-view ()markdown-export-and-view1782,66946
+(defun markdown-wiki-link-p ()markdown-wiki-link-p1791,67210
+(defun markdown-convert-wiki-link-to-filename (name)markdown-convert-wiki-link-to-filename1806,67827
+(defun markdown-follow-wiki-link (name)markdown-follow-wiki-link1814,68209
+(defun markdown-follow-wiki-link-at-point ()markdown-follow-wiki-link-at-point1822,68502
+(defun markdown-next-wiki-link ()markdown-next-wiki-link1830,68777
+(defun markdown-previous-wiki-link ()markdown-previous-wiki-link1842,69173
+(defun markdown-highlight-wiki-link (from to face)markdown-highlight-wiki-link1848,69343
+(defun markdown-unfontify-region-wiki-links (from to)markdown-unfontify-region-wiki-links1853,69540
+(defun markdown-fontify-region-wiki-links (from to)markdown-fontify-region-wiki-links1859,69812
+(defun markdown-extend-changed-region (from to)markdown-extend-changed-region1875,70495
+(defun markdown-check-change-for-wiki-link (from to change)markdown-check-change-for-wiki-link1893,71110
+(defun markdown-fontify-buffer-wiki-links ()markdown-fontify-buffer-wiki-links1922,72199
+(defun markdown-line-number-at-pos (&optional pos)markdown-line-number-at-pos1929,72453
+(defun markdown-nobreak-p ()markdown-nobreak-p1941,72881
+(defun markdown-show-version ()markdown-show-version1950,73155
+(define-derived-mode markdown-mode text-mode "Markdown"markdown-mode1956,73329
+(define-derived-mode gfm-mode markdown-mode "GFM"gfm-mode2014,75567
+
+pymacs.el,2957
+(defvar pymacs-use-hash-tablespymacs-use-hash-tables40,1547
+(defvar pymacs-python-command "python"pymacs-python-command95,3550
+(defvar pymacs-load-path nilpymacs-load-path98,3643
+(defvar pymacs-trace-transit '(5000 . 30000)pymacs-trace-transit102,3806
+(defvar pymacs-forget-mutability nilpymacs-forget-mutability110,4249
+(defvar pymacs-mutable-strings nilpymacs-mutable-strings115,4506
+(defvar pymacs-timeout-at-start 30pymacs-timeout-at-start121,4803
+(defvar pymacs-timeout-at-reply 5pymacs-timeout-at-reply125,4983
+(defvar pymacs-timeout-at-line 2pymacs-timeout-at-line129,5158
+(defvar pymacs-auto-restart 'askpymacs-auto-restart133,5330
+(defvar pymacs-dreadful-zombies nilpymacs-dreadful-zombies137,5460
+(defvar pymacs-load-history nil "Pymacs loading history.")pymacs-load-history141,5636
+(defun pymacs-load (module &optional prefix noerror)pymacs-load144,5711
+(defun pymacs-autoload (function module &optional prefix docstring interactive)pymacs-autoload169,7039
+(defun pymacs-eval (text)pymacs-eval196,8252
+(defun pymacs-exec (text)pymacs-exec205,8528
+(defun pymacs-call (function &rest arguments)pymacs-call215,8876
+(defun pymacs-apply (function arguments)pymacs-apply224,9326
+(defun pymacs-python-reference (object)pymacs-python-reference261,10712
+(defun pymacs-file-handler (operation &rest arguments)pymacs-file-handler290,12105
+(defun pymacs-file-force (operation arguments)pymacs-file-force324,13929
+(defvar pymacs-used-ids nilpymacs-used-ids343,14754
+(defvar pymacs-weak-hash nilpymacs-weak-hash350,15112
+(defvar pymacs-gc-wanted nilpymacs-gc-wanted353,15210
+(defvar pymacs-gc-inhibit nilpymacs-gc-inhibit356,15314
+(defvar pymacs-gc-timer nilpymacs-gc-timer359,15417
+(defun pymacs-schedule-gc (&optional xemacs-list)pymacs-schedule-gc363,15580
+(defun pymacs-garbage-collect ()pymacs-garbage-collect367,15691
+(defun pymacs-defuns (arguments)pymacs-defuns386,16382
+(defun pymacs-defun (index interaction)pymacs-defun399,17026
+(defun pymacs-python (index)pymacs-python417,17933
+(defvar pymacs-lisp nilpymacs-lisp434,18671
+(defvar pymacs-freed-list nilpymacs-freed-list437,18752
+(defun pymacs-allocate-lisp (expression)pymacs-allocate-lisp443,18950
+(defun pymacs-free-lisp (indices)pymacs-free-lisp462,19717
+(defun pymacs-print-for-apply (function arguments)pymacs-print-for-apply472,20157
+(defun pymacs-print-for-eval (expression)pymacs-print-for-eval490,20791
+(defvar pymacs-transit-buffer nilpymacs-transit-buffer567,23784
+(defun pymacs-start-services ()pymacs-start-services588,25089
+(defun pymacs-terminate-services ()pymacs-terminate-services670,29080
+(defun pymacs-serve-until-reply (action inserter)pymacs-serve-until-reply690,29796
+(defun pymacs-round-trip (action inserter)pymacs-round-trip745,32291
+(defun pymacs-interruptible-eval (expression)pymacs-interruptible-eval808,35154
+(defun pymacs-proper-list-p (expression)pymacs-proper-list-p822,35853
+
+rename-sgml-tag.el,104
+(defun rst--inside-tag-p ()rst--inside-tag-p35,1167
+(defun rename-sgml-tag ()rename-sgml-tag40,1267
+
+sr-speedbar.el,3231
+(defgroup sr-speedbar nilsr-speedbar244,8813
+(defcustom sr-speedbar-width-x 24sr-speedbar-width-x248,8885
+(defcustom sr-speedbar-width-console 24sr-speedbar-width-console253,9023
+(defcustom sr-speedbar-max-width 50sr-speedbar-max-width258,9158
+(defcustom sr-speedbar-auto-refresh tsr-speedbar-auto-refresh266,9394
+(defcustom sr-speedbar-right-side tsr-speedbar-right-side274,9613
+(defcustom sr-speedbar-delete-windows nilsr-speedbar-delete-windows283,9872
+(defcustom sr-speedbar-skip-other-window-p nilsr-speedbar-skip-other-window-p293,10174
+(defconst sr-speedbar-version "0.1.4"sr-speedbar-version312,10881
+(defconst sr-speedbar-buffer-name "*SPEEDBAR*"sr-speedbar-buffer-name315,10942
+(defvar sr-speedbar-width nilsr-speedbar-width319,11099
+(defvar sr-speedbar-window nilsr-speedbar-window322,11169
+(defvar sr-speedbar-last-refresh-dictionary nilsr-speedbar-last-refresh-dictionary325,11223
+(defun sr-speedbar-toggle ()sr-speedbar-toggle329,11422
+(defun sr-speedbar-open ()sr-speedbar-open341,11804
+(defun sr-speedbar-close ()sr-speedbar-close392,14733
+(defun sr-speedbar-select-window ()sr-speedbar-select-window413,15530
+(defun sr-speedbar-refresh-turn-on ()sr-speedbar-refresh-turn-on420,15755
+(defun sr-speedbar-refresh-turn-off ()sr-speedbar-refresh-turn-off426,15953
+(defun sr-speedbar-refresh-toggle ()sr-speedbar-refresh-toggle432,16155
+(defun sr-speedbar-exist-p ()sr-speedbar-exist-p439,16453
+(defun sr-speedbar-window-p ()sr-speedbar-window-p445,16663
+(defun sr-speedbar-remember-window-width ()sr-speedbar-remember-window-width450,16846
+(defun sr-speedbar-recalculate-width ()sr-speedbar-recalculate-width458,17141
+(defun sr-speedbar-get-window ()sr-speedbar-get-window467,17518
+(defun sr-speedbar-before-visiting-file-hook ()sr-speedbar-before-visiting-file-hook485,18207
+(defun sr-speedbar-before-visiting-tag-hook ()sr-speedbar-before-visiting-tag-hook489,18354
+(defun sr-speedbar-visiting-file-hook ()sr-speedbar-visiting-file-hook493,18499
+(defun sr-speedbar-visiting-tag-hook ()sr-speedbar-visiting-tag-hook497,18632
+(defun sr-speedbar-kill-buffer-hook ()sr-speedbar-kill-buffer-hook501,18763
+(defun sr-speedbar-refresh ()sr-speedbar-refresh513,19359
+(defun sr-speedbar-handle-auto-refresh (activate &optional echo-show)sr-speedbar-handle-auto-refresh520,19696
+(defun sr-speedbar-current-window-take-width (&optional window)sr-speedbar-current-window-take-width531,20233
+(defun sr-speedbar-window-dedicated-only-one-p ()sr-speedbar-window-dedicated-only-one-p537,20455
+(defun sr-speedbar-window-exist-p (window)sr-speedbar-window-exist-p552,20927
+(defun sr-speedbar-buffer-exist-p (buffer)sr-speedbar-buffer-exist-p557,21073
+(defun sr-speedbar-handle-other-window-advice (activate)sr-speedbar-handle-other-window-advice562,21219
+(defadvice delete-other-windows (around sr-speedbar-delete-other-window-advice activate)delete-other-windows572,21694
+(defadvice delete-window (before sr-speedbar-delete-window-advice activate)delete-window584,22281
+(defadvice pop-to-buffer (before sr-speedbar-pop-to-buffer-advice activate)pop-to-buffer590,22600
+(defadvice other-window (after sr-speedbar-other-window-advice)other-window610,23604
+
+tango-dark-theme.el,40
+(deftheme tango-darktango-dark30,1045
+
+tbemail.el,586
+(defvar tbemail-mode-hook nil)tbemail-mode-hook40,1280
+(defface tbemail-email-quote1tbemail-email-quote146,1410
+(defface tbemail-email-quote2tbemail-email-quote250,1531
+(defface tbemail-email-quote3tbemail-email-quote354,1652
+(defface tbemail-email-quote4tbemail-email-quote458,1773
+(defface tbemail-email-boldtbemail-email-bold62,1894
+(defface tbemail-email-italictbemail-email-italic66,1973
+(defface tbemail-email-underlinetbemail-email-underline70,2058
+(defvar tbemail-font-lock-keywordstbemail-font-lock-keywords74,2153
+(defun tbemail-mode ()tbemail-mode84,2653
+
+xml-rpc.el,2788
+(defconst xml-rpc-version "1.6.8"xml-rpc-version17,539
+(defconst xml-rpc-maintainer-address "mah@everybody.org"xml-rpc-maintainer-address192,6645
+(defcustom xml-rpc-load-hook nilxml-rpc-load-hook195,6754
+(defcustom xml-rpc-use-coding-systemxml-rpc-use-coding-system199,6856
+(defcustom xml-rpc-allow-unicode-string (coding-system-p 'utf-8)xml-rpc-allow-unicode-string204,7008
+(defcustom xml-rpc-base64-encode-unicode (coding-system-p 'utf-8)xml-rpc-base64-encode-unicode210,7296
+(defcustom xml-rpc-base64-decode-unicode (coding-system-p 'utf-8)xml-rpc-base64-decode-unicode215,7480
+(defcustom xml-rpc-debug 0xml-rpc-debug220,7664
+(defvar xml-rpc-fault-string nilxml-rpc-fault-string225,7848
+(defvar xml-rpc-fault-code nilxml-rpc-fault-code228,7936
+(defsubst xml-rpc-value-intp (value)xml-rpc-value-intp235,8060
+(defsubst xml-rpc-value-doublep (value)xml-rpc-value-doublep239,8155
+(defsubst xml-rpc-value-stringp (value)xml-rpc-value-stringp243,8266
+(defsubst xml-rpc-value-structp (value)xml-rpc-value-structp249,8472
+(defsubst xml-rpc-value-arrayp (value)xml-rpc-value-arrayp264,8961
+(defun xml-rpc-submit-bug-report ()xml-rpc-submit-bug-report270,9156
+(defun xml-rpc-value-booleanp (value)xml-rpc-value-booleanp291,9934
+(defun xml-rpc-value-datetimep (value)xml-rpc-value-datetimep296,10051
+(defun xml-rpc-string-to-boolean (value)xml-rpc-string-to-boolean303,10308
+(defun xml-rpc-caddar-safe (list)xml-rpc-caddar-safe307,10446
+(defun xml-rpc-xml-list-to-value (xml-list)xml-rpc-xml-list-to-value310,10533
+(defun xml-rpc-boolean-to-string (value)xml-rpc-boolean-to-string363,12549
+(defun xml-rpc-datetime-to-string (value)xml-rpc-datetime-to-string369,12663
+(defun xml-rpc-value-to-xml-list (value)xml-rpc-value-to-xml-list373,12809
+(defun xml-rpc-xml-to-string (xml)xml-rpc-xml-to-string423,14942
+(defsubst xml-rpc-response-errorp (response)xml-rpc-response-errorp443,15561
+(defsubst xml-rpc-response-error-code (response)xml-rpc-response-error-code449,15845
+(defsubst xml-rpc-response-error-string (response)xml-rpc-response-error-string454,16032
+(defun xml-rpc-xml-to-response (xml)xml-rpc-xml-to-response459,16221
+(defun xml-rpc-request (server-url xml &optional async-callback-function)xml-rpc-request485,17100
+(defun xml-rpc-clean-string (s)xml-rpc-clean-string555,20870
+(defun xml-rpc-clean (l)xml-rpc-clean561,20987
+(defun xml-rpc-request-process-buffer (xml-buffer)xml-rpc-request-process-buffer594,21882
+(defun xml-rpc-request-callback-handler (callback-fun xml-buffer)xml-rpc-request-callback-handler634,23578
+(defun xml-rpc-method-call-async (async-callback-func server-url methodxml-rpc-method-call-async643,23945
+(defun xml-rpc-method-call (server-url method &rest params)xml-rpc-method-call663,24988
