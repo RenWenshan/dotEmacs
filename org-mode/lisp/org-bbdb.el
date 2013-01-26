@@ -1,6 +1,6 @@
 ;;; org-bbdb.el --- Support for links to BBDB entries from within Org-mode
 
-;; Copyright (C) 2004-2012  Free Software Foundation, Inc.
+;; Copyright (C) 2004-2013 Free Software Foundation, Inc.
 
 ;; Authors: Carsten Dominik <carsten at orgmode dot org>
 ;;       Thomas Baumann <thomas dot baumann at ch dot tum dot de>
@@ -109,7 +109,7 @@
 (declare-function bbdb-record-getprop "ext:bbdb" (record property))
 (declare-function bbdb-record-name "ext:bbdb" (record))
 (declare-function bbdb-records "ext:bbdb"
-          (&optional dont-check-disk already-in-db-buffer))
+		  (&optional dont-check-disk already-in-db-buffer))
 (declare-function bbdb-split "ext:bbdb" (string separators))
 (declare-function bbdb-string-trim "ext:bbdb" (string))
 (declare-function bbdb-record-get-field "ext:bbdb" (record field))
@@ -122,7 +122,7 @@
 (declare-function calendar-leap-year-p "calendar" (year))
 (declare-function diary-ordinal-suffix "diary-lib" (n))
 
-(defvar date)   ;; dynamically scoped from Org
+(org-no-warnings (defvar date)) ;; unprefixed, from calendar.el
 
 ;; Customization
 
@@ -207,7 +207,7 @@ date year)."
 	   (company (if (fboundp 'bbdb-record-getprop)
                         (bbdb-record-getprop rec 'company)
                       (car (bbdb-record-get-field rec 'organization))))
-	   (link (org-make-link "bbdb:" name)))
+	   (link (concat "bbdb:" name)))
       (org-store-link-props :type "bbdb" :name name :company company
 			    :link link :description name)
       link)))
@@ -221,6 +221,8 @@ italicized, in all other cases it is left unchanged."
   (cond
    ((eq format 'html) (format "<i>%s</i>" desc))
    ((eq format 'latex) (format "\\textit{%s}" desc))
+   ((eq format 'odt)
+    (format "<text:span text:style-name=\"Emphasis\">%s</text:span>" desc))
    (t desc)))
 
 (defun org-bbdb-open (name)
@@ -336,7 +338,7 @@ This is used by Org to re-create the anniversary hash table."
 (add-hook 'bbdb-after-change-hook 'org-bbdb-updated)
 
 ;;;###autoload
-(defun org-bbdb-anniversaries()
+(defun org-bbdb-anniversaries ()
   "Extract anniversaries from BBDB for display in the agenda."
   (require 'bbdb)
   (require 'diary-lib)
@@ -430,5 +432,9 @@ END:VEVENT\n"
 		     categ)))))
 
 (provide 'org-bbdb)
+
+;; Local variables:
+;; generated-autoload-file: "org-loaddefs.el"
+;; End:
 
 ;;; org-bbdb.el ends here

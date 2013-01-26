@@ -1,6 +1,6 @@
 ;;; org-odt.el --- OpenDocument Text exporter for Org-mode
 
-;; Copyright (C) 2010-2012 Free Software Foundation, Inc.
+;; Copyright (C) 2010-2013 Free Software Foundation, Inc.
 
 ;; Author: Jambunathan K <kjambunathan at gmail dot com>
 ;; Keywords: outlines, hypermedia, calendar, wp
@@ -27,6 +27,7 @@
 (eval-when-compile
   (require 'cl))
 (require 'org-lparse)
+(require 'org-compat)
 
 (defgroup org-export-odt nil
   "Options specific for ODT export of Org-mode files."
@@ -115,11 +116,11 @@ and `org-odt-data-dir'.")
 	     (lambda (schema-dir)
 	       (when schema-dir
 		 (message "Debug (org-odt): Trying %s..." schema-dir)
-		 (when (and (file-readable-p
-			     (expand-file-name "od-manifest-schema-v1.2-cs01.rnc"
+		 (when (and (file-expand-wildcards
+			     (expand-file-name "od-manifest-schema*.rnc"
 					       schema-dir))
-			    (file-readable-p
-			     (expand-file-name "od-schema-v1.2-cs01.rnc"
+			    (file-expand-wildcards
+			     (expand-file-name "od-schema*.rnc"
 					       schema-dir))
 			    (file-readable-p
 			     (expand-file-name "schemas.xml" schema-dir)))
@@ -159,10 +160,10 @@ Also add it to `rng-schema-locating-files'."
     (let ((schema-dir value))
       (set var
 	   (if (and
-		(file-readable-p
-		 (expand-file-name "od-manifest-schema-v1.2-cs01.rnc" schema-dir))
-		(file-readable-p
-		 (expand-file-name "od-schema-v1.2-cs01.rnc" schema-dir))
+		(file-expand-wildcards
+		 (expand-file-name "od-manifest-schema*.rnc" schema-dir))
+		(file-expand-wildcards
+		 (expand-file-name "od-schema*.rnc" schema-dir))
 		(file-readable-p
 		 (expand-file-name "schemas.xml" schema-dir)))
 	       schema-dir
@@ -211,7 +212,7 @@ heuristically based on the values of `org-odt-lib-dir' and
 		  org-odt-styles-dir-list)
 	    nil)))
     (unless styles-dir
-      (error "Error (org-odt): Cannot find factory styles files. Aborting."))
+      (error "Error (org-odt): Cannot find factory styles files, aborting"))
     styles-dir)
   "Directory that holds auxiliary XML files used by the ODT exporter.
 
@@ -243,9 +244,6 @@ standard Emacs.")
 
 (mapc
  (lambda (desc)
-   ;; Let Org open all OpenDocument files using system-registered app
-   (add-to-list 'org-file-apps
-		(cons (concat  "\\." (car desc) "\\'") 'system))
    ;; Let Emacs open all OpenDocument files in archive mode
    (add-to-list 'auto-mode-alist
 		(cons (concat  "\\." (car desc) "\\'") 'archive-mode)))
@@ -283,7 +281,7 @@ Valid values are one of:
 4. list of the form (ODT-OR-OTT-FILE (FILE-MEMBER-1 FILE-MEMBER-2
 ...))
 
-In case of option 1, an in-built styles.xml is used. See
+In case of option 1, an in-built styles.xml is used.  See
 `org-odt-styles-dir' for more information.
 
 In case of option 3, the specified file is unzipped and the
@@ -324,6 +322,8 @@ a per-file basis.  For example,
 
 (defconst org-export-odt-tmpdir-prefix "%s-")
 (defconst org-export-odt-bookmark-prefix "OrgXref.")
+(defvar org-odt-zip-dir nil
+  "Temporary directory that holds XML files during export.")
 
 (defvar org-export-odt-embed-images t
   "Should the images be copied in to the odt file or just linked?")
@@ -380,7 +380,8 @@ This variable is effective only if
 		  (table . "Table")
 		  (definition-term . "Text_20_body_20_bold")
 		  (horizontal-line . "Horizontal_20_Line")))
-    (character . ((bold . "Bold")
+    (character . ((default . "Default")
+		  (bold . "Bold")
 		  (emphasis . "Emphasis")
 		  (code . "OrgCode")
 		  (verbatim . "OrgCode")
@@ -411,7 +412,10 @@ Interactive commands `org-export-as-odt' and
 then use `org-export-odt-convert-process' to convert the
 resulting document to this format.  During customization of this
 variable, the list of valid values are populated based on
-`org-export-odt-convert-capabilities'."
+`org-export-odt-convert-capabilities'.
+
+You can set this option on per-file basis using file local
+values.  See Info node `(emacs) File Variables'."
   :group 'org-export-odt
   :version "24.1"
   :type '(choice :convert-widget
@@ -422,6 +426,35 @@ variable, the list of valid values are populated based on
 		   ,@(mapcar (lambda (c)
 			       `(const :tag ,c ,c))
 			     (org-lparse-reachable-formats "odt")))))
+;;;###autoload
+(put 'org-export-odt-preferred-output-format 'safe-local-variable 'stringp)
+
+(defmacro org-odt-cleanup-xml-buffers (&rest body)
+  `(let ((org-odt-zip-dir
+	  (make-temp-file
+	   (format org-export-odt-tmpdir-prefix "odf") t))
+	 (--cleanup-xml-buffers
+	  (function
+	   (lambda nil
+	     (let ((xml-files '("mimetype" "META-INF/manifest.xml" "content.xml"
+				"meta.xml" "styles.xml")))
+	       ;; kill all xml buffers
+	       (mapc (lambda (file)
+		       (with-current-buffer
+			   (find-file-noselect
+			    (expand-file-name file org-odt-zip-dir) t)
+			 (set-buffer-modified-p nil)
+			 (kill-buffer)))
+		     xml-files))
+	     ;; delete temporary directory.
+	     (org-delete-directory org-odt-zip-dir t)))))
+     (condition-case err
+	 (prog1 (progn ,@body)
+	   (funcall --cleanup-xml-buffers))
+       ((quit error)
+	(funcall --cleanup-xml-buffers)
+	(message "OpenDocument export failed: %s"
+		 (error-message-string err))))))
 
 ;;;###autoload
 (defun org-export-as-odt-and-open (arg)
@@ -430,8 +463,9 @@ If there is an active region, export only the region.
 The prefix ARG specifies how many levels of the outline should become
 headlines.  The default is 3.  Lower levels will become bulleted lists."
   (interactive "P")
-  (org-lparse-and-open
-   (or org-export-odt-preferred-output-format "odt") "odt" arg))
+  (org-odt-cleanup-xml-buffers
+   (org-lparse-and-open
+    (or org-export-odt-preferred-output-format "odt") "odt" arg)))
 
 ;;;###autoload
 (defun org-export-as-odt-batch ()
@@ -441,7 +475,7 @@ emacs   --batch
         --load=$HOME/lib/emacs/org.el
         --eval \"(setq org-export-headline-levels 2)\"
         --visit=MyFile --funcall org-export-as-odt-batch"
-  (org-lparse-batch "odt"))
+  (org-odt-cleanup-xml-buffers (org-lparse-batch "odt")))
 
 ;;; org-export-as-odt
 ;;;###autoload
@@ -462,8 +496,9 @@ the file header and footer, simply return the content of
 <body>...</body>, without even the body tags themselves.  When
 PUB-DIR is set, use this as the publishing directory."
   (interactive "P")
-  (org-lparse (or org-export-odt-preferred-output-format "odt")
-	      "odt" arg hidden ext-plist to-buffer body-only pub-dir))
+  (org-odt-cleanup-xml-buffers
+   (org-lparse (or org-export-odt-preferred-output-format "odt")
+	       "odt" arg hidden ext-plist to-buffer body-only pub-dir)))
 
 (defvar org-odt-entity-control-callbacks-alist
   `((EXPORT
@@ -537,7 +572,7 @@ PUB-DIR is set, use this as the publishing directory."
   (delete-region (match-beginning 0) (point-max)))
 
 ;; Following variable is let bound when `org-do-lparse' is in
-;; progress. See org-html.el.
+;; progress.  See org-html.el.
 (defvar org-lparse-toc)
 (defun org-odt-format-toc ()
   (if (not org-lparse-toc) "" (concat  "\n" org-lparse-toc "\n")))
@@ -808,7 +843,7 @@ PUB-DIR is set, use this as the publishing directory."
 	(org-lparse-begin-list-item list-type)))
 
 ;; Following variables are let bound when table emission is in
-;; progress. See org-lparse.el.
+;; progress.  See org-lparse.el.
 (defvar org-lparse-table-begin-marker)
 (defvar org-lparse-table-ncols)
 (defvar org-lparse-table-rowgrp-open)
@@ -942,7 +977,7 @@ Use `org-odt-add-automatic-style' to add update this variable.'")
 
 (defvar org-odt-object-counters nil
   "Running counters for various OBJECT-TYPEs.
-Use this to generate automatic names and style-names. See
+Use this to generate automatic names and style-names.  See
 `org-odt-add-automatic-style'.")
 
 (defun org-odt-write-automatic-styles ()
@@ -1096,7 +1131,7 @@ styles congruent with the ODF-1.2 specification."
 
     ;; Additional Note: LibreOffice's AutoFormat facility for tables -
     ;; which recognizes as many as 16 different cell types - is much
-    ;; richer. Unfortunately it is NOT amenable to easy configuration
+    ;; richer.  Unfortunately it is NOT amenable to easy configuration
     ;; by hand.
 
     (let* ((template-name (nth 1 style-spec))
@@ -1246,7 +1281,7 @@ styles congruent with the ODF-1.2 specification."
 		       (+ level (or (org-lparse-get 'TOPLEVEL-HLEVEL) 1) -1))))
     (insert "\n" (org-odt-format-stylized-paragraph style toc-entry) "\n")))
 
-;; Following variable is let bound during 'ORG-LINK callback. See
+;; Following variable is let bound during 'ORG-LINK callback.  See
 ;; org-html.el
 (defvar org-lparse-link-description-is-image nil)
 (defun org-odt-format-link (desc href &optional attr)
@@ -1442,7 +1477,7 @@ is turned on."
 			       (" " "<text:s/>")
 			       ("	" "<text:tab/>")))
 	 (hfy-face-to-css 'org-odt-hfy-face-to-css)
-	 (hfy-optimisations-1 (copy-seq hfy-optimisations))
+	 (hfy-optimisations-1 (copy-sequence hfy-optimisations))
 	 (hfy-optimisations (add-to-list 'hfy-optimisations-1
 					 'body-text-only))
 	 (hfy-begin-span-handler
@@ -1693,6 +1728,7 @@ ATTR is a string of other attributes of the a element."
        ((and (string= type "")
 	     (or (not thefile) (string= thefile ""))
 	     (plist-get org-lparse-opt-plist :section-numbers)
+	     (get-text-property 0 'org-no-description fragment)
 	     (setq sec-frag fragment)
 	     (or (string-match  "\\`sec\\(\\(-[0-9]+\\)+\\)" sec-frag)
 		 (and (setq sec-frag
@@ -1722,7 +1758,11 @@ ATTR is a string of other attributes of the a element."
 	(when (not (member type '("" "file")))
 	  (setq thefile (concat type ":" thefile)))
 
-	(let ((org-odt-suppress-xref nil))
+	(let ((org-odt-suppress-xref
+	       ;; Typeset link to headlines with description, as a
+	       ;; regular hyperlink.
+	       (and (string= type "")
+		    (not (get-text-property 0 'org-no-description fragment)))))
 	  (org-odt-format-link
 	   (org-xml-format-desc desc) thefile attr)))))))
 
@@ -1737,7 +1777,7 @@ ATTR is a string of other attributes of the a element."
   (concat
    (org-lparse-format 'EXTRA-TARGETS extra-targets)
 
-   ;; No need to generate section numbers. They are auto-generated by
+   ;; No need to generate section numbers.  They are auto-generated by
    ;; the application
 
    ;; (concat (org-lparse-format 'SECTION-NUMBER snumber level) " ")
@@ -1993,37 +2033,43 @@ ATTR is a string of other attributes of the a element."
   methods.")
 
 ;; A4 page size is 21.0 by 29.7 cms
-;; The default page settings has 2cm margin on each of the sides. So
+;; The default page settings has 2cm margin on each of the sides.  So
 ;; the effective text area is 17.0 by 25.7 cm
 (defvar org-export-odt-max-image-size '(17.0 . 20.0)
   "Limiting dimensions for an embedded image.")
 
 (defun org-odt-do-image-size (probe-method file &optional dpi anchor-type)
-  (setq dpi (or dpi org-export-odt-pixels-per-inch))
-  (setq anchor-type (or anchor-type "paragraph"))
-  (flet ((size-in-cms (size-in-pixels)
-		      (flet ((pixels-to-cms (pixels)
-					    (let* ((cms-per-inch 2.54)
-						   (inches (/ pixels dpi)))
-					      (* cms-per-inch inches))))
-			(and size-in-pixels
-			     (cons (pixels-to-cms (car size-in-pixels))
-				   (pixels-to-cms (cdr size-in-pixels)))))))
+  (let* ((dpi (or dpi org-export-odt-pixels-per-inch))
+	 (anchor-type (or anchor-type "paragraph"))
+	 (--pixels-to-cms
+	  (function
+	   (lambda (pixels dpi)
+	     (let* ((cms-per-inch 2.54)
+		    (inches (/ pixels dpi)))
+	       (* cms-per-inch inches)))))
+	 (--size-in-cms
+	  (function
+	   (lambda (size-in-pixels dpi)
+	     (and size-in-pixels
+		  (cons (funcall --pixels-to-cms (car size-in-pixels) dpi)
+			(funcall --pixels-to-cms (cdr size-in-pixels) dpi)))))))
     (case probe-method
       (emacs
-       (size-in-cms (ignore-errors	; Emacs could be in batch mode
-		      (clear-image-cache)
-		      (image-size (create-image file) 'pixels))))
+       (let ((size-in-pixels
+	      (ignore-errors		; Emacs could be in batch mode
+		(clear-image-cache)
+		(image-size (create-image file) 'pixels))))
+	 (funcall --size-in-cms size-in-pixels dpi)))
       (imagemagick
-       (size-in-cms
-	(let ((dim (shell-command-to-string
-		    (format "identify -format \"%%w:%%h\" \"%s\"" file))))
-	  (when (string-match "\\([0-9]+\\):\\([0-9]+\\)" dim)
-	    (cons (string-to-number (match-string 1 dim))
-		  (string-to-number (match-string 2 dim)))))))
-      (t
-       (cdr (assoc-string anchor-type
-			  org-export-odt-default-image-sizes-alist))))))
+       (let ((size-in-pixels
+	      (let ((dim (shell-command-to-string
+			  (format "identify -format \"%%w:%%h\" \"%s\"" file))))
+		(when (string-match "\\([0-9]+\\):\\([0-9]+\\)" dim)
+		  (cons (string-to-number (match-string 1 dim))
+			(string-to-number (match-string 2 dim)))))))
+	 (funcall --size-in-cms size-in-pixels dpi)))
+      (t (cdr (assoc-string anchor-type
+			    org-export-odt-default-image-sizes-alist))))))
 
 (defun org-odt-image-size-from-file (file &optional user-width
 					  user-height scale dpi embed-as)
@@ -2036,7 +2082,7 @@ ATTR is a string of other attributes of the a element."
 	    until size
 	    do (setq size (org-odt-do-image-size
 			   probe-method file dpi embed-as)))
-      (or size (error "Cannot determine Image size. Aborting ..."))
+      (or size (error "Cannot determine image size, aborting"))
       (setq width (car size) height (cdr size)))
     (cond
      (scale
@@ -2226,12 +2272,11 @@ captions on export.")
     ;; Not at all OSes ship with zip by default
     (error "Executable \"zip\" needed for creating OpenDocument files"))
 
-  (let* ((outdir (make-temp-file
-		  (format org-export-odt-tmpdir-prefix org-lparse-backend) t))
-	 (content-file (expand-file-name "content.xml" outdir)))
-
+  (let* ((content-file (expand-file-name "content.xml" org-odt-zip-dir)))
     ;; init conten.xml
-    (with-current-buffer (find-file-noselect content-file t))
+    (require 'nxml-mode)
+    (let ((nxml-auto-insert-xml-declaration-flag nil))
+      (find-file-noselect content-file t))
 
     ;; reset variables
     (setq org-odt-manifest-file-entries nil
@@ -2277,11 +2322,9 @@ visually."
   (org-odt-write-manifest-file)
 
   (let ((xml-files '("mimetype" "META-INF/manifest.xml" "content.xml"
-		     "meta.xml"))
-	(zipdir default-directory))
+		     "meta.xml")))
     (when (equal org-lparse-backend 'odt)
       (push "styles.xml" xml-files))
-    (message "Switching to directory %s" (expand-file-name zipdir))
 
     ;; save all xml files
     (mapc (lambda (file)
@@ -2317,15 +2360,8 @@ visually."
 	 cmds))
 
       ;; move the file from outdir to target-dir
-      (rename-file target-name target-dir)
+      (rename-file target-name target-dir)))
 
-      ;; kill all xml buffers
-      (mapc (lambda (file)
-	      (kill-buffer
-	       (find-file-noselect (expand-file-name file zipdir) t)))
-	    xml-files)
-
-      (delete-directory zipdir)))
   (message "Created %s" target)
   (set-buffer (find-file-noselect target t)))
 
@@ -2340,7 +2376,8 @@ visually."
   (make-directory "META-INF")
   (let ((manifest-file (expand-file-name "META-INF/manifest.xml")))
     (with-current-buffer
-	(find-file-noselect manifest-file t)
+	(let ((nxml-auto-insert-xml-declaration-flag nil))
+	  (find-file-noselect manifest-file t))
       (insert
        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
      <manifest:manifest xmlns:manifest=\"urn:oasis:names:tc:opendocument:xmlns:manifest:1.0\" manifest:version=\"1.2\">\n")
@@ -2404,12 +2441,12 @@ visually."
   ;; Update styles.xml - take care of outline numbering
   (with-current-buffer
       (find-file-noselect (expand-file-name "styles.xml") t)
-    ;; Don't make automatic backup of styles.xml file. This setting
+    ;; Don't make automatic backup of styles.xml file.  This setting
     ;; prevents the backed-up styles.xml file from being zipped in to
-    ;; odt file. This is more of a hackish fix. Better alternative
+    ;; odt file.  This is more of a hackish fix.  Better alternative
     ;; would be to fix the zip command so that the output odt file
     ;; includes only the needed files and excludes any auto-generated
-    ;; extra files like backups and auto-saves etc etc. Note that
+    ;; extra files like backups and auto-saves etc etc.  Note that
     ;; currently the zip command zips up the entire temp directory so
     ;; that any auto-generated files created under the hood ends up in
     ;; the resulting odt file.
@@ -2627,7 +2664,7 @@ using `org-open-file'."
 	 cache-dir display-msg)
     (cond
      ((eq latex-frag-opt 'dvipng)
-      (setq cache-dir "ltxpng/")
+      (setq cache-dir org-latex-preview-ltxpng-directory)
       (setq display-msg "Creating LaTeX image %s"))
      ((member latex-frag-opt '(mathjax t))
       (setq latex-frag-opt 'mathml)
@@ -2675,7 +2712,7 @@ Do this when translation to MathML fails."
 	    "" (org-add-props label '(org-protected t)))) t t)))))
 
 ;; process latex fragments as part of
-;; `org-export-preprocess-after-blockquote-hook'. Note that this hook
+;; `org-export-preprocess-after-blockquote-hook'.  Note that this hook
 ;; is the one that is closest and well before the call to
 ;; `org-export-attach-captions-and-attributes' in
 ;; `org-export-preprocess-string'.  The above arrangement permits
@@ -2687,7 +2724,7 @@ Do this when translation to MathML fails."
 (defun org-export-odt-preprocess (parameters)
   (org-export-odt-preprocess-label-references))
 
-(declare-function archive-zip-extract "arc-mode.el" (archive name))
+(declare-function archive-zip-extract "arc-mode" (archive name))
 (defun org-odt-zip-extract-one (archive member &optional target)
   (require 'arc-mode)
   (let* ((target (or target default-directory))
@@ -2710,7 +2747,7 @@ Do this when translation to MathML fails."
 	members))
 
 (defun org-odt-copy-styles-file (&optional styles-file)
-  ;; Non-availability of styles.xml is not a critical error. For now
+  ;; Non-availability of styles.xml is not a critical error.  For now
   ;; throw an error purely for aesthetic reasons.
   (setq styles-file (or styles-file
 			org-export-odt-styles-file
@@ -2767,7 +2804,7 @@ MathML source to kill ring, if `org-export-copy-to-kill-ring' is
 non-nil."
   (interactive
    `(,(let (frag)
-	(setq frag (and (setq frag (and (region-active-p)
+	(setq frag (and (setq frag (and (org-region-active-p)
 					(buffer-substring (region-beginning)
 							  (region-end))))
 			(loop for e in org-latex-regexps
@@ -2782,27 +2819,28 @@ non-nil."
 			   (file-name-directory buffer-file-name))))
 	(read-file-name "ODF filename: " nil odf-filename nil
 			(file-name-nondirectory odf-filename)))))
-  (let* ((org-lparse-backend 'odf)
-	 org-lparse-opt-plist
-	 (filename (or odf-file
-		       (expand-file-name
-			(concat
-			 (file-name-sans-extension
-			  (or (file-name-nondirectory buffer-file-name)))
-			 "." "odf")
-			(file-name-directory buffer-file-name))))
-	 (buffer (find-file-noselect (org-odt-init-outfile filename)))
-	 (coding-system-for-write 'utf-8)
-	 (save-buffer-coding-system 'utf-8))
-    (set-buffer buffer)
-    (set-buffer-file-coding-system coding-system-for-write)
-    (let ((mathml (org-create-math-formula latex-frag)))
-      (unless mathml (error "No Math formula created"))
-      (insert mathml)
-      (or (org-export-push-to-kill-ring
-	   (upcase (symbol-name org-lparse-backend)))
-	  (message "Exporting... done")))
-    (org-odt-save-as-outfile filename nil)))
+  (org-odt-cleanup-xml-buffers
+   (let* ((org-lparse-backend 'odf)
+	  org-lparse-opt-plist
+	  (filename (or odf-file
+			(expand-file-name
+			 (concat
+			  (file-name-sans-extension
+			   (or (file-name-nondirectory buffer-file-name)))
+			  "." "odf")
+			 (file-name-directory buffer-file-name))))
+	  (buffer (find-file-noselect (org-odt-init-outfile filename)))
+	  (coding-system-for-write 'utf-8)
+	  (save-buffer-coding-system 'utf-8))
+     (set-buffer buffer)
+     (set-buffer-file-coding-system coding-system-for-write)
+     (let ((mathml (org-create-math-formula latex-frag)))
+       (unless mathml (error "No Math formula created"))
+       (insert mathml)
+       (or (org-export-push-to-kill-ring
+	    (upcase (symbol-name org-lparse-backend)))
+	   (message "Exporting... done")))
+     (org-odt-save-as-outfile filename nil))))
 
 ;;;###autoload
 (defun org-export-as-odf-and-open ()
@@ -2814,5 +2852,9 @@ formula file."
    nil nil nil (call-interactively 'org-export-as-odf)))
 
 (provide 'org-odt)
+
+;; Local variables:
+;; generated-autoload-file: "org-loaddefs.el"
+;; End:
 
 ;;; org-odt.el ends here

@@ -1,6 +1,6 @@
 ;;; ob-picolisp.el --- org-babel functions for picolisp evaluation
 
-;; Copyright (C) 2010-2012  Free Software Foundation, Inc.
+;; Copyright (C) 2010-2013 Free Software Foundation, Inc.
 
 ;; Authors: Thorsten Jolitz
 ;;	 Eric Schulte
@@ -25,16 +25,16 @@
 ;;; Commentary:
 
 ;; This library enables the use of PicoLisp in the multi-language
-;; programming framework Org-Babel. PicoLisp is a minimal yet
+;; programming framework Org-Babel.  PicoLisp is a minimal yet
 ;; fascinating lisp dialect and a highly productive application
 ;; framework for web-based client-server applications on top of
-;; object-oriented databases. A good way to learn PicoLisp is to first
+;; object-oriented databases.  A good way to learn PicoLisp is to first
 ;; read Paul Grahams essay "The hundred year language"
 ;; (http://www.paulgraham.com/hundred.html) and then study the various
 ;; documents and essays published in the PicoLisp wiki
 ;; (http://picolisp.com/5000/-2.html). PicoLisp is included in some
 ;; GNU/Linux Distributions, and can be downloaded here:
-;; http://software-lab.de/down.html. It ships with a picolisp-mode and
+;; http://software-lab.de/down.html.  It ships with a picolisp-mode and
 ;; a inferior-picolisp-mode for Emacs (to be found in the /lib/el/
 ;; directory).
 
@@ -54,12 +54,11 @@
 
 ;;; Code:
 (require 'ob)
-(require 'ob-eval)
-(require 'ob-comint)
 (require 'comint)
 (eval-when-compile (require 'cl))
 
 (declare-function run-picolisp "ext:inferior-picolisp" (cmd))
+(defvar org-babel-tangle-lang-exts) ;; Autoloaded
 
 ;; optionally define a file extension for this language
 (add-to-list 'org-babel-tangle-lang-exts '("picolisp" . "l"))
@@ -122,13 +121,8 @@
            (t full-body))))
 
     ((lambda (result)
-       (if (or (member "verbatim" result-params)
-               (member "scalar" result-params)
-               (member "output" result-params)
-               (member "code" result-params)
-               (member "pp" result-params)
-               (= (length result) 0))
-           result
+       (org-babel-result-cond result-params
+	 result
          (read result)))
      (if (not (string= session-name "none"))
          ;; session based evaluation

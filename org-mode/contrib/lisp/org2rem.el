@@ -1,6 +1,6 @@
 ;;; org2rem.el --- Convert org appointments into reminders
 
-;; Copyright (C) 2006-2012 Free Software Foundation, Inc.
+;; Copyright (C) 2006-2013 Free Software Foundation, Inc.
 
 ;; Author: Bastien Guerry and Shatad Pratap
 ;; Keywords: outlines, hypermedia, calendar, wp
@@ -211,7 +211,7 @@ The file is stored under the name `org-combined-agenda-remind-file'."
 If COMBINE is non-nil, combine all calendar entries into a single large
 file and store it under the name `org-combined-agenda-remind-file'."
   (save-excursion
-    (org-prepare-agenda-buffers files)
+    (org-agenda-prepare-buffers files)
     (let* ((dir (org-export-directory
 		 :ical (list :publishing-directory
 			     org-export-publishing-directory)))

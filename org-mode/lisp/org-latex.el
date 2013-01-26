@@ -1,6 +1,6 @@
 ;;; org-latex.el --- LaTeX exporter for org-mode
 ;;
-;; Copyright (C) 2007-2012 Free Software Foundation, Inc.
+;; Copyright (C) 2007-2013 Free Software Foundation, Inc.
 ;;
 ;; Emacs Lisp Archive Entry
 ;; Filename: org-latex.el
@@ -235,7 +235,7 @@ are written as utf8 files."
   "Alist of LaTeX expressions to convert emphasis fontifiers.
 Each element of the list is a list of three elements.
 The first element is the character used as a marker for fontification.
-The second element is a formatting string to wrap fontified text with.
+The second element is a format string to wrap fontified text with.
 If it is \"\\verb\", Org will automatically select a delimiter
 character that is not in the string.  \"\\protectedtexttt\" will use \\texttt
 to typeset and try to protect special characters.
@@ -247,7 +247,7 @@ conversions."
 (defcustom org-export-latex-title-command "\\maketitle"
   "The command used to insert the title just after \\begin{document}.
 If this string contains the formatting specification \"%s\" then
-it will be used as a formatting string, passing the title as an
+it will be used as a format string, passing the title as an
 argument."
   :group 'org-export-latex
   :type 'string)
@@ -320,6 +320,18 @@ will be filled with the link, the second with its description."
   :group 'org-export-latex
   :version "24.1"
   :type 'string)
+
+(defcustom org-export-latex-hyperref-options-format
+  "\\hypersetup{\n  pdfkeywords={%s},\n  pdfsubject={%s},\n  pdfcreator={Emacs Org-mode version %s}}\n"
+  "A format string for hyperref options.
+When non-nil, it must contain three %s format specifications
+which will respectively be replaced by the document's keywords,
+its description and the Org's version number, as a string.  Set
+this option to the empty string if you don't want to include
+hyperref options altogether."
+  :type 'string
+  :version "24.3"
+  :group 'org-export-latex)
 
 (defcustom org-export-latex-footnote-separator "\\textsuperscript{,}\\,"
   "Text used to separate footnotes."
@@ -545,9 +557,9 @@ pygmentize -L lexers
   "Association list of options for the latex listings package.
 
 These options are supplied as a comma-separated list to the
-\\lstset command. Each element of the association list should be
+\\lstset command.  Each element of the association list should be
 a list containing two strings: the name of the option, and the
-value. For example,
+value.  For example,
 
   (setq org-export-latex-listings-options
     '((\"basicstyle\" \"\\small\")
@@ -569,9 +581,9 @@ languages."
   "Association list of options for the latex minted package.
 
 These options are supplied within square brackets in
-\\begin{minted} environments. Each element of the alist should be
+\\begin{minted} environments.  Each element of the alist should be
 a list containing two strings: the name of the option, and the
-value. For example,
+value.  For example,
 
   (setq org-export-latex-minted-options
     '((\"bgcolor\" \"bg\") (\"frame\" \"lines\")))
@@ -580,7 +592,7 @@ will result in src blocks being exported with
 
 \\begin{minted}[bgcolor=bg,frame=lines]{<LANG>}
 
-as the start of the minted environment. Note that the same
+as the start of the minted environment.  Note that the same
 options will be applied to blocks of all languages."
   :group 'org-export-latex
   :version "24.1"
@@ -592,7 +604,7 @@ options will be applied to blocks of all languages."
 (defvar org-export-latex-custom-lang-environments nil
   "Association list mapping languages to language-specific latex
   environments used during export of src blocks by the listings
-  and minted latex packages. For example,
+  and minted latex packages.  For example,
 
   (setq org-export-latex-custom-lang-environments
      '((python \"pythoncode\")))
@@ -633,6 +645,23 @@ and `org-export-with-tags' instead."
   :group 'org-export-latex
   :version "24.1"
   :type 'string)
+
+(defcustom org-export-latex-link-with-unknown-path-format "\\texttt{%s}"
+  "Format string for links with unknown path type."
+  :group 'org-export-latex
+  :version "24.3"
+  :type 'string)
+
+(defcustom org-export-latex-inline-images 'maybe
+  "Non-nil means inline images into exported LaTeX pages.
+If this option is `maybe', then images in links with an empty
+description will be inlined, while images with a description will
+be linked only."
+  :group 'org-export-html
+  :version "24.3"
+  :type '(choice (const :tag "Never" nil)
+		 (const :tag "Always" t)
+		 (const :tag "When there is no description" maybe)))
 
 (defcustom org-export-latex-inline-image-extensions
   '("pdf" "jpeg" "jpg" "png" "ps" "eps")
@@ -701,28 +730,28 @@ This function should accept the file name as its single argument."
 		  (string :tag "Shell command"))
 	  (const :tag "2 runs of pdflatex"
 		 ("pdflatex -interaction nonstopmode -output-directory %o %f"
-		   "pdflatex -interaction nonstopmode -output-directory %o %f"))
+		  "pdflatex -interaction nonstopmode -output-directory %o %f"))
 	  (const :tag "3 runs of pdflatex"
 		 ("pdflatex -interaction nonstopmode -output-directory %o %f"
-		   "pdflatex -interaction nonstopmode -output-directory %o %f"
-		   "pdflatex -interaction nonstopmode -output-directory %o %f"))
+		  "pdflatex -interaction nonstopmode -output-directory %o %f"
+		  "pdflatex -interaction nonstopmode -output-directory %o %f"))
 	  (const :tag "pdflatex,bibtex,pdflatex,pdflatex"
 		 ("pdflatex -interaction nonstopmode -output-directory %o %f"
-		   "bibtex %b"
-		   "pdflatex -interaction nonstopmode -output-directory %o %f"
-		   "pdflatex -interaction nonstopmode -output-directory %o %f"))
+		  "bibtex %b"
+		  "pdflatex -interaction nonstopmode -output-directory %o %f"
+		  "pdflatex -interaction nonstopmode -output-directory %o %f"))
 	  (const :tag "2 runs of xelatex"
 		 ("xelatex -interaction nonstopmode -output-directory %o %f"
-		   "xelatex -interaction nonstopmode -output-directory %o %f"))
+		  "xelatex -interaction nonstopmode -output-directory %o %f"))
 	  (const :tag "3 runs of xelatex"
 		 ("xelatex -interaction nonstopmode -output-directory %o %f"
-		   "xelatex -interaction nonstopmode -output-directory %o %f"
-		   "xelatex -interaction nonstopmode -output-directory %o %f"))
+		  "xelatex -interaction nonstopmode -output-directory %o %f"
+		  "xelatex -interaction nonstopmode -output-directory %o %f"))
 	  (const :tag "xelatex,bibtex,xelatex,xelatex"
 		 ("xelatex -interaction nonstopmode -output-directory %o %f"
-		   "bibtex %b"
-		   "xelatex -interaction nonstopmode -output-directory %o %f"
-		   "xelatex -interaction nonstopmode -output-directory %o %f"))
+		  "bibtex %b"
+		  "xelatex -interaction nonstopmode -output-directory %o %f"
+		  "xelatex -interaction nonstopmode -output-directory %o %f"))
 	  (const :tag "texi2dvi"
 		 ("texi2dvi -p -b -c -V %f"))
 	  (const :tag "rubber"
@@ -769,14 +798,14 @@ emacs   --batch
         --load=$HOME/lib/emacs/org.el
         --eval \"(setq org-export-headline-levels 2)\"
         --visit=MyFile --funcall org-export-as-latex-batch"
-  (org-export-as-latex org-export-headline-levels 'hidden))
+  (org-export-as-latex org-export-headline-levels))
 
 ;;;###autoload
 (defun org-export-as-latex-to-buffer (arg)
   "Call `org-export-as-latex` with output to a temporary buffer.
 No file is created.  The prefix ARG is passed through to `org-export-as-latex'."
   (interactive "P")
-  (org-export-as-latex arg nil nil "*Org LaTeX Export*")
+  (org-export-as-latex arg nil "*Org LaTeX Export*")
   (when org-export-show-temporary-export-buffer
     (switch-to-buffer-other-window "*Org LaTeX Export*")))
 
@@ -830,7 +859,7 @@ in a window.  A non-interactive call will only return the buffer."
     (set-mark (point)) ;; to activate the region
     (goto-char beg)
     (setq rtn (org-export-as-latex
-	       nil nil ext-plist
+	       nil ext-plist
 	       buffer body-only))
     (if (fboundp 'deactivate-mark) (deactivate-mark))
     (if (and (org-called-interactively-p 'any) (bufferp rtn))
@@ -838,25 +867,23 @@ in a window.  A non-interactive call will only return the buffer."
       rtn)))
 
 ;;;###autoload
-(defun org-export-as-latex (arg &optional hidden ext-plist
-				to-buffer body-only pub-dir)
+(defun org-export-as-latex (arg &optional ext-plist to-buffer body-only pub-dir)
   "Export current buffer to a LaTeX file.
 If there is an active region, export only the region.  The prefix
 ARG specifies how many levels of the outline should become
 headlines.  The default is 3.  Lower levels will be exported
 depending on `org-export-latex-low-levels'.  The default is to
 convert them as description lists.
-HIDDEN is obsolete and does nothing.
-EXT-PLIST is a property list with
-external parameters overriding org-mode's default settings, but
-still inferior to file-local settings.  When TO-BUFFER is
-non-nil, create a buffer with that name and export to that
-buffer.  If TO-BUFFER is the symbol `string', don't leave any
-buffer behind but just return the resulting LaTeX as a string.
+EXT-PLIST is a property list with external parameters overriding
+org-mode's default settings, but still inferior to file-local settings.
+When TO-BUFFER is non-nil, create a buffer with that name and export
+to that buffer.  If TO-BUFFER is the symbol `string', don't leave any
+buffer behind and just return the resulting LaTeX as a string, with
+no LaTeX header.
 When BODY-ONLY is set, don't produce the file header and footer,
 simply return the content of \\begin{document}...\\end{document},
 without even the \\begin{document} and \\end{document} commands.
-when PUB-DIR is set, use this as the publishing directory."
+When PUB-DIR is set, use this as the publishing directory."
   (interactive "P")
   (when (and (not body-only) arg (listp arg)) (setq body-only t))
   (run-hooks 'org-export-first-hook)
@@ -939,10 +966,9 @@ when PUB-DIR is set, use this as the publishing directory."
 	 (auto-insert nil); Avoid any auto-insert stuff for the new file
 	 (TeX-master (boundp 'TeX-master))
 	 (buffer (if to-buffer
-		     (cond
-		      ((eq to-buffer 'string) (get-buffer-create
-					       "*Org LaTeX Export*"))
-		      (t (get-buffer-create to-buffer)))
+		     (if (eq to-buffer 'string)
+			 (get-buffer-create "*Org LaTeX Export*")
+		       (get-buffer-create to-buffer))
 		   (find-file-noselect filename)))
 	 (odd org-odd-levels-only)
 	 (header (org-export-latex-make-header title opt-plist))
@@ -1025,7 +1051,7 @@ when PUB-DIR is set, use this as the publishing directory."
     (when (and text (not (eq to-buffer 'string)))
       (insert (org-export-latex-content
 	       text '(lists tables fixed-width keywords))
-	       "\n\n"))
+	      "\n\n"))
 
     ;; insert lines before the first headline
     (unless (or skip (string-match "^\\*" first-lines))
@@ -1102,8 +1128,7 @@ when PUB-DIR is set, use this as the publishing directory."
   (interactive "P")
   (message "Exporting to PDF...")
   (let* ((wconfig (current-window-configuration))
-	 (lbuf (org-export-as-latex arg hidden ext-plist
-				    to-buffer body-only pub-dir))
+	 (lbuf (org-export-as-latex arg ext-plist to-buffer body-only pub-dir))
 	 (file (buffer-file-name lbuf))
 	 (base (file-name-sans-extension (buffer-file-name lbuf)))
 	 (pdffile (concat base ".pdf"))
@@ -1518,11 +1543,10 @@ OPT-PLIST is the options plist for current buffer."
 	      (or (plist-get opt-plist :date)
 		  org-export-latex-date-format)))
      ;; add some hyperref options
-     ;; FIXME: let's have a defcustom for this?
-     (format "\\hypersetup{\n  pdfkeywords={%s},\n  pdfsubject={%s},\n  pdfcreator={%s}}\n"
-         (org-export-latex-fontify-headline keywords)
-         (org-export-latex-fontify-headline description)
-	 (concat "Emacs Org-mode version " (org-version)))
+     (format org-export-latex-hyperref-options-format
+	     (org-export-latex-fontify-headline keywords)
+	     (org-export-latex-fontify-headline description)
+	     (org-version))
      ;; beginning of the document
      "\n\\begin{document}\n\n"
      ;; insert the title command
@@ -1616,7 +1640,7 @@ links, keywords, lists, tables, fixed-width"
     (unless (memq 'fixed-width exclude-list)
       (org-export-latex-fixed-width
        (plist-get org-export-latex-options-plist :fixed-width)))
-   ;; return string
+    ;; return string
     (buffer-substring (point-min) (point-max))))
 
 (defun org-export-latex-protect-string (s)
@@ -1738,13 +1762,13 @@ links, keywords, lists, tables, fixed-width"
   (let ((org-display-custom-times org-export-latex-display-custom-times))
     (while (re-search-forward org-ts-regexp-both nil t)
       (org-if-unprotected-at (1- (point))
-       (replace-match
-	(org-export-latex-protect-string
-	 (format (if (string= "<" (substring (match-string 0) 0 1))
-		     org-export-latex-timestamp-markup
-		   org-export-latex-timestamp-inactive-markup)
-		 (substring (org-translate-time (match-string 0)) 1 -1)))
-	t t)))))
+	(replace-match
+	 (org-export-latex-protect-string
+	  (format (if (string= "<" (substring (match-string 0) 0 1))
+		      org-export-latex-timestamp-markup
+		    org-export-latex-timestamp-inactive-markup)
+		  (substring (org-translate-time (match-string 0)) 1 -1)))
+	 t t)))))
 
 (defun org-export-latex-quotation-marks ()
   "Export quotation marks depending on language conventions."
@@ -1923,19 +1947,19 @@ The conversion is made depending of STRING-BEFORE and STRING-AFTER."
   (goto-char (point-min))
   (while (re-search-forward "^[ \t]*:\\([ \t]\\|$\\)" nil t)
     (unless (get-text-property (point) 'org-example)
-     (if opt
-	 (progn (goto-char (match-beginning 0))
-		(insert "\\begin{verbatim}\n")
-		(while (looking-at "^\\([ \t]*\\):\\(\\([ \t]\\|$\\).*\\)$")
-		  (replace-match (concat (match-string 1)
-					 (match-string 2)) t t)
-		  (forward-line))
-		(insert "\\end{verbatim}\n"))
-       (progn (goto-char (match-beginning 0))
-	      (while (looking-at "^\\([ \t]*\\):\\(\\([ \t]\\|$\\).*\\)$")
-		(replace-match (concat "%" (match-string 1)
-				       (match-string 2)) t t)
-		(forward-line)))))))
+      (if opt
+	  (progn (goto-char (match-beginning 0))
+		 (insert "\\begin{verbatim}\n")
+		 (while (looking-at "^\\([ \t]*\\):\\(\\([ \t]\\|$\\).*\\)$")
+		   (replace-match (concat (match-string 1)
+					  (match-string 2)) t t)
+		   (forward-line))
+		 (insert "\\end{verbatim}\n"))
+	(progn (goto-char (match-beginning 0))
+	       (while (looking-at "^\\([ \t]*\\):\\(\\([ \t]\\|$\\).*\\)$")
+		 (replace-match (concat "%" (match-string 1)
+					(match-string 2)) t t)
+		 (forward-line)))))))
 
 (defvar org-table-last-alignment) ; defined in org-table.el
 (defvar org-table-last-column-widths) ; defined in org-table.el
@@ -2016,7 +2040,7 @@ The conversion is made depending of STRING-BEFORE and STRING-AFTER."
             (when org-table-clean-did-remove-column
 	      (pop org-table-last-alignment)
 	      (pop org-table-last-column-widths))
-            ;; make a formatting string to reflect alignment
+            ;; make a format string to reflect alignment
             (setq olines lines)
             (while (and (not line-fmt) (setq line (pop olines)))
               (unless (string-match "^[ \t]*|-" line)
@@ -2095,9 +2119,9 @@ The conversion is made depending of STRING-BEFORE and STRING-AFTER."
 %s\\multicolumn{%d}{r}{Continued on next page}\\
 \\endfoot
 \\endlastfoot"
-                                           org-export-latex-tables-hline
-                                           org-export-latex-tables-hline
-                                           (length org-table-last-alignment))
+						       org-export-latex-tables-hline
+						       org-export-latex-tables-hline
+						       (length org-table-last-alignment))
                                              nil)))
                         (if (not longtblp) (format "\n\\end{%s}" tabular-env))
                         (if longtblp "\n" (if org-export-latex-tables-centered
@@ -2278,14 +2302,13 @@ The conversion is made depending of STRING-BEFORE and STRING-AFTER."
 		    (concat type ":" raw-path))
 		   ((equal type "file")
 		    (if (and (org-file-image-p
-			      (expand-file-name
-			       raw-path)
+			      (expand-file-name (org-link-unescape raw-path))
 			      org-export-latex-inline-image-extensions)
-			     (or (get-text-property 0 'org-no-description
-						    raw-path)
+			     (or (get-text-property 0 'org-no-description raw-path)
 				 (equal desc full-raw-path)))
 			(setq imgp t)
-		      (progn (when (string-match "\\(.+\\)::.+" raw-path)
+		      (progn (setq raw-path (org-link-unescape raw-path))
+			     (when (string-match "\\(.+\\)::.+" raw-path)
 			       (setq raw-path (match-string 1 raw-path)))
 			     (if (file-exists-p raw-path)
 				 (concat type "://" (expand-file-name raw-path))
@@ -2295,8 +2318,7 @@ The conversion is made depending of STRING-BEFORE and STRING-AFTER."
        ;; process with link inserting
        (apply 'delete-region remove)
        (setq caption (and caption (org-export-latex-fontify-headline caption)))
-       (cond ((and imgp
-		   (plist-get org-export-latex-options-plist :inline-images))
+       (cond ((and imgp (plist-get org-export-latex-options-plist :latex-inline-images))
 	      ;; OK, we need to inline an image
 	      (insert
 	       (org-export-latex-format-image raw-path caption label attr shortn)))
@@ -2328,8 +2350,8 @@ The conversion is made depending of STRING-BEFORE and STRING-AFTER."
 	      (insert
 	       (save-match-data
 		 (funcall fnc (org-link-unescape raw-path) desc 'latex))))
-
-	     (t (insert "\\texttt{" desc "}")))))))
+	     ;; Unrecognized path type
+	     (t (insert (format org-export-latex-link-with-unknown-path-format desc))))))))
 
 
 (defun org-export-latex-format-image (path caption label attr &optional shortn)
@@ -2438,7 +2460,7 @@ The conversion is made depending of STRING-BEFORE and STRING-AFTER."
 	  ;; Compute string to insert (FNOTE), and protect the outside
 	  ;; macro from further transformation.  When footnote at
 	  ;; point is referring to a previously defined footnote, use
-	  ;; \footnotemark. Otherwise, use \footnote.
+	  ;; \footnotemark.  Otherwise, use \footnote.
 	  (let ((fnote (if (member lbl org-export-latex-footmark-seen)
 			   (org-export-latex-protect-string
 			    (format "\\footnotemark[%s]" lbl))
@@ -2663,7 +2685,7 @@ The conversion is made depending of STRING-BEFORE and STRING-AFTER."
 (defun org-export-latex-lists ()
   "Convert plain text lists in current buffer into LaTeX lists."
   ;; `org-list-end-re' output has changed since preprocess from
-  ;; org-exp.el. Make sure it is taken into account.
+  ;; org-exp.el.  Make sure it is taken into account.
   (let ((org-list-end-re "^ORG-LIST-END-MARKER\n"))
     (mapc
      (lambda (e)
@@ -2694,181 +2716,181 @@ The conversion is made depending of STRING-BEFORE and STRING-AFTER."
      (append org-list-export-context '(nil)))))
 
 (defconst org-latex-entities
- '("\\!"
-   "\\'"
-   "\\+"
-   "\\,"
-   "\\-"
-   "\\:"
-   "\\;"
-   "\\<"
-   "\\="
-   "\\>"
-   "\\Huge"
-   "\\LARGE"
-   "\\Large"
-   "\\Styles"
-   "\\\\"
-   "\\`"
-   "\\\""
-   "\\addcontentsline"
-   "\\address"
-   "\\addtocontents"
-   "\\addtocounter"
-   "\\addtolength"
-   "\\addvspace"
-   "\\alph"
-   "\\appendix"
-   "\\arabic"
-   "\\author"
-   "\\begin{array}"
-   "\\begin{center}"
-   "\\begin{description}"
-   "\\begin{enumerate}"
-   "\\begin{eqnarray}"
-   "\\begin{equation}"
-   "\\begin{figure}"
-   "\\begin{flushleft}"
-   "\\begin{flushright}"
-   "\\begin{itemize}"
-   "\\begin{list}"
-   "\\begin{minipage}"
-   "\\begin{picture}"
-   "\\begin{quotation}"
-   "\\begin{quote}"
-   "\\begin{tabbing}"
-   "\\begin{table}"
-   "\\begin{tabular}"
-   "\\begin{thebibliography}"
-   "\\begin{theorem}"
-   "\\begin{titlepage}"
-   "\\begin{verbatim}"
-   "\\begin{verse}"
-   "\\bf"
-   "\\bf"
-   "\\bibitem"
-   "\\bigskip"
-   "\\cdots"
-   "\\centering"
-   "\\circle"
-   "\\cite"
-   "\\cleardoublepage"
-   "\\clearpage"
-   "\\cline"
-   "\\closing"
-   "\\dashbox"
-   "\\date"
-   "\\ddots"
-   "\\dotfill"
-   "\\em"
-   "\\fbox"
-   "\\flushbottom"
-   "\\fnsymbol"
-   "\\footnote"
-   "\\footnotemark"
-   "\\footnotesize"
-   "\\footnotetext"
-   "\\frac"
-   "\\frame"
-   "\\framebox"
-   "\\hfill"
-   "\\hline"
-   "\\hrulespace"
-   "\\hspace"
-   "\\huge"
-   "\\hyphenation"
-   "\\include"
-   "\\includeonly"
-   "\\indent"
-   "\\input"
-   "\\it"
-   "\\kill"
-   "\\label"
-   "\\large"
-   "\\ldots"
-   "\\line"
-   "\\linebreak"
-   "\\linethickness"
-   "\\listoffigures"
-   "\\listoftables"
-   "\\location"
-   "\\makebox"
-   "\\maketitle"
-   "\\mark"
-   "\\mbox"
-   "\\medskip"
-   "\\multicolumn"
-   "\\multiput"
-   "\\newcommand"
-   "\\newcounter"
-   "\\newenvironment"
-   "\\newfont"
-   "\\newlength"
-   "\\newline"
-   "\\newpage"
-   "\\newsavebox"
-   "\\newtheorem"
-   "\\nocite"
-   "\\nofiles"
-   "\\noindent"
-   "\\nolinebreak"
-   "\\nopagebreak"
-   "\\normalsize"
-   "\\onecolumn"
-   "\\opening"
-   "\\oval"
-   "\\overbrace"
-   "\\overline"
-   "\\pagebreak"
-   "\\pagenumbering"
-   "\\pageref"
-   "\\pagestyle"
-   "\\par"
-   "\\parbox"
-   "\\put"
-   "\\raggedbottom"
-   "\\raggedleft"
-   "\\raggedright"
-   "\\raisebox"
-   "\\ref"
-   "\\rm"
-   "\\roman"
-   "\\rule"
-   "\\savebox"
-   "\\sc"
-   "\\scriptsize"
-   "\\setcounter"
-   "\\setlength"
-   "\\settowidth"
-   "\\sf"
-   "\\shortstack"
-   "\\signature"
-   "\\sl"
-   "\\small"
-   "\\smallskip"
-   "\\sqrt"
-   "\\tableofcontents"
-   "\\telephone"
-   "\\thanks"
-   "\\thispagestyle"
-   "\\tiny"
-   "\\title"
-   "\\tt"
-   "\\twocolumn"
-   "\\typein"
-   "\\typeout"
-   "\\underbrace"
-   "\\underline"
-   "\\usebox"
-   "\\usecounter"
-   "\\value"
-   "\\vdots"
-   "\\vector"
-   "\\verb"
-   "\\vfill"
-   "\\vline"
-   "\\vspace")
- "A list of LaTeX commands to be protected when performing conversion.")
+  '("\\!"
+    "\\'"
+    "\\+"
+    "\\,"
+    "\\-"
+    "\\:"
+    "\\;"
+    "\\<"
+    "\\="
+    "\\>"
+    "\\Huge"
+    "\\LARGE"
+    "\\Large"
+    "\\Styles"
+    "\\\\"
+    "\\`"
+    "\\\""
+    "\\addcontentsline"
+    "\\address"
+    "\\addtocontents"
+    "\\addtocounter"
+    "\\addtolength"
+    "\\addvspace"
+    "\\alph"
+    "\\appendix"
+    "\\arabic"
+    "\\author"
+    "\\begin{array}"
+    "\\begin{center}"
+    "\\begin{description}"
+    "\\begin{enumerate}"
+    "\\begin{eqnarray}"
+    "\\begin{equation}"
+    "\\begin{figure}"
+    "\\begin{flushleft}"
+    "\\begin{flushright}"
+    "\\begin{itemize}"
+    "\\begin{list}"
+    "\\begin{minipage}"
+    "\\begin{picture}"
+    "\\begin{quotation}"
+    "\\begin{quote}"
+    "\\begin{tabbing}"
+    "\\begin{table}"
+    "\\begin{tabular}"
+    "\\begin{thebibliography}"
+    "\\begin{theorem}"
+    "\\begin{titlepage}"
+    "\\begin{verbatim}"
+    "\\begin{verse}"
+    "\\bf"
+    "\\bf"
+    "\\bibitem"
+    "\\bigskip"
+    "\\cdots"
+    "\\centering"
+    "\\circle"
+    "\\cite"
+    "\\cleardoublepage"
+    "\\clearpage"
+    "\\cline"
+    "\\closing"
+    "\\dashbox"
+    "\\date"
+    "\\ddots"
+    "\\dotfill"
+    "\\em"
+    "\\fbox"
+    "\\flushbottom"
+    "\\fnsymbol"
+    "\\footnote"
+    "\\footnotemark"
+    "\\footnotesize"
+    "\\footnotetext"
+    "\\frac"
+    "\\frame"
+    "\\framebox"
+    "\\hfill"
+    "\\hline"
+    "\\hrulespace"
+    "\\hspace"
+    "\\huge"
+    "\\hyphenation"
+    "\\include"
+    "\\includeonly"
+    "\\indent"
+    "\\input"
+    "\\it"
+    "\\kill"
+    "\\label"
+    "\\large"
+    "\\ldots"
+    "\\line"
+    "\\linebreak"
+    "\\linethickness"
+    "\\listoffigures"
+    "\\listoftables"
+    "\\location"
+    "\\makebox"
+    "\\maketitle"
+    "\\mark"
+    "\\mbox"
+    "\\medskip"
+    "\\multicolumn"
+    "\\multiput"
+    "\\newcommand"
+    "\\newcounter"
+    "\\newenvironment"
+    "\\newfont"
+    "\\newlength"
+    "\\newline"
+    "\\newpage"
+    "\\newsavebox"
+    "\\newtheorem"
+    "\\nocite"
+    "\\nofiles"
+    "\\noindent"
+    "\\nolinebreak"
+    "\\nopagebreak"
+    "\\normalsize"
+    "\\onecolumn"
+    "\\opening"
+    "\\oval"
+    "\\overbrace"
+    "\\overline"
+    "\\pagebreak"
+    "\\pagenumbering"
+    "\\pageref"
+    "\\pagestyle"
+    "\\par"
+    "\\parbox"
+    "\\put"
+    "\\raggedbottom"
+    "\\raggedleft"
+    "\\raggedright"
+    "\\raisebox"
+    "\\ref"
+    "\\rm"
+    "\\roman"
+    "\\rule"
+    "\\savebox"
+    "\\sc"
+    "\\scriptsize"
+    "\\setcounter"
+    "\\setlength"
+    "\\settowidth"
+    "\\sf"
+    "\\shortstack"
+    "\\signature"
+    "\\sl"
+    "\\small"
+    "\\smallskip"
+    "\\sqrt"
+    "\\tableofcontents"
+    "\\telephone"
+    "\\thanks"
+    "\\thispagestyle"
+    "\\tiny"
+    "\\title"
+    "\\tt"
+    "\\twocolumn"
+    "\\typein"
+    "\\typeout"
+    "\\underbrace"
+    "\\underline"
+    "\\usebox"
+    "\\usecounter"
+    "\\value"
+    "\\vdots"
+    "\\vector"
+    "\\verb"
+    "\\vfill"
+    "\\vline"
+    "\\vspace")
+  "A list of LaTeX commands to be protected when performing conversion.")
 
 (defconst org-latex-entities-regexp
   (let (names rest)
@@ -2881,5 +2903,9 @@ The conversion is made depending of STRING-BEFORE and STRING-AFTER."
 
 (provide 'org-export-latex)
 (provide 'org-latex)
+
+;; Local variables:
+;; generated-autoload-file: "org-loaddefs.el"
+;; End:
 
 ;;; org-latex.el ends here

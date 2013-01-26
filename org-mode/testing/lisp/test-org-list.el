@@ -1,6 +1,6 @@
 ;;; test-org-list.el --- Tests for org-list.el
 
-;; Copyright (C) 2012  Nicolas Goaziou
+;; Copyright (C) 2012, 2013  Nicolas Goaziou
 
 ;; Author: Nicolas Goaziou <n.goaziou at gmail dot com>
 
@@ -112,6 +112,111 @@
 	(goto-line 7)
 	(org-previous-item)
 	(should (looking-at "  - item 1.3"))))))
+
+(ert-deftest test-org-list/cycle-bullet ()
+  "Test `org-cycle-list-bullet' specifications."
+  ;; Error when not at an item.
+  (should-error
+   (org-test-with-temp-text "Paragraph"
+     (org-cycle-list-bullet)))
+  ;; Cycle through "-", "+", "*", "1.", "1)".
+  (org-test-with-temp-text "  - item"
+    (org-cycle-list-bullet)
+    (should (looking-at "[ \t]+\\+"))
+    (org-cycle-list-bullet)
+    (should (looking-at "[ \t]+\\*"))
+    (let ((org-plain-list-ordered-item-terminator t))
+      (org-cycle-list-bullet))
+    (should (looking-at "[ \t]+1\\."))
+    (let ((org-plain-list-ordered-item-terminator t))
+      (org-cycle-list-bullet))
+    (should (looking-at "[ \t]+1)")))
+  ;; Argument is a valid bullet: cycle to that bullet directly.
+  (should
+   (equal "1. item"
+	  (org-test-with-temp-text "- item"
+	    (let ((org-plain-list-ordered-item-terminator t))
+	      (org-cycle-list-bullet "1.")
+	      (buffer-string)))))
+  ;; Argument is an integer N: cycle to the Nth allowed bullet.
+  (should
+   (equal "+ item"
+	  (org-test-with-temp-text "1. item"
+	    (let ((org-plain-list-ordered-item-terminator t))
+	      (org-cycle-list-bullet 1)
+	      (buffer-string)))))
+  ;; Argument is `previous': cycle backwards.
+  (should
+   (equal "- item"
+	  (org-test-with-temp-text "+ item"
+	    (let ((org-plain-list-ordered-item-terminator t))
+	      (org-cycle-list-bullet 'previous)
+	      (buffer-string)))))
+  ;; Do not cycle to "*" bullets when item is at column 0.
+  (should
+   (equal "1. item"
+	  (org-test-with-temp-text "+ item"
+	    (let ((org-plain-list-ordered-item-terminator t))
+	      (org-cycle-list-bullet)
+	      (buffer-string)))))
+  ;; Do not cycle to numbered bullets in a description list.
+  (should-not
+   (equal "1. tag :: item"
+	  (org-test-with-temp-text "+ tag :: item"
+	    (let ((org-plain-list-ordered-item-terminator t))
+	      (org-cycle-list-bullet)
+	      (buffer-string)))))
+  ;; Do not cycle to ordered item terminators if they are not allowed
+  ;; in `org-plain-list-ordered-item-terminator'.
+  (should
+   (equal "  1) item"
+	  (org-test-with-temp-text "  * item"
+	    (let ((org-plain-list-ordered-item-terminator 41))
+	      (org-cycle-list-bullet)
+	      (buffer-string)))))
+  ;; When `org-alphabetical-lists' is non-nil, cycle to alpha bullets.
+  (should
+   (equal "a. item"
+	  (org-test-with-temp-text "1) item"
+	    (let ((org-plain-list-ordered-item-terminator t)
+		  (org-alphabetical-lists t))
+	      (org-cycle-list-bullet)
+	      (buffer-string)))))
+  ;; Do not cycle to alpha bullets when list has more than 26
+  ;; elements.
+  (should-not
+   (equal "a. item 1"
+	  (org-test-with-temp-text "1) item 1
+2) item 2
+3) item 3
+4) item 4
+5) item 5
+6) item 6
+7) item 7
+8) item 8
+9) item 9
+10) item 10
+11) item 11
+12) item 12
+13) item 13
+14) item 14
+15) item 15
+16) item 16
+17) item 17
+18) item 18
+19) item 19
+20) item 20
+21) item 21
+22) item 22
+23) item 23
+24) item 24
+25) item 25
+26) item 26
+27) item 27"
+	    (let ((org-plain-list-ordered-item-terminator t)
+		  (org-alphabetical-lists t))
+	      (org-cycle-list-bullet)
+	      (buffer-substring (point) (line-end-position)))))))
 
 (ert-deftest test-org-list/indent-item ()
   "Test `org-indent-item' specifications."
@@ -520,6 +625,93 @@
     (should (org-invisible-p2))
     (search-forward "Text1")
     (should (org-invisible-p2))))
+
+(ert-deftest test-org-list/insert-item ()
+  "Test item insertion."
+  ;; Blank lines specifications.
+  ;;
+  ;; Non-nil `org-blank-before-new-entry': insert a blank line, unless
+  ;; `org-empty-line-terminates-plain-lists' is non-nil.
+  (should
+   (org-test-with-temp-text "- a"
+     (let ((org-empty-line-terminates-plain-lists nil)
+	   (org-blank-before-new-entry '((plain-list-item . t))))
+       (end-of-line)
+       (org-insert-item)
+       (forward-line -1)
+       (looking-at "$"))))
+  (should-not
+   (org-test-with-temp-text "- a"
+     (let ((org-empty-line-terminates-plain-lists t)
+	   (org-blank-before-new-entry '((plain-list-item . t))))
+       (end-of-line)
+       (org-insert-item)
+       (forward-line -1)
+       (looking-at "$"))))
+  ;; Nil `org-blank-before-new-entry': do not insert a blank line.
+  (should-not
+   (org-test-with-temp-text "- a"
+     (let ((org-empty-line-terminates-plain-lists nil)
+	   (org-blank-before-new-entry '((plain-list-item . nil))))
+       (end-of-line)
+       (org-insert-item)
+       (forward-line -1)
+       (looking-at "$"))))
+  ;; `org-blank-before-new-entry' set to auto: if there's no blank
+  ;; line already in the sole item, do not insert one.
+  (should-not
+   (org-test-with-temp-text "- a"
+     (let ((org-empty-line-terminates-plain-lists nil)
+	   (org-blank-before-new-entry '((plain-list-item . auto))))
+       (end-of-line)
+       (org-insert-item)
+       (forward-line -1)
+       (looking-at "$"))))
+  ;; `org-blank-before-new-entry' set to `auto': if there's a blank
+  ;; line in the sole item, insert another one.
+  (should
+   (org-test-with-temp-text "- a\n\n  b"
+     (let ((org-empty-line-terminates-plain-lists nil)
+	   (org-blank-before-new-entry '((plain-list-item . auto))))
+       (goto-char (point-max))
+       (org-insert-item)
+       (forward-line -1)
+       (looking-at "$"))))
+  ;; `org-blank-before-new-entry' set to `auto': if the user specified
+  ;; a blank line, preserve it.
+  (should
+   (org-test-with-temp-text "- a\n\n"
+     (let ((org-empty-line-terminates-plain-lists nil)
+	   (org-blank-before-new-entry '((plain-list-item . auto))))
+       (goto-char (point-max))
+       (org-insert-item)
+       (forward-line -1)
+       (looking-at "$"))))
+  ;; `org-blank-before-new-entry' set to `auto': if some items in list
+  ;; are already separated by blank lines, insert one.
+  (should
+   (org-test-with-temp-text "- a\n\n- b"
+     (let ((org-empty-line-terminates-plain-lists nil)
+	   (org-blank-before-new-entry '((plain-list-item . auto))))
+       (goto-char (point-max))
+       (org-insert-item)
+       (forward-line -1)
+       (looking-at "$"))))
+  (should
+   (org-test-with-temp-text "- a\n\n- b"
+     (let ((org-empty-line-terminates-plain-lists nil)
+	   (org-blank-before-new-entry '((plain-list-item . auto))))
+       (org-insert-item)
+       (forward-line)
+       (looking-at "$"))))
+  (should
+   (org-test-with-temp-text "- a\n  #+BEGIN_EXAMPLE\n\n  x\n  #+END_EXAMPLE"
+     (let ((org-empty-line-terminates-plain-lists nil)
+	   (org-blank-before-new-entry '((plain-list-item . auto))))
+       (goto-char (point-max))
+       (org-insert-item)
+       (forward-line -1)
+       (looking-at "$")))))
 
 
 (provide 'test-org-list)

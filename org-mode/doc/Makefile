@@ -3,8 +3,7 @@ ifeq ($(MAKELEVEL), 0)
   $(error This make needs to be started as a sub-make from the toplevel directory.)
 endif
 .PHONY:		all info html pdf card manual guide install \
-		clean cleanall clean-install \
-		org-version.inc
+		clean cleanall clean-install
 
 all:		$(ORG_MAKE_DOC)
 
@@ -16,21 +15,23 @@ pdf:		org.pdf orgguide.pdf
 
 card:		orgcard.pdf orgcard_letter.pdf orgguide.pdf
 
+ifneq ($(SERVERMK),)
 manual guide::
-	$(RMR) $@ ; $(MKDIR) $@
-manual::	org.texi
+	-$(RMR) $@
+	$(MKDIR) $@
+manual::	org.texi org-version.inc
 	$(TEXI2HTML) -o $@ $<
-	../UTILITIES/mansplit.pl $@/*
-guide::		orgguide.texi
+	../mk/mansplit.pl $@/*
+guide::		orgguide.texi org-version.inc
 	$(TEXI2HTML) -o $@ $<
-	../UTILITIES/guidesplit.pl $@/*
+	../mk/guidesplit.pl $@/*
+endif
 
-org-version.inc:
+org-version.inc:	org.texi
 	@echo "org-version: $(ORGVERSION) ($(GITVERSION))"
 	@echo "@c automatically generated, do not edit"  > org-version.inc
 	@echo "@set VERSION $(ORGVERSION) ($(GITVERSION))" >> org-version.inc
 	@echo "@set DATE $(DATE)" >> org-version.inc
-
 
 install:	org
 	if [ ! -d $(DESTDIR)$(infodir) ]; then $(MKDIR) $(DESTDIR)$(infodir); else true; fi ;
@@ -38,9 +39,9 @@ install:	org
 	$(INSTALL_INFO) --infodir=$(DESTDIR)$(infodir) org
 
 clean:
-	$(RM) org *.pdf *.html *_letter.tex \
+	$(RM) org *.pdf *.html *_letter.tex org-version.inc \
 	      *.aux *.cp *.cps *.dvi *.fn *.fns *.ky *.kys *.pg *.pgs \
-	      *.toc *.tp *.tps *.vr *.vrs *.log *.html *.ps org-version.inc
+	      *.toc *.tp *.tps *.vr *.vrs *.log *.html *.ps
 cleanall:	clean
 	$(RMR) guide manual
 
@@ -48,7 +49,7 @@ clean-install:
 	$(RM) $(DESTDIR)$(infodir)/org*
 	$(INSTALL_INFO) --infodir=$(DESTDIR)$(infodir) --remove org
 
-.SUFFIXES:	.texi .tex .txt
+.SUFFIXES:	.texi .tex .txt _letter.tex
 
 %:		%.texi org-version.inc
 	$(MAKEINFO) --no-split $< -o $@
@@ -62,11 +63,16 @@ clean-install:
 
 %.html:		%.texi org-version.inc
 	$(TEXI2HTML) --no-split -o $@ $<
-	../UTILITIES/manfull.pl $@
+ifneq ($(SERVERMK),)
+	../mk/manfull.pl $@
 
 %.txt:		%.tex
-	perl ../UTILITIES/orgcard2txt.pl $< > $@
+	perl ../mk/orgcard2txt.pl $< > $@
+endif
 
 %_letter.tex:	%.tex
-	$(SED) -e 's/\\pdflayout=(0l)/\\pdflayout=(1l)/' \
-                   $< > $@
+	$(BATCH) \
+	  --eval '(add-to-list '"'"'load-path "../lisp")' \
+	  --eval '(load "org-compat.el")' \
+	  --eval '(load "../mk/org-fixup.el")' \
+	  --eval '(org-make-letterformat "$(<F)" "$(@F)")'
