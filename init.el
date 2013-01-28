@@ -303,9 +303,8 @@
 ;;----------------------------------------------------------
 ;; ---- BEGIN org-mode ----
 ;;----------------------------------------------------------
-
-(setq load-path (cons "~/.emacs.d/dotEmacs/org-mode/lisp" load-path))
-(setq load-path (cons "~/.emacs.d/dotEmacs/org-mode/contrib/lisp" load-path))
+(setq load-path (cons "~/.emacs.d/el-get/org-mode/contrib/lisp" load-path))
+(setq load-path (cons "~/.emacs.d/el-get/org-mode/lisp" load-path))
 (require 'org-install)
 
 (add-hook 'org-mode-hook '(lambda ()
@@ -844,7 +843,7 @@
  user-full-name  "Wenshan Ren"
  message-signature
  (concat
-  "Wenshan Ren\n"
+  "任文山 (Ren Wenshan)\n"
   "Email: renws1990@gmail.com\n"
   "Blog: wenshanren.org\n"
   "Douban: www.douban.com/people/renws\n"
