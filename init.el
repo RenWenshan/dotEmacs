@@ -894,7 +894,8 @@
 ;;----------------------------------------------------------
 (setq newsticker-url-list
       '(("Coding Horror" "http://feeds.feedburner.com/codinghorror")
-        ("赖永浩" "http://blog.csdn.net/lanphaday/rss/list")))
+        ("赖永浩" "http://blog.csdn.net/lanphaday/rss/list")
+        ("陈斌" "http://blog.binchen.org/?feed=rss2")))
 (autoload 'w3m-region "w3m" nil t)
 (setq newsticker-html-renderer 'w3m-region)
 ;;----------------------------------------------------------

@@ -11,6 +11,12 @@ It is mostly intended to be used on Linux especially Debian and CentOS.
 * Prerequisites
 ** el-get
 
+** org-mode
+   "Org is a mode for keeping notes, maintaining TODO lists, and doing project
+   planning with a fast and effective plain-text system."  -- org-mode manual
+
+   In Emacs, M-x el-get-install org-mode
+
 ** magit
    An Emacs git plugin.
 
