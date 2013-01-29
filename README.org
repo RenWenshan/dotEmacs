@@ -72,11 +72,18 @@ It is mostly intended to be used on Linux especially Debian and CentOS.
   | C-x b      | anonymous                            | call anything for buffer switching                  |
   | C-tab      | aj-toogle-fold                       | toggle fold all lines larger than current line      |
 
-* mu4e (Email client)
+* Email client
+  mu4e
 
-* newsticker (RSS reader)
+* RSS reader
+  newsticker
 
-* org2blog (Wordpress blogging)
+* Blog
+  org2blog
+
+* Microblog
+  Sina Weibo
+
 
 * EMMS (Media Player)
 

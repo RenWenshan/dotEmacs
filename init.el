@@ -724,15 +724,7 @@
 ;; ---- BEGIN microblog ----
 ;;----------------------------------------------------------
 
-(require 'twittering-mode)
-(setq twittering-use-master-password t)
-(setq twittering-allow-insecure-server-cert t)
-(setq twittering-oauth-use-ssl nil)
-(setq twittering-use-ssl nil)
-(twittering-enable-unread-status-notifier)
-(setq-default twittering-icon-mode t)
-(setq twittering-initial-timeline-spec-string `(":home@sina"))
-
+(require 'weibo)
 ;;----------------------------------------------------------
 ;; ---- END microblog ----
 ;;----------------------------------------------------------
