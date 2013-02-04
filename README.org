@@ -42,13 +42,11 @@ It is mostly intended to be used on Linux especially Debian and CentOS.
 ** emacs-w3m
    Web browser, the snapshot version works in Emacs 24.
 
-   $ sudo apt-get install w3m emacs-w3m-snapshot
+   $ sudo apt-get install w3m
 
 ** mu4e
    Email client for Emacs
 
-** newsticker
-   RSS reader
 
 * Key-bindings
   | Keystrokes | Function                             | Note                                                |
@@ -75,8 +73,17 @@ It is mostly intended to be used on Linux especially Debian and CentOS.
 * Email client
   mu4e
 
+  | function | note                  |
+  |----------+-----------------------|
+  | M-x mu4e | open mu4e main window |
+  | j        | jump to ...           |
+  | C        | compose               |
+  | R        | reply                 |
+  | s        | search                |
+
 * RSS reader
-  newsticker
+  I use rss2email, so all my RSS feeds will be sent to E-mail inbox. Please
+  search rss2email for details.
 
 * Blog
   org2blog
@@ -84,14 +91,12 @@ It is mostly intended to be used on Linux especially Debian and CentOS.
 * Microblog
   Sina Weibo
 
+* Media Player
+  EMMS + MPlayer
 
-* EMMS (Media Player)
-
-* capture screen-shot
-
-* Microblog
-
-* ERC (IRC client)
+* Screen-Shot
+* IRC
+  ERC
 
 * Python
 

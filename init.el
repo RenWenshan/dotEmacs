@@ -219,6 +219,33 @@
 (setq auto-insert-query nil) ; turn of prompt
 (define-auto-insert "\.py" "python-template.py")
 
+;; shell mode
+;; fix "wrong type argument: characterp, return"
+(add-hook 'term-mode-hook
+           #'(lambda ()
+               (setq autopair-dont-activate t) ;; for emacsen < 24
+               (autopair-mode -1))             ;; for emacsen >= 24
+)
+;; use zsh instead of bash
+(defun sh ()
+  (interactive)
+  (ansi-term "/bin/zsh"))
+
+;; completion
+(add-to-list 'load-path "~/.emacs.d/el-get/shell-completion")
+(require 'shell-completion)
+
+;; remove ^M
+(add-hook 'comint-output-filter-functions
+          'comint-strip-ctrl-m)
+
+;; clear shell
+(defun clear-shell ()
+   (interactive)
+   (let ((old-max comint-buffer-maximum-size))
+     (setq comint-buffer-maximum-size 0)
+     (comint-truncate-buffer)
+     (setq comint-buffer-maximum-size old-max)))
 ;;----------------------------------------------------------
 ;; ---- END nicer ----
 ;;----------------------------------------------------------
@@ -874,6 +901,7 @@
 ;;----------------------------------------------------------
 ;; ---- Begin w3m web browser ----
 ;;----------------------------------------------------------
+(add-to-list 'load-path "~/.emacs.d/el-get/emacs-w3m")
 (require 'w3m-load)
 
 ;; search Google Code and StackOverflow in Firefox
@@ -900,16 +928,17 @@
 
 
 ;;----------------------------------------------------------
-;; ---- BEGIN RSS reader----
+;; ---- BEGIN Instant Message ---
 ;;----------------------------------------------------------
-(setq newsticker-url-list
-      '(("Coding Horror" "http://feeds.feedburner.com/codinghorror")
-        ("赖永浩" "http://blog.csdn.net/lanphaday/rss/list")
-        ("陈斌" "http://blog.binchen.org/?feed=rss2")))
-(autoload 'w3m-region "w3m" nil t)
-(setq newsticker-html-renderer 'w3m-region)
+(add-to-list 'load-path "~/.emacs.d/dotEmacs/jabber")
+(load "jabber-autoloads")
+(setq jabber-account-list
+      '(("renws1990@gmail.com"
+         (:network-server . "talk.google.com")
+         (:connection-type . ssl)
+         (:port . 443))))
 ;;----------------------------------------------------------
-;; ---- END w3m browser----
+;; ---- END Instant Message ---
 ;;----------------------------------------------------------
 
 
