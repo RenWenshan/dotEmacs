@@ -277,7 +277,7 @@
 ;; xml/html files checking, default setting not work
 (defun flymake-xml-init ()
   (list "xmlstarlet"
-        (list "val" "-e" "-q"
+        (list "val"
               (flymake-init-create-temp-buffer-copy
                'flymake-create-temp-inplace))))
 
@@ -940,6 +940,7 @@
 ;;----------------------------------------------------------
 ;; ---- END Instant Message ---
 ;;----------------------------------------------------------
+
 
 
 
