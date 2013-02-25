@@ -246,6 +246,10 @@
      (setq comint-buffer-maximum-size 0)
      (comint-truncate-buffer)
      (setq comint-buffer-maximum-size old-max)))
+
+;; enable region narrowing
+(put 'narrow-to-region 'disabled nil)
+
 ;;----------------------------------------------------------
 ;; ---- END nicer ----
 ;;----------------------------------------------------------
@@ -273,13 +277,6 @@
 ;; tex files checking, replaced texify with chktex
 (defun flymake-get-tex-args (file-name)
   (list "chktex" (list "-q" "-v0" file-name)))
-
-;; xml/html files checking, default setting not work
-(defun flymake-xml-init ()
-  (list "xmlstarlet"
-        (list "val"
-              (flymake-init-create-temp-buffer-copy
-               'flymake-create-temp-inplace))))
 
 ;; f7 to go to previous error, f8 to jump to next error
 ;; (global-set-key [f7] 'flymake-goto-prev-error)
@@ -740,6 +737,13 @@
   (define-key nxml-mode-map (kbd "C-c C-r") 'rename-sgml-tag)
   )
 (add-hook 'nxml-mode-hook 'nxml-mode-additional-keys)
+
+;; xml/html files checking, default setting not work
+(defun flymake-xml-init ()
+  (list "xmlstarlet"
+        (list "val" "e"
+              (flymake-init-create-temp-buffer-copy
+               'flymake-create-temp-inplace))))
 
 ;;----------------------------------------------------------
 ;; ---- END web development ----
