@@ -254,6 +254,10 @@
 (require 'golden-ratio)
 (golden-ratio-enable)
 
+;; turn off cursor blink
+(if (fboundp 'blink-cursor-mode)
+    (blink-cursor-mode -1))
+
 ;;----------------------------------------------------------
 ;; ---- END nicer ----
 ;;----------------------------------------------------------
