@@ -8,6 +8,11 @@
 (progn (cd "~/.emacs.d/dotEmacs")
        (normal-top-level-add-subdirs-to-load-path))
 
+(add-to-list 'load-path "~/.emacs.d/el-get")
+(progn (cd "~/.emacs.d/el-get")
+       (normal-top-level-add-subdirs-to-load-path))
+
+
 ;; start server, used for emacsclient
 (server-start)
 
@@ -162,7 +167,6 @@
 (global-set-key [(meta f8)] 'highlight-symbol-prev)
 
 ;; color theme tango-dark (Emacs24)
-(add-to-list 'custom-theme-load-path "~/.emacs.d/dotEmacs/")
 (load-theme 'tango-dark t)
 
 ;; indentation guide
@@ -197,9 +201,6 @@
   (interactive)
   (insert (format-time-string "%Y-%m-%d %a")))
 
-;; shortcut for (eval-print-last-sexp)
-(global-set-key (kbd "C-j") 'eval-print-last-sexp)
-
 ;; name completion for describe function, variable, etc
 (icomplete-mode 1)
 
@@ -232,7 +233,6 @@
   (ansi-term "/bin/zsh"))
 
 ;; completion
-(add-to-list 'load-path "~/.emacs.d/el-get/shell-completion")
 (require 'shell-completion)
 
 ;; remove ^M
@@ -250,6 +250,10 @@
 ;; enable region narrowing
 (put 'narrow-to-region 'disabled nil)
 
+;; golden-ratio, resize windows automatically
+(require 'golden-ratio)
+(golden-ratio-enable)
+
 ;;----------------------------------------------------------
 ;; ---- END nicer ----
 ;;----------------------------------------------------------
@@ -259,7 +263,6 @@
 ;;----------------------------------------------------------
 ;; ---- BEGIN el-get ----
 ;;----------------------------------------------------------
-(add-to-list 'load-path "~/.emacs.d/el-get/el-get")
 (require 'el-get)
 (el-get 'sync)
 ;;----------------------------------------------------------
@@ -332,8 +335,6 @@
 (require 'org-install)
 
 (add-hook 'org-mode-hook '(lambda ()
-                            ;; use C-j to eval elisp expressions in org-mode
-                            (define-key org-mode-map (kbd "C-j") 'eval-print-last-sexp)
                             ;; turn on flyspell-mode by default
                             (flyspell-mode 1)))
 
@@ -377,6 +378,11 @@
 (add-to-list 'load-path "/usr/local/share/emacs/site-lisp/")
 (require 'magit)
 
+;; turn on flyspell mode when editing commit messages
+(add-hook 'magit-log-edit-mode-hook
+          '(lambda ()
+             (flyspell-mode 1)))
+
 ;;----------------------------------------------------------
 ;; ---- END magit ---
 ;;----------------------------------------------------------
@@ -387,7 +393,6 @@
 ;; ---- BEGIN yasnippet ----
 ;;----------------------------------------------------------
 
-(add-to-list 'load-path "~/.emacs.d/dotEmacs/yasnippet")
 (require 'yasnippet)
 (yas-global-mode 1)
 
@@ -401,7 +406,6 @@
 ;; ---- BEGIN auto-complete ----
 ;;----------------------------------------------------------
 
-(add-to-list 'load-path "~/.emacs.d/dotEmacs/auto-complete")
 (require 'auto-complete-config)
 (add-to-list 'ac-dictionary-directories "~/.emacs.d/dotEmacs/auto-complete/dict")
 (ac-config-default)
@@ -416,7 +420,6 @@
 ;; ---- BEGIN anything ----
 ;;----------------------------------------------------------
 
-(add-to-list 'load-path "～/.emacs.d/dotEmacs/anything-config")
 (require 'anything-config)
 
 ;; buffer switch
@@ -477,7 +480,6 @@
 ;; ---- BEGIN EMMS (Emacs MultiMedia System ) ----
 ;;----------------------------------------------------------
 
-(add-to-list 'load-path "~/.emacs.d/dotEmacs/emms/")
 (require 'emms-setup)
 (emms-standard)
 (emms-default-players)
@@ -497,7 +499,6 @@
 ;; ---- BEGIN go lang ----
 ;;----------------------------------------------------------
 
-(add-to-list 'load-path "~/.emacs.d/dotEmacs/go")
 (require 'go-mode-load)
 
 ;;----------------------------------------------------------
@@ -543,9 +544,7 @@
 ;; Usage:
 ;; C-c h term
 ;;
-;; add pylookup to your loadpath, ex) ~/.emacs.d/pylookup
 (setq pylookup-dir "~/.emacs.d/dotEmacs/pylookup")
-(add-to-list 'load-path pylookup-dir)
 
 ;; load pylookup when compile time
 (eval-when-compile (require 'pylookup))
@@ -745,6 +744,9 @@
               (flymake-init-create-temp-buffer-copy
                'flymake-create-temp-inplace))))
 
+;; use common indentation (4 spaces)
+(setq sgml-basic-offset 4)
+
 ;;----------------------------------------------------------
 ;; ---- END web development ----
 ;;----------------------------------------------------------
@@ -834,7 +836,6 @@
 ;;----------------------------------------------------------
 ;; ---- BEGIN Email client ----
 ;;----------------------------------------------------------
-(add-to-list 'load-path "~/.emacs.d/dotEmacs/mu4e")
 (require 'mu4e)
 
 ;; default
@@ -905,7 +906,6 @@
 ;;----------------------------------------------------------
 ;; ---- Begin w3m web browser ----
 ;;----------------------------------------------------------
-(add-to-list 'load-path "~/.emacs.d/el-get/emacs-w3m")
 (require 'w3m-load)
 
 ;; search Google Code and StackOverflow in Firefox
@@ -934,7 +934,6 @@
 ;;----------------------------------------------------------
 ;; ---- BEGIN Instant Message ---
 ;;----------------------------------------------------------
-(add-to-list 'load-path "~/.emacs.d/dotEmacs/jabber")
 (load "jabber-autoloads")
 (setq jabber-account-list
       '(("renws1990@gmail.com"
@@ -945,6 +944,25 @@
 ;; ---- END Instant Message ---
 ;;----------------------------------------------------------
 
+
+
+;;----------------------------------------------------------
+;; ---- BEGIN epa ---
+;;----------------------------------------------------------
+
+(require 'epa-file)
+(epa-file-enable)
+
+;; always use symmetric encryption
+(setq epa-file-encrypt-to nil)
+;; turn on passphrase cache, so don't need to type in password for every save
+(setq epa-file-cache-passphrase-for-symmetric-encryption t)
+;; turn on auto save
+(setq epa-file-inhibit-auto-save nil)
+
+;;----------------------------------------------------------
+;; ---- END epa ---
+;;----------------------------------------------------------
 
 
 
