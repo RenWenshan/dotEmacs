@@ -250,10 +250,6 @@
 ;; enable region narrowing
 (put 'narrow-to-region 'disabled nil)
 
-;; golden-ratio, resize windows automatically
-(require 'golden-ratio)
-(golden-ratio-enable)
-
 ;; turn off cursor blink
 (if (fboundp 'blink-cursor-mode)
     (blink-cursor-mode -1))
