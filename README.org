@@ -47,7 +47,6 @@ It is mostly intended to be used on Linux especially Debian and CentOS.
 ** mu4e
    Email client for Emacs
 
-
 * Key-bindings
   | Keystrokes | Function                             | Note                                                |
   |------------+--------------------------------------+-----------------------------------------------------|

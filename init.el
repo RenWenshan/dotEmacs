@@ -254,6 +254,9 @@
 (if (fboundp 'blink-cursor-mode)
     (blink-cursor-mode -1))
 
+;; csv-mode, please install this by elpa
+(require 'csv-mode)
+
 ;;----------------------------------------------------------
 ;; ---- END nicer ----
 ;;----------------------------------------------------------
@@ -914,6 +917,15 @@
 
 (setq gnus-dired-mail-mode 'mu4e-user-agent)
 (add-hook 'dired-mode-hook 'turn-on-gnus-dired-mode)
+
+;; enable inline images
+(setq mu4e-view-show-images t)
+;; use imagemagick, if available
+(when (fboundp 'imagemagick-register-types)
+  (imagemagick-register-types))
+
+;; prefer HTML
+(setq mu4e-view-prefer-html t)
 
 ;;----------------------------------------------------------
 ;; ---- END Email client ----
