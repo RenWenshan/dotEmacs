@@ -393,10 +393,10 @@
           '(lambda ()
              (flyspell-mode 1)))
 
-;; make the highlighting stand out less to see diffs
+;; turn off magit highlighting
 (eval-after-load "magit"
-  '(set-face-attribute
-    'magit-item-highlight nil :foreground "#ffffff" :background "#3f4747"))
+  ;; no highlight
+  (defun magit-highlight-section ())
 
 ;;----------------------------------------------------------
 ;; ---- END magit ---
