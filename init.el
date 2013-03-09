@@ -254,8 +254,15 @@
 (if (fboundp 'blink-cursor-mode)
     (blink-cursor-mode -1))
 
-;; csv-mode, please install this by elpa
+;; csv-mode, please install this by ELPA
 (require 'csv-mode)
+
+;; search the kill ring with M-C-y
+(autoload 'kill-ring-search "kill-ring-search"
+  "Search the kill ring in the minibuffer."
+  (interactive))
+
+(global-set-key "\M-\C-y" 'kill-ring-search)
 
 ;;----------------------------------------------------------
 ;; ---- END nicer ----
@@ -385,6 +392,11 @@
 (add-hook 'magit-log-edit-mode-hook
           '(lambda ()
              (flyspell-mode 1)))
+
+;; make the highlighting stand out less to see diffs
+(eval-after-load "magit"
+  '(set-face-attribute
+    'magit-item-highlight nil :foreground "#ffffff" :background "#3f4747"))
 
 ;;----------------------------------------------------------
 ;; ---- END magit ---
@@ -753,6 +765,33 @@
 ;;----------------------------------------------------------
 ;; ---- END web development ----
 ;;----------------------------------------------------------
+
+
+
+;;----------------------------------------------------------
+;; ---- BEGIN Java ----
+;;----------------------------------------------------------
+
+(require 'eclim)
+(global-eclim-mode)
+
+;; eclipse dir
+(custom-set-variables
+ '(eclim-eclipse-dirs '("~/eclipse")))
+
+;; display compilation error messages in the echo area
+(setq help-at-pt-display-when-idle t)
+(setq help-at-pt-timer-delay 0.1)
+(help-at-pt-set-timer)
+
+;; add the emacs-eclim source
+(require 'ac-emacs-eclim-source)
+(ac-emacs-eclim-config)
+
+;;----------------------------------------------------------
+;; ---- END Java ----
+;;----------------------------------------------------------
+
 
 
 
