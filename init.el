@@ -1,6 +1,6 @@
 ;; This is the main configuration file of GNU Emacs
 ;;
-;; Author: Wenshan Ren (renws1990@gmail.com)
+;; Author: 任文山 (Ren Wenshan <renws1990@gmail.com>)
 ;; Blog: wenshanren.org
 
 ;; set load-path
@@ -223,10 +223,10 @@
 ;; shell mode
 ;; fix "wrong type argument: characterp, return"
 (add-hook 'term-mode-hook
-           #'(lambda ()
-               (setq autopair-dont-activate t) ;; for emacsen < 24
-               (autopair-mode -1))             ;; for emacsen >= 24
-)
+          #'(lambda ()
+              (setq autopair-dont-activate t) ;; for emacsen < 24
+              (autopair-mode -1))             ;; for emacsen >= 24
+          )
 ;; use zsh instead of bash
 (defun sh ()
   (interactive)
@@ -241,11 +241,11 @@
 
 ;; clear shell
 (defun clear-shell ()
-   (interactive)
-   (let ((old-max comint-buffer-maximum-size))
-     (setq comint-buffer-maximum-size 0)
-     (comint-truncate-buffer)
-     (setq comint-buffer-maximum-size old-max)))
+  (interactive)
+  (let ((old-max comint-buffer-maximum-size))
+    (setq comint-buffer-maximum-size 0)
+    (comint-truncate-buffer)
+    (setq comint-buffer-maximum-size old-max)))
 
 ;; enable region narrowing
 (put 'narrow-to-region 'disabled nil)
@@ -396,7 +396,7 @@
 ;; turn off magit highlighting
 (eval-after-load "magit"
   ;; no highlight
-  (defun magit-highlight-section ())
+  '(defun magit-highlight-section ()))
 
 ;;----------------------------------------------------------
 ;; ---- END magit ---
@@ -906,7 +906,7 @@
 ;; something about ourselves
 (setq
  user-mail-address "renws1990@gmail.com"
- user-full-name  "Wenshan Ren"
+ user-full-name  "Ren Wenshan"
  message-signature
  (concat
   "任文山 (Ren Wenshan)\n"
@@ -931,10 +931,10 @@
 
 ;; alternatively, for emacs-24 you can use:
 (setq message-send-mail-function 'smtpmail-send-it
-    smtpmail-stream-type 'starttls
-    smtpmail-default-smtp-server "smtp.gmail.com"
-    smtpmail-smtp-server "smtp.gmail.com"
-    smtpmail-smtp-service 587)
+      smtpmail-stream-type 'starttls
+      smtpmail-default-smtp-server "smtp.gmail.com"
+      smtpmail-smtp-server "smtp.gmail.com"
+      smtpmail-smtp-service 587)
 
 ;; don't keep message buffers around
 (setq message-kill-buffer-on-exit t)
@@ -948,10 +948,10 @@
   (let (buffers)
     (save-current-buffer
       (dolist (buffer (buffer-list t))
-     	(set-buffer buffer)
-     	(when (and (derived-mode-p 'message-mode)
+        (set-buffer buffer)
+        (when (and (derived-mode-p 'message-mode)
                    (null message-sent-message-via))
-     	  (push (buffer-name buffer) buffers))))
+          (push (buffer-name buffer) buffers))))
     (nreverse buffers)))
 
 (setq gnus-dired-mail-mode 'mu4e-user-agent)
@@ -962,9 +962,6 @@
 ;; use imagemagick, if available
 (when (fboundp 'imagemagick-register-types)
   (imagemagick-register-types))
-
-;; prefer HTML
-(setq mu4e-view-prefer-html t)
 
 ;;----------------------------------------------------------
 ;; ---- END Email client ----
@@ -981,7 +978,7 @@
 ;; original code: http://blog.binchen.org/?p=478
 ;; external browser should be firefox
 (setq browse-url-generic-program
-       (executable-find "firefox"))
+      (executable-find "firefox"))
 
 ;; use external browser to search
 (defun w3mext-hacker-search ()
