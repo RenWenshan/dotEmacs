@@ -100,12 +100,17 @@ All the other properties are optional. They over-ride the global variables.
 
 (defcustom org2blog/wp-buffer-template
   "#+DATE: %s
-#+OPTIONS: toc:nil num:nil todo:nil pri:nil tags:nil ^:nil TeX:nil
+#+OPTIONS: toc:nil num:t todo:nil pri:nil tags:nil ^:nil TeX:nil
 #+CATEGORY: %s
 #+TAGS:
 #+DESCRIPTION:
 #+TITLE: %s
-\n"
+#+AUTHOR: 任文山 (Ren Wenshan)
+\n
+\n
+Happy Hacking!
+------------------------------------\n"
+
   "The default template to be inserted in a new post buffer."
   :group 'org2blog/wp
   :type 'string)
