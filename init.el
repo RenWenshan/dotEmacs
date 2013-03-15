@@ -178,17 +178,10 @@
 ;; indentation guide
 (require 'highlight-indentation)
 
-;; code folding with C-tab
-(defun aj-toggle-fold ()
-  "Toggle fold all lines larger than indentation on current line"
-  (interactive)
-  (let ((col 1))
-    (save-excursion
-      (back-to-indentation)
-      (setq col (+ 1 (current-column)))
-      (set-selective-display
-       (if selective-display nil (or col 1))))))
-(global-set-key [C-tab] 'aj-toggle-fold)
+;; folding/unfolding with C-c C-h and C-c C-j
+(hs-minor-mode 1)
+(global-set-key (kbd "C-c C-h") 'hs-toggle-hiding)
+
 
 ;; enter for new line and indent
 (local-set-key (kbd "RET") 'newline-and-indent)
