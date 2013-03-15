@@ -3,6 +3,12 @@
 ;; Author: 任文山 (Ren Wenshan <renws1990@gmail.com>)
 ;; Blog: wenshanren.org
 
+
+
+;;----------------------------------------------------------
+;; ---- BEGIN basic configuration ----
+;;----------------------------------------------------------
+
 ;; set load-path
 (add-to-list 'load-path "~/.emacs.d/dotEmacs")
 (progn (cd "~/.emacs.d/dotEmacs")
@@ -11,7 +17,6 @@
 (add-to-list 'load-path "~/.emacs.d/el-get")
 (progn (cd "~/.emacs.d/el-get")
        (normal-top-level-add-subdirs-to-load-path))
-
 
 ;; start server, used for emacsclient
 (server-start)
@@ -22,14 +27,18 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(erc-modules (quote (autojoin button completion fill irccontrols list log match menu move-to-prompt netsplit networks noncommands readonly ring smiley stamp track))))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
+ '(eclim-eclipse-dirs (quote ("~/eclipse")))
+ '(erc-modules (quote
+                (autojoin button completion fill irccontrols list log match
+                          menu move-to-prompt netsplit networks noncommands
+                          readonly ring smiley stamp track)))
+ '(user-full-name "任文山 (Ren Wenshan)")
+ '(user-email-address "renws1990@gmail.com")
  )
 
+;;----------------------------------------------------------
+;; ---- END basic configuration ----
+;;----------------------------------------------------------
 
 
 
@@ -63,9 +72,6 @@
 
 ;; explicitly show the end of a buffer
 (set-default 'indicate-empty-lines t)
-
-;; line-wrapping
-(set-default 'fill-column 80)
 
 ;; prevent beep
 (setq visible-bell t)
@@ -264,6 +270,13 @@
 
 (global-set-key "\M-\C-y" 'kill-ring-search)
 
+;; csv-mode
+(require 'csv-mode)
+
+;; hide-show easy folding with C-c C-h and C-c C-j
+(global-set-key (kbd "C-c C-h") 'hs-hide-block)
+(global-set-key (kbd "C-c C-j") 'hs-show-block)
+
 ;;----------------------------------------------------------
 ;; ---- END nicer ----
 ;;----------------------------------------------------------
@@ -422,7 +435,8 @@
 ;;----------------------------------------------------------
 
 (require 'auto-complete-config)
-(add-to-list 'ac-dictionary-directories "~/.emacs.d/dotEmacs/auto-complete/dict")
+(add-to-list 'ac-dictionary-directories
+             "~/.emacs.d/dotEmacs/auto-complete/dict")
 (ac-config-default)
 
 ;;----------------------------------------------------------
@@ -442,13 +456,13 @@
                 (lambda() (interactive)
                   (anything
                    :prompt "Switch to: "
-                   :candidate-number-limit 10                 ;; up to 10 of each
+                   :candidate-number-limit 10
                    :sources
-                   '( anything-c-source-buffers               ;; buffers
-                      anything-c-source-recentf               ;; recent files
-                      anything-c-source-bookmarks             ;; bookmarks
-                      anything-c-source-files-in-current-dir+ ;; current dir
-                      anything-c-source-locate))))            ;; use 'locate'
+                   '( anything-c-source-buffers
+                      anything-c-source-recentf
+                      anything-c-source-bookmarks
+                      anything-c-source-files-in-current-dir+
+                      anything-c-source-locate))))
 
 ;; search documents
 (global-set-key (kbd "C-c I")  ;; i -> info
@@ -529,18 +543,15 @@
 ;; load python.el
 (require 'python)
 
+;; elpy: Emacs Python Development Environment
+(package-initialize)
+(elpy-enable)
+
+;; grammar checking
+(setq python-check-command "python-check.sh")
+
 ;; use ipython
-(setq python-command "ipython")
-(setq
- python-shell-interpreter "ipython"
- python-shell-interpreter-args ""
- python-shell-prompt-regexp "In \\[[0-9]+\\]: "
- python-shell-prompt-output-regexp "Out\\[[0-9]+\\]: "
- python-shell-completion-setup-code
- "from IPython.core.completerlib import module_completion"
- python-shell-completion-string-code
- "';'.join(__IP.complete('''%s'''p))\n"
- python-shell-completion-module-string-code "")
+(elpy-use-ipython)
 
 ;; load indentation guide by default
 (add-hook 'python-mode-hook
@@ -550,52 +561,11 @@
 
 ;; bind RET to py-newline-and-indent
 (add-hook 'python-mode-hook '(lambda ()
-                               (define-key python-mode-map "\C-m" 'newline-and-indent)))
+                               (define-key
+                                 python-mode-map "\C-m" 'newline-and-indent)))
 
 ;; display lambda for python
 (add-hook 'python-mode-hook #'lambda-mode 1)
-
-;; pylookup
-;; Usage:
-;; C-c h term
-;;
-(setq pylookup-dir "~/.emacs.d/dotEmacs/pylookup")
-
-;; load pylookup when compile time
-(eval-when-compile (require 'pylookup))
-
-;; set executable file and db file
-(setq pylookup-program (concat pylookup-dir "/pylookup.py"))
-(setq pylookup-db-file (concat pylookup-dir "/pylookup.db"))
-
-;; to speedup, just load it on demand
-(autoload 'pylookup-lookup "pylookup"
-  "Lookup SEARCH-TERM in the Python HTML indexes." t)
-
-(autoload 'pylookup-update "pylookup"
-  "Run pylookup-update and create the database at `pylookup-db-file'." t)
-(global-set-key "\C-ch" 'pylookup-lookup)
-
-;; flymake for python, need create a script named pycheckers
-(add-hook 'find-file-hook 'flymake-find-file-hook)
-(when (load "flymake" t)
-  (defun flymake-pyflakes-init ()
-    (let* ((temp-file (flymake-init-create-temp-buffer-copy
-                       'flymake-create-temp-inplace))
-           (local-file (file-relative-name
-                        temp-file
-                        (file-name-directory buffer-file-name))))
-      (list "pycheckers"  (list local-file))))
-  (add-to-list 'flymake-allowed-file-name-masks
-               '("\\.py\\'" flymake-pyflakes-init)))
-
-;; highlight breakpoint(s)
-(defun annotate-pdb ()
-  (interactive)
-  (highlight-lines-matching-regexp "import pdb")
-  (highlight-lines-matching-regexp "pdb.set_trace()"))
-
-(add-hook 'python-mode-hook 'annotate-pdb)
 
 ;; add a breakpoint with C-c C-t
 (defun python-add-breakpoint ()
@@ -611,9 +581,18 @@
   (interactive)
   (newline-and-indent)
   (insert "if DEBUG: print '----- wenshan log -----'")
-  (highlight-lines-matching-regexp "^[ ]*if DEBUG: print '----- wenshan log -----"))
+  (highlight-lines-matching-regexp
+   "^[ ]*if DEBUG: print '----- wenshan log -----"))
 
 (define-key python-mode-map (kbd "C-c C-d") 'python-add-log-print)
+
+;; enter interactive python with C-c C-p
+(defun python-interactive ()
+  (interactive)
+  (insert "!import code; code.interact(local=vars())"))
+
+(define-key python-mode-map (kbd "C-c C-p") 'python-interactive)
+
 
 ;; jedi for auto-completion
 (add-hook 'python-mode-hook 'jedi:setup)
@@ -635,27 +614,27 @@
        (setcdr pair 'cperl-mode)))
  (append auto-mode-alist interpreter-mode-alist))
 
-                                        ; Outline-minor-mode key map
+
 (define-prefix-command 'cm-map nil "Outline-")
-                                        ; HIDE
-(define-key cm-map "q" 'hide-sublevels)    ; Hide everything but the top-level headings
-(define-key cm-map "t" 'hide-body)         ; Hide everything but headings (all body lines)
-(define-key cm-map "o" 'hide-other)        ; Hide other branches
-(define-key cm-map "c" 'hide-entry)        ; Hide this entry's body
-(define-key cm-map "l" 'hide-leaves)       ; Hide body lines in this entry and sub-entries
-(define-key cm-map "d" 'hide-subtree)      ; Hide everything in this entry and sub-entries
-                                        ; SHOW
-(define-key cm-map "a" 'show-all)          ; Show (expand) everything
-(define-key cm-map "e" 'show-entry)        ; Show this heading's body
-(define-key cm-map "i" 'show-children)     ; Show this heading's immediate child sub-headings
-(define-key cm-map "k" 'show-branches)     ; Show all sub-headings under this heading
-(define-key cm-map "s" 'show-subtree)      ; Show (expand) everything in this heading & below
-                                        ; MOVE
-(define-key cm-map "u" 'outline-up-heading)                ; Up
-(define-key cm-map "n" 'outline-next-visible-heading)      ; Next
-(define-key cm-map "p" 'outline-previous-visible-heading)  ; Previous
-(define-key cm-map "f" 'outline-forward-same-level)        ; Forward - same level
-(define-key cm-map "b" 'outline-backward-same-level)       ; Backward - same level
+
+(define-key cm-map "q" 'hide-sublevels)
+(define-key cm-map "t" 'hide-body)
+(define-key cm-map "o" 'hide-other)
+(define-key cm-map "c" 'hide-entry)
+(define-key cm-map "l" 'hide-leaves)
+(define-key cm-map "d" 'hide-subtree)
+
+(define-key cm-map "a" 'show-all)
+(define-key cm-map "e" 'show-entry)
+(define-key cm-map "i" 'show-children)
+(define-key cm-map "k" 'show-branches)
+(define-key cm-map "s" 'show-subtree)
+
+(define-key cm-map "u" 'outline-up-heading)
+(define-key cm-map "n" 'outline-next-visible-heading)
+(define-key cm-map "p" 'outline-previous-visible-heading)
+(define-key cm-map "f" 'outline-forward-same-level)
+(define-key cm-map "b" 'outline-backward-same-level)
 (global-set-key "\M-o" cm-map)
 
 (setq cperl-mode-hook 'my-cperl-customizations)
@@ -794,6 +773,18 @@
 
 
 
+;;----------------------------------------------------------
+;; ---- BEGIN C ----
+;;----------------------------------------------------------
+
+(setq-default c-default-style "linux"
+              c-basic-offset 4)
+
+;;----------------------------------------------------------
+;; ---- END C ----
+;;----------------------------------------------------------
+
+
 
 ;;----------------------------------------------------------
 ;; ---- BEGIN microblog ----
@@ -836,7 +827,7 @@
      :server "irc.freenode.net"
      :port "6667"
      :nick "Meatball_py"
-     :password (password-read (format "password for Meatball at freenode?")))))
+     :password (password-read (format "password for Meatball at freenode? ")))))
 
 ;; invoke fly-spell by default
 (add-hook 'erc-mode-hook (lambda ()
@@ -866,7 +857,8 @@
 ;; ---- BEGIN Markdown support ----
 ;;----------------------------------------------------------
 
-(autoload 'markdown-mode "markdown-mode.el" "Major mode for editing Markdown files" t)
+(autoload 'markdown-mode
+  "markdown-mode.el" "Major mode for editing Markdown files" t)
 (setq auto-mode-alist (cons '("\\.md" . markdown-mode) auto-mode-alist))
 
 ;;----------------------------------------------------------
@@ -920,16 +912,6 @@
 ;; package 'gnutls-bin' in Debian/Ubuntu
 
 (require 'smtpmail)
-;; (setq message-send-mail-function 'smtpmail-send-it
-;;       starttls-use-gnutls t
-;;       smtpmail-starttls-credentials '(("smtp.gmail.com" 587 nil nil))
-;;       smtpmail-auth-credentials
-;;       '(("smtp.gmail.com" 587 "renws1990@gmail.com" nil))
-;;       smtpmail-default-smtp-server "smtp.gmail.com"
-;;       smtpmail-smtp-server "smtp.gmail.com"
-;;       smtpmail-smtp-service 587)
-
-;; alternatively, for emacs-24 you can use:
 (setq message-send-mail-function 'smtpmail-send-it
       smtpmail-stream-type 'starttls
       smtpmail-default-smtp-server "smtp.gmail.com"
@@ -957,11 +939,11 @@
 (setq gnus-dired-mail-mode 'mu4e-user-agent)
 (add-hook 'dired-mode-hook 'turn-on-gnus-dired-mode)
 
-;; enable inline images
-(setq mu4e-view-show-images t)
-;; use imagemagick, if available
-(when (fboundp 'imagemagick-register-types)
-  (imagemagick-register-types))
+;; ;; enable inline images
+;; (setq mu4e-view-show-images t)
+;; ;; use imagemagick, if available
+;; (when (fboundp 'imagemagick-register-types)
+;;   (imagemagick-register-types))
 
 ;;----------------------------------------------------------
 ;; ---- END Email client ----
@@ -973,24 +955,6 @@
 ;; ---- Begin w3m web browser ----
 ;;----------------------------------------------------------
 (require 'w3m-load)
-
-;; search Google Code and StackOverflow in Firefox
-;; original code: http://blog.binchen.org/?p=478
-;; external browser should be firefox
-(setq browse-url-generic-program
-      (executable-find "firefox"))
-
-;; use external browser to search
-(defun w3mext-hacker-search ()
-  "search word under cursor in google code search and stackoverflow.com"
-  (interactive)
-  (require 'w3m)
-  (let ((keyword (w3m-url-encode-string (thing-at-point 'symbol))))
-    (browse-url-generic (concat "http://code.google.com/codesearch?q=" keyword))
-    (browse-url-generic (concat "http://www.google.com.au/search?hl=en&q=" keyword "+site:stackoverflow.com" )))
-  )
-
-(add-hook 'prog-mode-hook '( lambda () (local-set-key (kbd "C-c ; s") 'w3mext-hacker-search)) )
 ;;----------------------------------------------------------
 ;; ---- END w3m web browser----
 ;;----------------------------------------------------------
