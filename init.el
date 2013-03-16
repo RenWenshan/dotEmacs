@@ -560,16 +560,16 @@
 ;; display lambda for python
 (add-hook 'python-mode-hook #'lambda-mode 1)
 
-;; add a breakpoint with C-c C-t
+;; add a breakpoint with C-c C-b
 (defun python-add-breakpoint ()
   (interactive)
   (newline-and-indent)
   (insert "import ipdb; ipdb.set_trace()")
   (highlight-lines-matching-regexp "^[ ]*import ipdb; ipdb.set_trace()"))
 
-(define-key python-mode-map (kbd "C-c C-t") 'python-add-breakpoint)
+(define-key python-mode-map (kbd "C-c C-b") 'python-add-breakpoint)
 
-;; add a log print statement with C-c C-d
+;; add a log print statement
 (defun python-add-log-print ()
   (interactive)
   (newline-and-indent)
@@ -577,14 +577,10 @@
   (highlight-lines-matching-regexp
    "^[ ]*if DEBUG: print '----- wenshan log -----"))
 
-(define-key python-mode-map (kbd "C-c C-d") 'python-add-log-print)
-
-;; enter interactive python with C-c C-p
+;; enter interactive python
 (defun python-interactive ()
   (interactive)
   (insert "!import code; code.interact(local=vars())"))
-
-(define-key python-mode-map (kbd "C-c C-p") 'python-interactive)
 
 
 ;; jedi for auto-completion
