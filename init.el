@@ -178,11 +178,6 @@
 ;; indentation guide
 (require 'highlight-indentation)
 
-;; folding/unfolding with C-c C-h and C-c C-j
-(hs-minor-mode 1)
-(global-set-key (kbd "C-c C-h") 'hs-toggle-hiding)
-
-
 ;; enter for new line and indent
 (local-set-key (kbd "RET") 'newline-and-indent)
 
@@ -266,9 +261,11 @@
 ;; csv-mode
 (require 'csv-mode)
 
-;; hide-show easy folding with C-c C-h and C-c C-j
-(global-set-key (kbd "C-c C-h") 'hs-hide-block)
-(global-set-key (kbd "C-c C-j") 'hs-show-block)
+;; folding/unfolding with C-c C-h
+(global-set-key (kbd "C-c C-h") 'hs-toggle-hiding)
+
+;; eldoc
+(require 'eldoc)
 
 ;;----------------------------------------------------------
 ;; ---- END nicer ----
@@ -308,6 +305,34 @@
 
 
 ;;----------------------------------------------------------
+;; ---- BEGIN Lisp ----
+;;----------------------------------------------------------
+
+;; paredit
+(autoload 'paredit-mode "paredit"
+  "Minor mode for pseudo-structurally editing Lisp code." t)
+
+(eldoc-add-command
+ 'paredit-backward-delete
+ 'paredit-close-round)
+
+(add-hook 'lisp-mode-hook
+          (lambda ()
+            (paredit-mode +1)
+            (eldoc-mode t)))
+
+(add-hook 'lisp-interaction-mode-hook
+          (lambda ()
+            (paredit-mode +1)
+            (eldoc-mode t)))
+
+;;----------------------------------------------------------
+;; ---- END Lisp ----
+;;----------------------------------------------------------
+
+
+
+;;----------------------------------------------------------
 ;; ---- BEGIN Emacs Lisp ----
 ;;----------------------------------------------------------
 
@@ -317,10 +342,19 @@
             (flyspell-mode 1)
             ;; turn on indentation guide by default
             (highlight-indentation-mode t)
+            ;; paredit mode
+            (paredit-mode +1)
+            ;; eldoc
+            (eldoc-mode t)
+            ;; folding
+            (hs-minor-mode t)
             ))
 
 ;; turn on lambda mode by default, showing "lambda" as the lambda symbol
 (add-hook 'emacs-lisp-mode-hook #'lambda-mode 1)
+
+;; eldoc
+
 
 ;;----------------------------------------------------------
 ;; ---- END Emacs Lisp ----
@@ -550,12 +584,8 @@
 (add-hook 'python-mode-hook
           '(lambda ()
              (highlight-indentation-mode t)
-             ))
-
-;; bind RET to py-newline-and-indent
-(add-hook 'python-mode-hook '(lambda ()
-                               (define-key
-                                 python-mode-map "\C-m" 'newline-and-indent)))
+             (define-key python-mode-map "\C-m" 'newline-and-indent)
+             (hs-minor-mode t)))
 
 ;; display lambda for python
 (add-hook 'python-mode-hook #'lambda-mode 1)
@@ -581,7 +611,6 @@
 (defun python-interactive ()
   (interactive)
   (insert "!import code; code.interact(local=vars())"))
-
 
 ;; jedi for auto-completion
 (add-hook 'python-mode-hook 'jedi:setup)
