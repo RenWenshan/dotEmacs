@@ -108,8 +108,8 @@
 ;; copy-paste
 (setq x-select-enable-clipboard t)
 
-;; line width (fixed to 80)
-(setq-default fill-column 80)
+;; line width (fixed to 79)
+(setq-default fill-column 79)
 
 ;; Ctrl-x Ctrl-m to invoke M-x sequence
 (global-set-key "\C-x\C-m" 'execute-extended-command)
