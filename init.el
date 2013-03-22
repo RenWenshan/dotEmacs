@@ -48,6 +48,12 @@
 ;;
 ;; this part is for making Emacs easier to use
 
+;; join line with M-j
+(global-set-key (kbd "M-j")
+                (lambda ()
+                  (interactive)
+                  (join-line -1)))
+
 ;; avoid creating backup files in the same folder
 (setq backup-directory-alist
       `((".*" . ,"~/.emacs.d/backup")))
@@ -353,9 +359,6 @@
 ;; turn on lambda mode by default, showing "lambda" as the lambda symbol
 (add-hook 'emacs-lisp-mode-hook #'lambda-mode 1)
 
-;; eldoc
-
-
 ;;----------------------------------------------------------
 ;; ---- END Emacs Lisp ----
 ;;----------------------------------------------------------
@@ -575,7 +578,7 @@
 (elpy-enable)
 
 ;; grammar checking
-(setq python-check-command "python-check.sh")
+(setq python-check-command "pycheckers")
 
 ;; use ipython
 (elpy-use-ipython)
