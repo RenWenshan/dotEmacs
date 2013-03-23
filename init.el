@@ -273,6 +273,19 @@
 ;; eldoc
 (require 'eldoc)
 
+;; font
+(set-default-font "Dejavu Sans Mono 11")
+(dolist (charset '(kana han symbol cjk-misc bopomofo))
+  (set-fontset-font (frame-parameter nil 'font)
+                    charset
+                    (font-spec :family "WenQuanYi Micro Hei Mono" :size 18)))
+
+;; package
+(require 'package)
+(add-to-list 'package-archives
+             '("marmalade" . "http://marmalade-repo.org/packages/"))
+(package-initialize)
+
 ;;----------------------------------------------------------
 ;; ---- END nicer ----
 ;;----------------------------------------------------------
@@ -361,6 +374,17 @@
 
 ;;----------------------------------------------------------
 ;; ---- END Emacs Lisp ----
+;;----------------------------------------------------------
+
+
+
+;;----------------------------------------------------------
+;; ---- BEGIN Clojure ----
+;;----------------------------------------------------------
+(add-hook 'clojure-mode-hook 'paredit-mode)
+
+;;----------------------------------------------------------
+;; ---- END Clojure ----
 ;;----------------------------------------------------------
 
 
