@@ -967,7 +967,6 @@
 ;; something about ourselves
 (setq
  user-mail-address "renws1990@gmail.com"
- user-full-name  "Ren Wenshan"
  message-signature
  (concat
   "任文山 (Ren Wenshan)\n"
