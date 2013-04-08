@@ -311,6 +311,9 @@ user."
 
 (global-set-key (kbd "C-c g") 'google)
 
+;; turn on flyspell-prog-mode for all programming modes
+(add-hook 'prog-mode-hook 'flyspell-prog-mode)
+
 ;;----------------------------------------------------------
 ;; ---- END nicer ----
 ;;----------------------------------------------------------
@@ -382,8 +385,6 @@ user."
 
 (add-hook 'emacs-lisp-mode-hook
           (lambda ()
-            ;; turn on flyspell
-            (flyspell-mode 1)
             ;; turn on indentation guide by default
             (highlight-indentation-mode t)
             ;; paredit mode
@@ -438,7 +439,10 @@ user."
 
 (add-hook 'org-mode-hook '(lambda ()
                             ;; turn on flyspell-mode by default
-                            (flyspell-mode 1)))
+                            (flyspell-mode 1)
+                            ;; C-TAB for expanding
+                            (local-set-key (kbd "C-<tab>") 'yas/expand-from-trigger-key)
+                            ))
 
 ;;----------------------------------------------------------
 ;; ---- END org-mode ----
