@@ -168,9 +168,6 @@
 (autopair-global-mode 1)
 (setq autopair-autowrap t)
 
-;; show line numbers by default
-(global-linum-mode 1)
-
 ;; highlight a symbol
 (require 'highlight-symbol)
 (global-set-key [(control f8)] 'highlight-symbol-at-point)
@@ -312,7 +309,10 @@ user."
 (global-set-key (kbd "C-c g") 'google)
 
 ;; turn on flyspell-prog-mode for all programming modes
-(add-hook 'prog-mode-hook 'flyspell-prog-mode)
+(add-hook 'prog-mode-hook
+          (lambda ()
+            (flyspell-prog-mode)
+            (linum-mode t)))
 
 ;;----------------------------------------------------------
 ;; ---- END nicer ----
