@@ -1001,7 +1001,6 @@ user."
   "任文山 (Ren Wenshan)\n"
   "Email: renws1990@gmail.com\n"
   "Blog: wenshanren.org\n"
-  "Douban: www.douban.com/people/renws\n"
   "\n"))
 
 ;; sending mail -- replace USERNAME with your gmail username
