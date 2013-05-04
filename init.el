@@ -90,7 +90,9 @@
 (setq truncate-partial-width-windows nil)
 
 ;; trailing whitespace is unnecessary
-(add-hook 'before-save-hook (lambda () (delete-trailing-whitespace)))
+(add-hook 'before-save-hook
+          (lambda ()
+            (delete-trailing-whitespace)))
 
 ;; support trash
 (setq delete-by-moving-to-trash t)
@@ -139,19 +141,6 @@
 ;; 4000 keyboard
 (global-set-key (kbd "<f6>") 'kill-this-buffer)
 
-;; clear the buffer in eshell
-(defun eshell/clear ()
-  "clear the eshell buffer."
-  (interactive)
-  (let ((inhibit-read-only t))
-    (erase-buffer)))
-
-;; stop eshell cycle completion
-(setq eshell-cmpl-cycle-completions nil)
-
-;; max-specpdl-size
-(setq max-specpdl-size 65525)
-
 ;; ibuffer
 (global-set-key (kbd "C-x C-b") 'ibuffer)
 (add-hook 'ibuffer-mode-hook
@@ -174,9 +163,6 @@
 (global-set-key [f8] 'highlight-symbol-next)
 (global-set-key [(shift f8)] 'highlight-symbol-prev)
 (global-set-key [(meta f8)] 'highlight-symbol-prev)
-
-;; color theme tango-dark (Emacs24)
-(load-theme 'tango-dark t)
 
 ;; indentation guide
 (require 'highlight-indentation)
@@ -217,33 +203,6 @@
 (setq auto-insert-query nil) ; turn of prompt
 (define-auto-insert "\.py" "python-template.py")
 
-;; shell mode
-;; fix "wrong type argument: characterp, return"
-(add-hook 'term-mode-hook
-          #'(lambda ()
-              (setq autopair-dont-activate t) ;; for emacsen < 24
-              (autopair-mode -1))             ;; for emacsen >= 24
-          )
-;; use zsh instead of bash
-(defun sh ()
-  (interactive)
-  (ansi-term "/bin/zsh"))
-
-;; completion
-(require 'shell-completion)
-
-;; remove ^M
-(add-hook 'comint-output-filter-functions
-          'comint-strip-ctrl-m)
-
-;; clear shell
-(defun clear-shell ()
-  (interactive)
-  (let ((old-max comint-buffer-maximum-size))
-    (setq comint-buffer-maximum-size 0)
-    (comint-truncate-buffer)
-    (setq comint-buffer-maximum-size old-max)))
-
 ;; enable region narrowing
 (put 'narrow-to-region 'disabled nil)
 
@@ -251,18 +210,12 @@
 (if (fboundp 'blink-cursor-mode)
     (blink-cursor-mode -1))
 
-;; csv-mode, please install this by ELPA
-(require 'csv-mode)
-
 ;; search the kill ring with M-C-y
 (autoload 'kill-ring-search "kill-ring-search"
   "Search the kill ring in the minibuffer."
   (interactive))
 
 (global-set-key "\M-\C-y" 'kill-ring-search)
-
-;; csv-mode
-(require 'csv-mode)
 
 ;; folding/unfolding with C-c C-h
 (global-set-key (kbd "C-c C-h") 'hs-toggle-hiding)
@@ -295,6 +248,15 @@ user."
     (find-file file)))
 (global-set-key (kbd "C-x F") 'djcb-find-file-as-root)
 
+(defun wenshan-edit-current-file-as-root ()
+  "Edit the file that is associated with the current buffer as root"
+  (interactive)
+  (if (buffer-file-name)
+      (progn
+        (setq file (concat "/sudo:root@localhost:" (buffer-file-name)))
+        (find-file file))
+    (message "Current buffer does not have an associated file.")))
+
 ;; Google search from Emacs
 (defun google ()
   "Google the selected region if any, display a query prompt otherwise."
@@ -303,8 +265,8 @@ user."
    (concat
     "http://www.google.com/search?ie=utf-8&oe=utf-8&q="
     (url-hexify-string (if mark-active
-         (buffer-substring (region-beginning) (region-end))
-       (read-string "Google: "))))))
+                           (buffer-substring (region-beginning) (region-end))
+                         (read-string "Google: "))))))
 
 (global-set-key (kbd "C-c g") 'google)
 
@@ -314,8 +276,83 @@ user."
             (flyspell-prog-mode)
             (linum-mode t)))
 
+;; split into multiple windows
+(defun wenshan-split-window-vertical (&optional wenshan-number)
+  "Split the current window into `wenshan-number' windows"
+  (interactive "P")
+  (setq wenshan-number (if wenshan-number
+                           (prefix-numeric-value wenshan-number)
+                         2))
+  (while (> wenshan-number 1)
+    (split-window-right)
+    (setq wenshan-number (- wenshan-number 1)))
+  (balance-windows))
+
+;; remember buffers that are opened
+(desktop-save-mode 1)
+
 ;;----------------------------------------------------------
 ;; ---- END nicer ----
+;;----------------------------------------------------------
+
+
+
+;;----------------------------------------------------------
+;; ---- BEGIN shell ----
+;;----------------------------------------------------------
+
+;; clear the buffer in eshell
+(defun eshell/clear ()
+  "clear the eshell buffer."
+  (interactive)
+  (let ((inhibit-read-only t))
+    (erase-buffer)))
+
+;; stop eshell cycle completion
+(setq eshell-cmpl-cycle-completions nil)
+
+;; max-specpdl-size
+(setq max-specpdl-size 65525)
+
+;; fix "wrong type argument: characterp, return"
+(add-hook 'term-mode-hook
+          #'(lambda ()
+              (setq autopair-dont-activate t) ;; for emacsen < 24
+              (autopair-mode -1))             ;; for emacsen >= 24
+          )
+;; use zsh instead of bash
+(defun sh ()
+  (interactive)
+  (ansi-term "/bin/zsh"))
+
+;; completion
+(require 'shell-completion)
+
+;; remove ^M
+(add-hook 'comint-output-filter-functions
+          'comint-strip-ctrl-m)
+
+;; clear shell
+(defun clear-shell ()
+  (interactive)
+  (let ((old-max comint-buffer-maximum-size))
+    (setq comint-buffer-maximum-size 0)
+    (comint-truncate-buffer)
+    (setq comint-buffer-maximum-size old-max)))
+
+;; colorful shell
+(setq ansi-color-names-vector
+      ["black" "red" "green" "yellow" "PaleBlue" "magenta" "cyan" "white"])
+(add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
+
+;; execute region for shell script
+(defun execute-shell-region (start end)
+  "execute region in an inferior shell"
+  (interactive "r")
+  (shell-command  (buffer-substring-no-properties start end)))
+
+;;----------------------------------------------------------
+;; ---- END shell ----
 ;;----------------------------------------------------------
 
 
@@ -398,6 +435,28 @@ user."
 ;; turn on lambda mode by default, showing "lambda" as the lambda symbol
 (add-hook 'emacs-lisp-mode-hook #'lambda-mode 1)
 
+;; turn on paredit for minibuffer when "eval-expression"
+(defun conditionally-enable-paredit-mode ()
+  "Enable `paredit-mode' in the minibuffer, during `eval-expression'."
+  (if (eq this-command 'eval-expression)
+      (paredit-mode 1)))
+
+(add-hook 'minibuffer-setup-hook 'conditionally-enable-paredit-mode)
+
+;; convenient keybindings
+(global-set-key (kbd "C-c e b") 'do-eval-buffer)
+(global-set-key (kbd "C-c e e") 'toggle-debug-on-error)
+(global-set-key (kbd "C-c e f") 'emacs-lisp-byte-compile-and-load)
+(global-set-key (kbd "C-c e r") 'eval-region)
+(global-set-key (kbd "C-c e s") 'scratch)
+
+(global-set-key (kbd "C-c h e") 'view-echo-area-messages)
+(global-set-key (kbd "C-c h f") 'find-function)
+(global-set-key (kbd "C-c h k") 'find-function-on-key)
+(global-set-key (kbd "C-c h l") 'find-library)
+(global-set-key (kbd "C-c h v") 'find-variable)
+(global-set-key (kbd "C-c h V") 'apropos-value)
+
 ;;----------------------------------------------------------
 ;; ---- END Emacs Lisp ----
 ;;----------------------------------------------------------
@@ -441,7 +500,11 @@ user."
                             ;; turn on flyspell-mode by default
                             (flyspell-mode 1)
                             ;; C-TAB for expanding
-                            (local-set-key (kbd "C-<tab>") 'yas/expand-from-trigger-key)
+                            (local-set-key (kbd "C-<tab>")
+                                           'yas/expand-from-trigger-key)
+                            ;; edit source code
+                            (local-set-key (kbd "C-c s")
+                                           'org-edit-src-code)
                             ))
 
 ;;----------------------------------------------------------
@@ -556,7 +619,7 @@ user."
                    :sources
                    '( anything-c-source-info-libc             ;; glibc docs
                       anything-c-source-man-pages             ;; man pages
-                      anything-c-source-info-emacs))))        ;; emacs
+                      anything-c-source-info-emacs))))
 
 ;; emacs lisp hook
 (add-hook 'emacs-lisp-mode-hook
@@ -578,9 +641,7 @@ user."
                                  anything-c-source-emacs-lisp-expectations
                                  anything-c-source-emacs-lisp-toplevels
                                  anything-c-source-emacs-functions-with-abbrevs
-                                 anything-c-source-info-emacs))))
-            )
-          )
+                                 anything-c-source-info-emacs))))))
 
 ;;----------------------------------------------------------
 ;; ---- END anything ----
@@ -640,7 +701,8 @@ user."
 (add-hook 'python-mode-hook
           '(lambda ()
              (highlight-indentation-mode t)
-             (define-key python-mode-map "\C-m" 'newline-and-indent)
+             (define-key python-mode-map (kbd "C-m")
+               'newline-and-indent)
              (hs-minor-mode t)))
 
 ;; display lambda for python
@@ -826,8 +888,8 @@ user."
   "Update the remote mozrepl instance"
   (interactive)
   (comint-send-string (inferior-moz-process)
-    (concat "content.document.body.innerHTML="
-             (json-encode (buffer-string)) ";")))
+                      (concat "content.document.body.innerHTML="
+                              (json-encode (buffer-string)) ";")))
 
 (defun moz-enable-auto-update ()
   "Automatically the remote mozrepl when this buffer changes"
@@ -915,17 +977,16 @@ user."
 ;; log files automatically written when part a channel or quit
 (setq erc-save-buffer-on-part t)
 
-
-;; login as Meatball_py
-(defun myerc ()
+(defun wenshan-erc ()
+  "Log into freenode without less keystrokes"
   (interactive)
   (let
       ((password-cache nil))
     (erc
      :server "irc.freenode.net"
      :port "6667"
-     :nick "Meatball_py"
-     :password (password-read (format "password for Meatball at freenode? ")))))
+     :nick "Meatball_py"                ;set your username here
+     :password (password-read (format "Your password for freenode? ")))))
 
 ;; invoke fly-spell by default
 (add-hook 'erc-mode-hook (lambda ()
@@ -1035,11 +1096,10 @@ user."
 (setq gnus-dired-mail-mode 'mu4e-user-agent)
 (add-hook 'dired-mode-hook 'turn-on-gnus-dired-mode)
 
-;; ;; enable inline images
-;; (setq mu4e-view-show-images t)
-;; ;; use imagemagick, if available
-;; (when (fboundp 'imagemagick-register-types)
-;;   (imagemagick-register-types))
+;; turn flyspell mode for editing emails
+(add-hook 'mu4e-compose-mode-hook
+          (lambda ()
+            (flyspell-mode 1)))
 
 ;;----------------------------------------------------------
 ;; ---- END Email client ----
@@ -1093,13 +1153,18 @@ user."
 
 
 ;;----------------------------------------------------------
-;; ---- BEGIN default directory ---
+;; ---- BEGIN default directory and color theme---
 ;;----------------------------------------------------------
 
+;; default directory
 (cd "~/Dropbox" )
 
+;; color theme zenburn (Emacs24)
+(load-theme 'zenburn t nil)
+;; (load-theme 'tango-dark)
+
 ;;----------------------------------------------------------
-;; ---- END default directory ---
+;; ---- END default directory and color theme---
 ;;----------------------------------------------------------
 
 
