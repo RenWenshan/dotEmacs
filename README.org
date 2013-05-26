@@ -102,3 +102,9 @@ It is mostly intended to be used on Linux especially Debian and CentOS.
 * Java
 
 * Elisp
+* ace-jump-mode
+  | keyboard shortcut | command            | note                               |
+  |-------------------+--------------------+------------------------------------|
+  | C-c SPC           | ace-jump-word-mode | enter first char of a word         |
+  | C-u C-c SPC       | ace-jump-char-mode | enter a char for query             |
+  | C-u C-u C-c SPC   | ace-jump-line-mode | each non-empty line will be marked |
