@@ -1,7 +1,7 @@
 ;; This is the main configuration file of GNU Emacs
 ;;
 ;; Author: 任文山 (Ren Wenshan <renws1990@gmail.com>)
-;; Blog: wenshanren.org
+;; Blog: http://wenshanren.org
 
 
 
@@ -10,12 +10,12 @@
 ;;----------------------------------------------------------
 
 ;; set load-path
-(add-to-list 'load-path "~/.emacs.d/dotEmacs")
-(progn (cd "~/.emacs.d/dotEmacs")
-       (normal-top-level-add-subdirs-to-load-path))
-
 (add-to-list 'load-path "~/.emacs.d/el-get")
 (progn (cd "~/.emacs.d/el-get")
+       (normal-top-level-add-subdirs-to-load-path))
+
+(add-to-list 'load-path "~/.emacs.d/dotEmacs")
+(progn (cd "~/.emacs.d/dotEmacs")
        (normal-top-level-add-subdirs-to-load-path))
 
 ;; start server, used for emacsclient
@@ -38,6 +38,17 @@
 
 ;;----------------------------------------------------------
 ;; ---- END basic configuration ----
+;;----------------------------------------------------------
+
+
+
+;;----------------------------------------------------------
+;; ---- BEGIN el-get ----
+;;----------------------------------------------------------
+(require 'el-get)
+(el-get 'sync)
+;;----------------------------------------------------------
+;; ---- END el-get ----
 ;;----------------------------------------------------------
 
 
@@ -82,11 +93,15 @@
 ;; prevent beep
 (setq visible-bell t)
 
-;; see matching parens
+;; see matching parenthesis
 (show-paren-mode t)
 
+;; light colored parenthesis
+(require 'parenface)
+(set-face-foreground 'paren-face "DimGray")
+
 ;; don't truncate lines
-(setq truncate-lines t)
+(setq truncate-lines nil)
 (setq truncate-partial-width-windows nil)
 
 ;; trailing whitespace is unnecessary
@@ -165,10 +180,11 @@
 (global-set-key [(meta f8)] 'highlight-symbol-prev)
 
 ;; indentation guide
+(add-to-list 'load-path "~/.emacs.d/elpa/highlight-indentation-0.5.0")
 (require 'highlight-indentation)
 
 ;; enter for new line and indent
-(local-set-key (kbd "RET") 'newline-and-indent)
+(global-set-key (kbd "RET") 'newline-and-indent)
 
 ;; speedbar that can be fired up in the same frame
 (require 'sr-speedbar)
@@ -210,11 +226,11 @@
 (if (fboundp 'blink-cursor-mode)
     (blink-cursor-mode -1))
 
-;; search the kill ring with M-C-y
 (autoload 'kill-ring-search "kill-ring-search"
   "Search the kill ring in the minibuffer."
   (interactive))
 
+;; search the kill ring with M-C-y
 (global-set-key "\M-\C-y" 'kill-ring-search)
 
 ;; folding/unfolding with C-c C-h
@@ -236,18 +252,6 @@
              '("marmalade" . "http://marmalade-repo.org/packages/"))
 (package-initialize)
 
-;; find file as root
-(defun djcb-find-file-as-root ()
-  "Like `ido-find-file, but automatically edit the file with
-root-privileges (using tramp/sudo), if the file is not writable by
-user."
-  (interactive)
-  (let ((file (ido-read-file-name "Edit as root: ")))
-    (unless (file-writable-p file)
-      (setq file (concat "/sudo:root@localhost:" file)))
-    (find-file file)))
-(global-set-key (kbd "C-x F") 'djcb-find-file-as-root)
-
 (defun wenshan-edit-current-file-as-root ()
   "Edit the file that is associated with the current buffer as root"
   (interactive)
@@ -257,7 +261,6 @@ user."
         (find-file file))
     (message "Current buffer does not have an associated file.")))
 
-;; Google search from Emacs
 (defun google ()
   "Google the selected region if any, display a query prompt otherwise."
   (interactive)
@@ -268,17 +271,27 @@ user."
                            (buffer-substring (region-beginning) (region-end))
                          (read-string "Google: "))))))
 
+;; C-c g for Google Search
 (global-set-key (kbd "C-c g") 'google)
 
-;; turn on flyspell-prog-mode for all programming modes
-(add-hook 'prog-mode-hook
-          (lambda ()
-            (flyspell-prog-mode)
-            (linum-mode t)))
+(require 'fill-column-indicator)
 
-;; split into multiple windows
+(add-hook 'prog-mode-hook
+          ;; for all programming modes
+          (lambda ()
+            ;; turn on spell checker
+            (flyspell-prog-mode)
+            ;; turn on line numbering
+            (linum-mode t)
+            ;; turn on fill-column indicator
+            (fci-mode t)
+            ;; indentation guide
+            (highlight-indentation))
+          )
+
 (defun wenshan-split-window-vertical (&optional wenshan-number)
-  "Split the current window into `wenshan-number' windows"
+  "Split the current window into `wenshan-number' windows and
+balance all windows"
   (interactive "P")
   (setq wenshan-number (if wenshan-number
                            (prefix-numeric-value wenshan-number)
@@ -290,6 +303,62 @@ user."
 
 ;; remember buffers that are opened
 (desktop-save-mode 1)
+
+;; rgrep
+(global-set-key (kbd "C-c r") 'rgrep)
+
+(defun open-file-at-cursor ()
+  "Open the file path under cursor.
+If there is text selection, uses the text selection for path.  If
+the path is starts with “http://”, open the URL in browser.
+Input path can be {relative, full path, URL}.  This command is
+similar to `find-file-at-point' but without prompting for
+confirmation.
+"
+  (interactive)
+  (let ((path (thing-at-point 'filename)))
+    (if (string-match-p "\\`https*://" path)
+        (progn (browse-url path))
+      (progn ; not starting “http://”
+        (if (file-exists-p path)
+              (progn (find-file path))
+            (if (file-exists-p (concat path ".el"))
+                (progn (find-file (concat path ".el")))
+              (progn
+                (when (y-or-n-p
+                       (format "file doesn't exist: 「%s」. Create?" path))
+                  (progn (find-file path ))))))))))
+
+(defun smarter-move-beginning-of-line (arg)
+  "Move point back to indentation of beginning of line.
+
+Move point to the first non-whitespace character on this line.
+If point is already there, move to the beginning of the line.
+Effectively toggle between the first non-whitespace character and
+the beginning of the line.
+
+If ARG is not nil or 1, move forward ARG - 1 lines first.  If
+point reaches the beginning or end of the buffer, stop there."
+  (interactive "^p")
+  (setq arg (or arg 1))
+
+  ;; Move lines first
+  (when (/= arg 1)
+    (let ((line-move-visual nil))
+      (forward-line (1- arg))))
+
+  (let ((orig-point (point)))
+    (back-to-indentation)
+    (when (= orig-point (point))
+      (move-beginning-of-line 1))))
+
+;; remap C-a to `smarter-move-beginning-of-line'
+(global-set-key [remap move-beginning-of-line]
+                'smarter-move-beginning-of-line)
+
+;; ace-jump-mode
+(require 'ace-jump-mode)
+(global-set-key (kbd "C-c SPC") 'ace-jump-mode)
 
 ;;----------------------------------------------------------
 ;; ---- END nicer ----
@@ -358,17 +427,6 @@ user."
 
 
 ;;----------------------------------------------------------
-;; ---- BEGIN el-get ----
-;;----------------------------------------------------------
-(require 'el-get)
-(el-get 'sync)
-;;----------------------------------------------------------
-;; ---- END el-get ----
-;;----------------------------------------------------------
-
-
-
-;;----------------------------------------------------------
 ;; ---- BEGIN flymake ----
 ;;----------------------------------------------------------
 
@@ -379,8 +437,8 @@ user."
   (list "chktex" (list "-q" "-v0" file-name)))
 
 ;; f7 to go to previous error, f8 to jump to next error
-;; (global-set-key [f7] 'flymake-goto-prev-error)
-;; (global-set-key [f8] 'flymake-goto-next-error)
+(global-set-key (kbd "C-<f7>") 'flymake-goto-prev-error)
+(global-set-key (kbd "C-<f8>") 'flymake-goto-next-error)
 
 ;;----------------------------------------------------------
 ;; ---- END flymake ----
@@ -422,8 +480,6 @@ user."
 
 (add-hook 'emacs-lisp-mode-hook
           (lambda ()
-            ;; turn on indentation guide by default
-            (highlight-indentation-mode t)
             ;; paredit mode
             (paredit-mode +1)
             ;; eldoc
@@ -446,7 +502,7 @@ user."
 ;; convenient keybindings
 (global-set-key (kbd "C-c e b") 'do-eval-buffer)
 (global-set-key (kbd "C-c e e") 'toggle-debug-on-error)
-(global-set-key (kbd "C-c e f") 'emacs-lisp-byte-compile-and-load)
+(global-set-key (kbd "C-c e f") 'eval-defun)
 (global-set-key (kbd "C-c e r") 'eval-region)
 (global-set-key (kbd "C-c e s") 'scratch)
 
@@ -492,9 +548,28 @@ user."
 ;;----------------------------------------------------------
 ;; ---- BEGIN org-mode ----
 ;;----------------------------------------------------------
-(setq load-path (cons "~/.emacs.d/el-get/org-mode/contrib/lisp" load-path))
-(setq load-path (cons "~/.emacs.d/el-get/org-mode/lisp" load-path))
+(setq load-path (cons "~/.emacs.d/dotEmacs/org-mode/contrib/lisp" load-path))
+(setq load-path (cons "~/.emacs.d/dotEmacs/org-mode/lisp" load-path))
+
 (require 'org-install)
+
+(defun org-insert-src-block (src-code-type)
+  "Insert a `SRC-CODE-TYPE' type source code block in org-mode."
+  (interactive
+   (let ((src-code-types
+          '("emacs-lisp" "python" "C" "sh" "java" "js" "clojure" "C++" "css"
+            "calc" "asymptote" "dot" "gnuplot" "ledger" "lilypond" "mscgen"
+            "octave" "oz" "plantuml" "R" "sass" "screen" "sql" "awk" "ditaa"
+            "haskell" "latex" "lisp" "matlab" "ocaml" "org" "perl" "ruby"
+            "scheme" "sqlite")))
+     (list (ido-completing-read "Source code type: " src-code-types))))
+  (progn
+    (newline-and-indent)
+    (insert (format "#+BEGIN_SRC %s -n -r\n" src-code-type))
+    (newline-and-indent)
+    (insert "#+END_SRC\n")
+    (previous-line 2)
+    (org-edit-src-code)))
 
 (add-hook 'org-mode-hook '(lambda ()
                             ;; turn on flyspell-mode by default
@@ -502,9 +577,12 @@ user."
                             ;; C-TAB for expanding
                             (local-set-key (kbd "C-<tab>")
                                            'yas/expand-from-trigger-key)
-                            ;; edit source code
-                            (local-set-key (kbd "C-c s")
+                            ;; keybinding for editing source code blocks
+                            (local-set-key (kbd "C-c s e")
                                            'org-edit-src-code)
+                            ;; keybinding for inserting code blocks
+                            (local-set-key (kbd "C-c s i")
+                                           'org-insert-src-block)
                             ))
 
 ;;----------------------------------------------------------
@@ -567,6 +645,7 @@ user."
 ;; ---- BEGIN yasnippet ----
 ;;----------------------------------------------------------
 
+(add-to-list 'load-path "~/.emacs.d/elpa/yasnippet-0.8.0")
 (require 'yasnippet)
 (yas-global-mode 1)
 
@@ -688,8 +767,18 @@ user."
 (require 'python)
 
 ;; elpy: Emacs Python Development Environment
-(package-initialize)
+(add-to-list 'load-path "~/.emacs.d/elpa/elpy-0.9")
+(add-to-list 'load-path "~/.emacs.d/elpa/find-file-in-project-3.2")
+(add-to-list 'load-path "~/.emacs.d/elpa/fuzzy-0.1")
+(add-to-list 'load-path "~/.emacs.d/elpa/idomenu-0.1")
+(add-to-list 'load-path "~/.emacs.d/elpa/iedit-0.97")
+(add-to-list 'load-path "~/.emacs.d/elpa/nose-0.1.1")
+(add-to-list 'load-path "~/.emacs.d/elpa/popup-0.5")
+(add-to-list 'load-path "~/.emacs.d/elpa/virtualenv-1.2")
+
+(require 'elpy)
 (elpy-enable)
+(elpy-clean-modeline)
 
 ;; grammar checking
 (setq python-check-command "pycheckers")
@@ -700,13 +789,9 @@ user."
 ;; load indentation guide by default
 (add-hook 'python-mode-hook
           '(lambda ()
-             (highlight-indentation-mode t)
-             (define-key python-mode-map (kbd "C-m")
-               'newline-and-indent)
-             (hs-minor-mode t)))
-
-;; display lambda for python
-(add-hook 'python-mode-hook #'lambda-mode 1)
+             (define-key python-mode-map (kbd "C-m") 'newline-and-indent)
+             (hs-minor-mode t)
+             (lambda-mode 1)))
 
 ;; add a breakpoint with C-c C-b
 (defun python-add-breakpoint ()
@@ -725,16 +810,35 @@ user."
   (highlight-lines-matching-regexp
    "^[ ]*if DEBUG: print '----- wenshan log -----"))
 
-;; enter interactive python
+;; enter interactive python with
 (defun python-interactive ()
   (interactive)
-  (insert "!import code; code.interact(local=vars())"))
+  (progn
+    (insert "!import code; code.interact(local=vars())")
+    (move-end-of-line 1)
+    (comint-send-input)))
 
-;; jedi for auto-completion
-(add-hook 'python-mode-hook 'jedi:setup)
-(setq jedi:setup-keys t)
+(global-set-key (kbd "C-c i") 'python-interactive)
 
-;;----------------------------------------------------------
+;; send code
+(add-to-list 'load-path "~/.emacs.d/dotEmacs/isend-mode.el")
+(require 'isend)
+(setq isend-skip-empty-lines nil)
+(setq isend-strip-empty-lines nil)
+(setq isend-delete-indentation t)
+(setq isend-end-with-empty-line t)
+
+(defadvice isend-send (after advice-run-code-sent activate compile)
+  "Execute whatever sent to the (Python) buffer"
+  (interactive)
+  (let ((old-buf (buffer-name)))
+    (progn
+      (switch-to-buffer isend--command-buffer)
+      (goto-char (point-max))
+      (comint-send-input)
+      (switch-to-buffer old-buf))))
+
+ ;;----------------------------------------------------------
 ;; ---- End Python ----
 ;;----------------------------------------------------------
 
@@ -978,7 +1082,7 @@ user."
 (setq erc-save-buffer-on-part t)
 
 (defun wenshan-erc ()
-  "Log into freenode without less keystrokes"
+  "Log into freenode with less keystrokes"
   (interactive)
   (let
       ((password-cache nil))
@@ -1153,15 +1257,32 @@ user."
 
 
 ;;----------------------------------------------------------
+;; ---- BEGIN Douban ---
+;;----------------------------------------------------------
+
+(require 'douban-music-mode)
+
+;;----------------------------------------------------------
+;; ---- END Douban ---
+;;----------------------------------------------------------
+
+
+
+;;----------------------------------------------------------
 ;; ---- BEGIN default directory and color theme---
 ;;----------------------------------------------------------
 
 ;; default directory
 (cd "~/Dropbox" )
 
-;; color theme zenburn (Emacs24)
-(load-theme 'zenburn t nil)
-;; (load-theme 'tango-dark)
+;; (color-theme-subtle-hacker)
+(load-theme 'tango-dark)
+;; (load-theme 'zenburn t nil)
+
+;; highlight current line
+(global-hl-line-mode 1)
+(set-face-background 'highlight "#222")
+(set-face-foreground 'highlight nil)
 
 ;;----------------------------------------------------------
 ;; ---- END default directory and color theme---
@@ -1182,5 +1303,5 @@ user."
 ;;      (eval-print-last-sexp))))
 
 ;;----------------------------------------------------------
-;; ---- BEGIN MISC ---
+;; ---- END MISC ---
 ;;----------------------------------------------------------

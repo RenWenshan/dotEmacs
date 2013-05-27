@@ -206,7 +206,6 @@ the associated buffer using \\[isend-send] (or `isend-send').
   :keymap     '(([C-return] . isend-send)))
 
 (defvar isend--command-buffer)
-(make-variable-buffer-local 'isend--command-buffer)
 
 ;;;###autoload
 (defun isend-associate (buffername)
