@@ -360,6 +360,9 @@ point reaches the beginning or end of the buffer, stop there."
 (require 'ace-jump-mode)
 (global-set-key (kbd "C-c SPC") 'ace-jump-mode)
 
+;; auto space after comma
+(global-set-key (kbd ",") (lambda() (interactive) (insert ", ")))
+
 ;;----------------------------------------------------------
 ;; ---- END nicer ----
 ;;----------------------------------------------------------
@@ -1012,32 +1015,6 @@ point reaches the beginning or end of the buffer, stop there."
 
 
 ;;----------------------------------------------------------
-;; ---- BEGIN Java ----
-;;----------------------------------------------------------
-
-(require 'eclim)
-(global-eclim-mode)
-
-;; eclipse dir
-(custom-set-variables
- '(eclim-eclipse-dirs '("~/eclipse")))
-
-;; display compilation error messages in the echo area
-(setq help-at-pt-display-when-idle t)
-(setq help-at-pt-timer-delay 0.1)
-(help-at-pt-set-timer)
-
-;; add the emacs-eclim source
-(require 'ac-emacs-eclim-source)
-(ac-emacs-eclim-config)
-
-;;----------------------------------------------------------
-;; ---- END Java ----
-;;----------------------------------------------------------
-
-
-
-;;----------------------------------------------------------
 ;; ---- BEGIN C ----
 ;;----------------------------------------------------------
 
@@ -1269,7 +1246,41 @@ point reaches the beginning or end of the buffer, stop there."
 
 
 ;;----------------------------------------------------------
-;; ---- BEGIN default directory and color theme---
+;; ---- BEGIN Android ---
+;;----------------------------------------------------------
+;; Eclim
+(require 'eclim)
+(global-eclim-mode)
+(require 'eclimd)
+
+(setq help-at-pt-display-when-idle t)
+(setq help-at-pt-timer-delay 0.1)
+(help-at-pt-set-timer)
+
+;; add the emacs-eclim source
+(require 'ac-emacs-eclim-source)
+(ac-emacs-eclim-config)
+
+(require 'company)
+(require 'company-emacs-eclim)
+(company-emacs-eclim-setup)
+(global-company-mode t)
+
+(setq eclim-executable "~/eclipse/eclim")
+
+;; android-mode
+(add-to-list 'load-path "~/.emacs.d/dotEmacs/android-mode")
+(require 'android-mode)
+(setq android-mode-sdk-dir "~/android")
+
+;;----------------------------------------------------------
+;; ---- END Android ---
+;;----------------------------------------------------------
+
+
+
+;;----------------------------------------------------------
+;; ---- BEGIN default directory and color theme ---
 ;;----------------------------------------------------------
 
 ;; default directory
@@ -1285,7 +1296,7 @@ point reaches the beginning or end of the buffer, stop there."
 (set-face-foreground 'highlight nil)
 
 ;;----------------------------------------------------------
-;; ---- END default directory and color theme---
+;; ---- END default directory and color theme ---
 ;;----------------------------------------------------------
 
 
