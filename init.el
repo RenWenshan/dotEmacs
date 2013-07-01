@@ -9,6 +9,14 @@
 ;; ---- BEGIN basic configuration ----
 ;;----------------------------------------------------------
 
+;; language and coding environment
+(set-language-environment 'utf-8)
+(set-buffer-file-coding-system 'utf-8)
+(setq default-buffer-file-coding-system 'utf-8)
+(set-terminal-coding-system 'utf-8)
+(set-keyboard-coding-system 'utf-8)
+(prefer-coding-system 'utf-8)
+
 ;; set load-path
 (add-to-list 'load-path "~/.emacs.d/el-get")
 (progn (cd "~/.emacs.d/el-get")
@@ -34,6 +42,7 @@
                           readonly ring smiley stamp track)))
  '(user-full-name "任文山 (Ren Wenshan)")
  '(user-email-address "renws1990@gmail.com")
+ '(speedbar-default-position (quote left))
  )
 
 ;;----------------------------------------------------------
@@ -70,9 +79,6 @@
       `((".*" . ,"~/.emacs.d/backup")))
 (setq auto-save-file-name-transforms
       `((".*" ,"~/.emacs.d/backup" t)))
-
-;; force English Emacs environment
-(set-language-environment 'English)
 
 ;; don't show start up sceen
 (setq inhibit-startup-message t)
@@ -189,10 +195,20 @@
 ;; speedbar that can be fired up in the same frame
 (require 'sr-speedbar)
 
-;; show all files and disable speedbar auto-refresh
+(defadvice sr-speedbar-open
+  (after advice-sr-speedbar-disable-auto-update activate compile)
+  "Turn off auto refresh"
+  (interactive)
+  (sr-speedbar-refresh-turn-off)
+  )
+
 (add-hook 'speedbar-mode-hook
           (lambda ()
+            ;; initial path
+            (cd "~/Dropbox")
+            ;; show all files
             (speedbar-toggle-show-all-files)
+            ;; disable speedbar auto-refresh
             (speedbar-disable-update)))
 
 ;; insert current date, will be used by org-mode
@@ -283,10 +299,10 @@
             (flyspell-prog-mode)
             ;; turn on line numbering
             (linum-mode t)
-            ;; turn on fill-column indicator
-            (fci-mode t)
             ;; indentation guide
-            (highlight-indentation))
+            (highlight-indentation)
+            ;; highlight symbol as point
+            (highlight-symbol-mode t))
           )
 
 (defun wenshan-split-window-vertical (&optional wenshan-number)
@@ -321,13 +337,13 @@ confirmation.
         (progn (browse-url path))
       (progn ; not starting “http://”
         (if (file-exists-p path)
-              (progn (find-file path))
-            (if (file-exists-p (concat path ".el"))
-                (progn (find-file (concat path ".el")))
-              (progn
-                (when (y-or-n-p
-                       (format "file doesn't exist: 「%s」. Create?" path))
-                  (progn (find-file path ))))))))))
+            (progn (find-file path))
+          (if (file-exists-p (concat path ".el"))
+              (progn (find-file (concat path ".el")))
+            (progn
+              (when (y-or-n-p
+                     (format "file doesn't exist: 「%s」. Create?" path))
+                (progn (find-file path ))))))))))
 
 (defun smarter-move-beginning-of-line (arg)
   "Move point back to indentation of beginning of line.
@@ -358,11 +374,103 @@ point reaches the beginning or end of the buffer, stop there."
 
 ;; ace-jump-mode
 (require 'ace-jump-mode)
-(global-set-key (kbd "C-c SPC") 'ace-jump-mode)
+(global-set-key (kbd "C-c C-SPC") 'ace-jump-mode)
 
-;; auto space after comma
-(global-set-key (kbd ",") (lambda() (interactive) (insert ", ")))
+;; dired configuration
 
+;; always recursively delete directory
+(setq dired-recursive-deletes 'always)
+;; always recursively copy directory
+(setq dired-recursive-copies 'always)
+
+;; auto guess target
+(setq dired-dwim-target t)
+
+;; dired+, dired-details and dired-details+
+(require 'dired+)
+(require 'dired-details)
+(require 'dired-details+)
+
+;; always show symbolic link targets
+(setq dired-details-hide-link-targets nil)
+
+;; omit unimportant files
+(setq-default dired-omit-mode nil
+              dired-omit-files "^\\.?#\\|^\\.$\\|^\\.\\.$\\|^\\.")
+;; toggle omit mode C-o
+(define-key dired-mode-map (kbd "C-o") 'dired-omit-mode)
+
+(defun ublt/dired-open-native ()
+  "Open marked files (or the file the cursor is on) from dired."
+  (interactive)
+  (let* ((files (dired-get-marked-files t current-prefix-arg))
+         (n (length files)))
+    (when (or (<= n 3)
+              (y-or-n-p (format "Open %d files?" n)))
+      (dolist (file files)
+        (call-process "gnome-open"
+                      nil 0 nil file)))))
+(define-key dired-mode-map (kbd "s-o") 'ublt/dired-open-native)
+
+(defun dired-do-shell-unmount-device ()
+  (interactive)
+  (save-window-excursion
+    (dired-do-async-shell-command
+     "umount" current-prefix-arg
+     (dired-get-marked-files t current-prefix-arg))))
+(define-key dired-mode-map (kbd "s-u") 'dired-do-shell-unmount-device)
+
+(global-set-key (kbd "C-x C-j") 'dired-jump)
+
+;; C-c C-b to backup current file, C-x C-j ~xy to delete them
+(defun make-backup-current-file ()
+  "Make a backup copy of current file.
+
+The backup file name has the form 「‹name›~‹timestamp›~」, in the
+same dir. If such a file already exist, it's overwritten.  If the
+current buffer is not associated with a file, do nothing."
+  (interactive)
+  (let ((currentFileName (buffer-file-name)) backupFileName)
+    (if (file-exists-p currentFileName)
+        (progn
+          (setq backupFileName
+                (concat
+                 currentFileName
+                 "~"
+                 (format-time-string "%Y%m%d_%H%M%S") "~"))
+          (copy-file currentFileName backupFileName t)
+          (message
+           (concat "Backup saved as: "
+                   (file-name-nondirectory backupFileName)))
+          )
+      (progn ; file doesn't exist happens when it's new file not yet saved.
+        (message (format "file 「%s」 doesn't exist." currentFileName))))))
+(global-set-key (kbd "C-c C-b") 'make-backup-current-file)
+
+;; shell alias
+(defcustom xen-shell-abbrev-alist nil "a list of shell abbrevs for Xen")
+(setq xen-shell-abbrev-alist
+      '(
+        ("xen-help" . "xe help")
+        ("xen-list-vm" . "xe vm-list")
+        ("xen-list-tmpl" . "xe template-list")
+        ("xen-vm-to-tmpl" . "xe snapshot-export-to template snapshot-uuid=<snapshot-uuid> filename=<template-filename>")
+        )
+      )
+
+(defun xen-shell-commands (cmdAbbrev)
+  "insert shell command from a selection prompt."
+  (interactive
+   (list
+      (ido-completing-read "shell abbrevs:"
+                           (mapcar (lambda (x) (car x)) xen-shell-abbrev-alist)
+                           "PREDICATE" "REQUIRE-MATCH") ) )
+  (progn
+    (insert (cdr (assoc cmdAbbrev xen-shell-abbrev-alist)))
+    ))
+
+(setq scroll-step            1
+      scroll-conservatively  10000)
 ;;----------------------------------------------------------
 ;; ---- END nicer ----
 ;;----------------------------------------------------------
@@ -508,6 +616,7 @@ point reaches the beginning or end of the buffer, stop there."
 (global-set-key (kbd "C-c e f") 'eval-defun)
 (global-set-key (kbd "C-c e r") 'eval-region)
 (global-set-key (kbd "C-c e s") 'scratch)
+(global-set-key (kbd "C-c e p") 'eval-print-last-sexp)
 
 (global-set-key (kbd "C-c h e") 'view-echo-area-messages)
 (global-set-key (kbd "C-c h f") 'find-function)
@@ -577,15 +686,15 @@ point reaches the beginning or end of the buffer, stop there."
 (add-hook 'org-mode-hook '(lambda ()
                             ;; turn on flyspell-mode by default
                             (flyspell-mode 1)
-                            ;; C-TAB for expanding
-                            (local-set-key (kbd "C-<tab>")
-                                           'yas/expand-from-trigger-key)
                             ;; keybinding for editing source code blocks
                             (local-set-key (kbd "C-c s e")
                                            'org-edit-src-code)
                             ;; keybinding for inserting code blocks
                             (local-set-key (kbd "C-c s i")
                                            'org-insert-src-block)
+                            ;; yas/expand
+                            (local-set-key (kbd "C-<tab>")
+                                           'yas/expand)
                             ))
 
 ;;----------------------------------------------------------
@@ -651,6 +760,7 @@ point reaches the beginning or end of the buffer, stop there."
 (add-to-list 'load-path "~/.emacs.d/elpa/yasnippet-0.8.0")
 (require 'yasnippet)
 (yas-global-mode 1)
+(global-set-key (kbd "C-<tab>") 'yas/expand)
 
 ;;----------------------------------------------------------
 ;; ---- END yasnippet ----
@@ -789,15 +899,14 @@ point reaches the beginning or end of the buffer, stop there."
 ;; use ipython
 (elpy-use-ipython)
 
-;; load indentation guide by default
 (add-hook 'python-mode-hook
           '(lambda ()
-             (define-key python-mode-map (kbd "C-m") 'newline-and-indent)
+             (jedi:setup)
              (hs-minor-mode t)
              (lambda-mode 1)))
 
-;; add a breakpoint with C-c C-b
 (defun python-add-breakpoint ()
+  "Add a break point"
   (interactive)
   (newline-and-indent)
   (insert "import ipdb; ipdb.set_trace()")
@@ -813,8 +922,8 @@ point reaches the beginning or end of the buffer, stop there."
   (highlight-lines-matching-regexp
    "^[ ]*if DEBUG: print '----- wenshan log -----"))
 
-;; enter interactive python with
 (defun python-interactive ()
+  "Enter the interactive Python environment"
   (interactive)
   (progn
     (insert "!import code; code.interact(local=vars())")
@@ -823,7 +932,7 @@ point reaches the beginning or end of the buffer, stop there."
 
 (global-set-key (kbd "C-c i") 'python-interactive)
 
-;; send code
+;; Python send code
 (add-to-list 'load-path "~/.emacs.d/dotEmacs/isend-mode.el")
 (require 'isend)
 (setq isend-skip-empty-lines nil)
@@ -841,7 +950,19 @@ point reaches the beginning or end of the buffer, stop there."
       (comint-send-input)
       (switch-to-buffer old-buf))))
 
- ;;----------------------------------------------------------
+;; Info documentation lookup
+(require 'info-look)
+
+(info-lookup-add-help
+ :mode 'python-mode
+ :regexp "[[:alnum:]_]+"
+ :doc-spec
+ '(("(python)Index" nil "")))
+
+;;; Kivy
+(require 'kivy-mode)
+
+;;----------------------------------------------------------
 ;; ---- End Python ----
 ;;----------------------------------------------------------
 
@@ -963,16 +1084,32 @@ point reaches the beginning or end of the buffer, stop there."
 ;; ---- BEGIN web development ----
 ;;----------------------------------------------------------
 
-;; auto close tag after </
-(setq nxml-slash-auto-complete-flag t)
-
+(setq auto-mode-alist (cons '("\\.xml" . sgml-mode) auto-mode-alist))
 ;; rename a tag and its closing tag at the same time
 (require 'rename-sgml-tag)
-(defun nxml-mode-additional-keys ()
-  "Key bindings to add to `nxml-mode'."
-  (define-key nxml-mode-map (kbd "C-c C-r") 'rename-sgml-tag)
-  )
-(add-hook 'nxml-mode-hook 'nxml-mode-additional-keys)
+(add-hook 'sgml-mode-hook
+          (lambda ()
+            ;; rename tag
+            (define-key sgml-mode-map (kbd "C-c C-r") 'rename-sgml-tag)
+            ;; turn on spell checker
+            (flyspell-prog-mode)
+            ;; turn on line numbering
+            (linum-mode t)
+            ;; turn on fill-column indicator
+            (fci-mode t)
+            ;; indentation guide
+            (highlight-indentation)
+            ;; turn on hs-minor-mode for folding
+            (hs-minor-mode 1)
+            ))
+
+(add-to-list 'hs-special-modes-alist
+             '(sgml-mode
+               "<!--\\|<[^/>]>\\|<[^/][^>]*[^/]>"
+               ""
+               "<!--"
+               sgml-skip-tag-forward
+               nil))
 
 ;; xml/html files checking, default setting not work
 (defun flymake-xml-init ()
@@ -1199,21 +1336,6 @@ point reaches the beginning or end of the buffer, stop there."
 
 
 ;;----------------------------------------------------------
-;; ---- BEGIN Instant Message ---
-;;----------------------------------------------------------
-(load "jabber-autoloads")
-(setq jabber-account-list
-      '(("renws1990@gmail.com"
-         (:network-server . "talk.google.com")
-         (:connection-type . ssl)
-         (:port . 443))))
-;;----------------------------------------------------------
-;; ---- END Instant Message ---
-;;----------------------------------------------------------
-
-
-
-;;----------------------------------------------------------
 ;; ---- BEGIN epa ---
 ;;----------------------------------------------------------
 
@@ -1275,6 +1397,28 @@ point reaches the beginning or end of the buffer, stop there."
 
 ;;----------------------------------------------------------
 ;; ---- END Android ---
+;;----------------------------------------------------------
+
+
+
+;;----------------------------------------------------------
+;; ---- BEGIN OpenERP ---
+;;----------------------------------------------------------
+(add-to-list 'load-path "~/Dropbox/hack/openerp-mode")
+(require 'openerp-mode)
+
+;;----------------------------------------------------------
+;; ---- END OpenERP ---
+;;----------------------------------------------------------
+
+
+
+;;----------------------------------------------------------
+;; ---- BEGIN Database Management ---
+;;----------------------------------------------------------
+(require 'edbi)
+;;----------------------------------------------------------
+;; ---- END Database Management ---
 ;;----------------------------------------------------------
 
 
