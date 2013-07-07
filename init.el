@@ -35,7 +35,6 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(eclim-eclipse-dirs (quote ("~/eclipse")))
  '(erc-modules (quote
                 (autojoin button completion fill irccontrols list log match
                           menu move-to-prompt netsplit networks noncommands
@@ -186,7 +185,6 @@
 (global-set-key [(meta f8)] 'highlight-symbol-prev)
 
 ;; indentation guide
-(add-to-list 'load-path "~/.emacs.d/elpa/highlight-indentation-0.5.0")
 (require 'highlight-indentation)
 
 ;; enter for new line and indent
@@ -300,7 +298,7 @@
             ;; turn on line numbering
             (linum-mode t)
             ;; indentation guide
-            (highlight-indentation)
+            (highlight-indentation-mode t)
             ;; highlight symbol as point
             (highlight-symbol-mode t))
           )
@@ -321,7 +319,7 @@ balance all windows"
 (desktop-save-mode 1)
 
 ;; rgrep
-(global-set-key (kbd "C-c r") 'rgrep)
+(global-set-key (kbd "C-c s") 'rgrep)
 
 (defun open-file-at-cursor ()
   "Open the file path under cursor.
@@ -462,182 +460,28 @@ current buffer is not associated with a file, do nothing."
   "insert shell command from a selection prompt."
   (interactive
    (list
-      (ido-completing-read "shell abbrevs:"
-                           (mapcar (lambda (x) (car x)) xen-shell-abbrev-alist)
-                           "PREDICATE" "REQUIRE-MATCH") ) )
+    (ido-completing-read "shell abbrevs:"
+                         (mapcar (lambda (x) (car x)) xen-shell-abbrev-alist)
+                         "PREDICATE" "REQUIRE-MATCH") ) )
   (progn
     (insert (cdr (assoc cmdAbbrev xen-shell-abbrev-alist)))
     ))
 
 (setq scroll-step            1
       scroll-conservatively  10000)
+
+;;; EPA
+(require 'epa-file)
+(epa-file-enable)
+
+;; always use symmetric encryption
+(setq epa-file-encrypt-to nil)
+;; turn on passphrase cache, so don't need to type in password for every save
+(setq epa-file-cache-passphrase-for-symmetric-encryption t)
+;; turn on auto save
+(setq epa-file-inhibit-auto-save nil)
 ;;----------------------------------------------------------
 ;; ---- END nicer ----
-;;----------------------------------------------------------
-
-
-
-;;----------------------------------------------------------
-;; ---- BEGIN shell ----
-;;----------------------------------------------------------
-
-;; clear the buffer in eshell
-(defun eshell/clear ()
-  "clear the eshell buffer."
-  (interactive)
-  (let ((inhibit-read-only t))
-    (erase-buffer)))
-
-;; stop eshell cycle completion
-(setq eshell-cmpl-cycle-completions nil)
-
-;; max-specpdl-size
-(setq max-specpdl-size 65525)
-
-;; fix "wrong type argument: characterp, return"
-(add-hook 'term-mode-hook
-          #'(lambda ()
-              (setq autopair-dont-activate t) ;; for emacsen < 24
-              (autopair-mode -1))             ;; for emacsen >= 24
-          )
-;; use zsh instead of bash
-(defun sh ()
-  (interactive)
-  (ansi-term "/bin/zsh"))
-
-;; completion
-(require 'shell-completion)
-
-;; remove ^M
-(add-hook 'comint-output-filter-functions
-          'comint-strip-ctrl-m)
-
-;; clear shell
-(defun clear-shell ()
-  (interactive)
-  (let ((old-max comint-buffer-maximum-size))
-    (setq comint-buffer-maximum-size 0)
-    (comint-truncate-buffer)
-    (setq comint-buffer-maximum-size old-max)))
-
-;; colorful shell
-(setq ansi-color-names-vector
-      ["black" "red" "green" "yellow" "PaleBlue" "magenta" "cyan" "white"])
-(add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
-
-;; execute region for shell script
-(defun execute-shell-region (start end)
-  "execute region in an inferior shell"
-  (interactive "r")
-  (shell-command  (buffer-substring-no-properties start end)))
-
-;;----------------------------------------------------------
-;; ---- END shell ----
-;;----------------------------------------------------------
-
-
-
-;;----------------------------------------------------------
-;; ---- BEGIN flymake ----
-;;----------------------------------------------------------
-
-(load-library "flymake-cursor")
-
-;; tex files checking, replaced texify with chktex
-(defun flymake-get-tex-args (file-name)
-  (list "chktex" (list "-q" "-v0" file-name)))
-
-;; f7 to go to previous error, f8 to jump to next error
-(global-set-key (kbd "C-<f7>") 'flymake-goto-prev-error)
-(global-set-key (kbd "C-<f8>") 'flymake-goto-next-error)
-
-;;----------------------------------------------------------
-;; ---- END flymake ----
-;;----------------------------------------------------------
-
-
-
-;;----------------------------------------------------------
-;; ---- BEGIN Lisp ----
-;;----------------------------------------------------------
-
-;; paredit
-(autoload 'paredit-mode "paredit"
-  "Minor mode for pseudo-structurally editing Lisp code." t)
-
-(eldoc-add-command
- 'paredit-backward-delete
- 'paredit-close-round)
-
-(add-hook 'lisp-mode-hook
-          (lambda ()
-            (paredit-mode +1)
-            (eldoc-mode t)))
-
-(add-hook 'lisp-interaction-mode-hook
-          (lambda ()
-            (paredit-mode +1)
-            (eldoc-mode t)))
-
-;;----------------------------------------------------------
-;; ---- END Lisp ----
-;;----------------------------------------------------------
-
-
-
-;;----------------------------------------------------------
-;; ---- BEGIN Emacs Lisp ----
-;;----------------------------------------------------------
-
-(add-hook 'emacs-lisp-mode-hook
-          (lambda ()
-            ;; paredit mode
-            (paredit-mode +1)
-            ;; eldoc
-            (eldoc-mode t)
-            ;; folding
-            (hs-minor-mode t)
-            ))
-
-;; turn on lambda mode by default, showing "lambda" as the lambda symbol
-(add-hook 'emacs-lisp-mode-hook #'lambda-mode 1)
-
-;; turn on paredit for minibuffer when "eval-expression"
-(defun conditionally-enable-paredit-mode ()
-  "Enable `paredit-mode' in the minibuffer, during `eval-expression'."
-  (if (eq this-command 'eval-expression)
-      (paredit-mode 1)))
-
-(add-hook 'minibuffer-setup-hook 'conditionally-enable-paredit-mode)
-
-;; convenient keybindings
-(global-set-key (kbd "C-c e b") 'do-eval-buffer)
-(global-set-key (kbd "C-c e e") 'toggle-debug-on-error)
-(global-set-key (kbd "C-c e f") 'eval-defun)
-(global-set-key (kbd "C-c e r") 'eval-region)
-(global-set-key (kbd "C-c e s") 'scratch)
-(global-set-key (kbd "C-c e p") 'eval-print-last-sexp)
-
-(global-set-key (kbd "C-c h e") 'view-echo-area-messages)
-(global-set-key (kbd "C-c h f") 'find-function)
-(global-set-key (kbd "C-c h k") 'find-function-on-key)
-(global-set-key (kbd "C-c h l") 'find-library)
-(global-set-key (kbd "C-c h v") 'find-variable)
-(global-set-key (kbd "C-c h V") 'apropos-value)
-
-;;----------------------------------------------------------
-;; ---- END Emacs Lisp ----
-;;----------------------------------------------------------
-
-
-
-;;----------------------------------------------------------
-;; ---- BEGIN Clojure ----
-;;----------------------------------------------------------
-(add-hook 'clojure-mode-hook 'paredit-mode)
-
-;;----------------------------------------------------------
-;; ---- END Clojure ----
 ;;----------------------------------------------------------
 
 
@@ -662,7 +506,6 @@ current buffer is not associated with a file, do nothing."
 ;;----------------------------------------------------------
 (setq load-path (cons "~/.emacs.d/dotEmacs/org-mode/contrib/lisp" load-path))
 (setq load-path (cons "~/.emacs.d/dotEmacs/org-mode/lisp" load-path))
-
 (require 'org-install)
 
 (defun org-insert-src-block (src-code-type)
@@ -730,7 +573,159 @@ current buffer is not associated with a file, do nothing."
 
 
 ;;----------------------------------------------------------
-;; ---- BEGIN magit ----
+;; ---- BEGIN IRC ----
+;;----------------------------------------------------------
+
+(require 'erc)
+
+;; hide time-stamp
+(setq erc-hide-timestamps t)
+
+;; highlight nicknames
+(and
+ (load-library "erc-highlight-nicknames")
+ (add-to-list 'erc-modules 'highlight-nicknames)
+ (erc-update-modules))
+
+;; save logs
+(setq erc-log-channels-directory "~/.erc/logs/")
+;; log files automatically written when part a channel or quit
+(setq erc-save-buffer-on-part t)
+
+(defun wenshan-erc ()
+  "Log into freenode with less keystrokes"
+  (interactive)
+  (let
+      ((password-cache nil))
+    (erc
+     :server "irc.freenode.net"
+     :port "6667"
+     :nick "Meatball_py"                ;set your username here
+     :password (password-read (format "Your password for freenode? ")))))
+
+;; invoke fly-spell by default
+(add-hook 'erc-mode-hook (lambda ()
+                           (flyspell-mode 1)))
+
+;;----------------------------------------------------------
+;; ---- END IRC ----
+;;----------------------------------------------------------
+
+
+
+;;----------------------------------------------------------
+;; ---- BEGIN Markdown support ----
+;;----------------------------------------------------------
+
+(autoload 'markdown-mode
+  "markdown-mode.el" "Major mode for editing Markdown files" t)
+(setq auto-mode-alist (cons '("\\.md" . markdown-mode) auto-mode-alist))
+
+;;----------------------------------------------------------
+;; ---- END Markdown support ----
+;;----------------------------------------------------------
+
+
+
+;;----------------------------------------------------------
+;; ---- BEGIN w3m web browser ----
+;;----------------------------------------------------------
+(require 'w3m-load)
+;;----------------------------------------------------------
+;; ---- END w3m web browser----
+;;----------------------------------------------------------
+
+
+
+;;----------------------------------------------------------
+;; ---- BEGIN Douban ---
+;;----------------------------------------------------------
+
+(require 'douban-music-mode)
+
+;;----------------------------------------------------------
+;; ---- END Douban ---
+;;----------------------------------------------------------
+
+
+
+;;----------------------------------------------------------
+;; ---- BEGIN shell ----
+;;----------------------------------------------------------
+
+;; clear the buffer in eshell
+(defun eshell/clear ()
+  "clear the eshell buffer."
+  (interactive)
+  (let ((inhibit-read-only t))
+    (erase-buffer)))
+
+;; stop eshell cycle completion
+(setq eshell-cmpl-cycle-completions nil)
+
+;; max-specpdl-size
+(setq max-specpdl-size 65525)
+
+;; fix "wrong type argument: characterp, return"
+(add-hook 'term-mode-hook
+          #'(lambda ()
+              (setq autopair-dont-activate t) ;; for emacsen < 24
+              (autopair-mode -1))             ;; for emacsen >= 24
+          )
+;; use zsh instead of bash
+(defun sh ()
+  (interactive)
+  (ansi-term "/bin/zsh"))
+
+;; completion
+(require 'shell-completion)
+
+;; remove ^M
+(add-hook 'comint-output-filter-functions
+          'comint-strip-ctrl-m)
+
+;; clear shell
+(defun clear-shell ()
+  (interactive)
+  (let ((old-max comint-buffer-maximum-size))
+    (setq comint-buffer-maximum-size 0)
+    (comint-truncate-buffer)
+    (setq comint-buffer-maximum-size old-max)))
+
+;; execute region for shell script
+(defun execute-shell-region (start end)
+  "execute region in an inferior shell"
+  (interactive "r")
+  (shell-command  (buffer-substring-no-properties start end)))
+
+;;----------------------------------------------------------
+;; ---- END shell ----
+;;----------------------------------------------------------
+
+
+
+;;----------------------------------------------------------
+;; ---- BEGIN flymake ----
+;;----------------------------------------------------------
+
+(load-library "flymake-cursor")
+
+;; tex files checking, replaced texify with chktex
+(defun flymake-get-tex-args (file-name)
+  (list "chktex" (list "-q" "-v0" file-name)))
+
+;; f7 to go to previous error, f8 to jump to next error
+(global-set-key (kbd "C-<f7>") 'flymake-goto-prev-error)
+(global-set-key (kbd "C-<f8>") 'flymake-goto-next-error)
+
+;;----------------------------------------------------------
+;; ---- END flymake ----
+;;----------------------------------------------------------
+
+
+
+;;----------------------------------------------------------
+;; ---- BEGIN git ----
 ;;----------------------------------------------------------
 
 ;; this path should be changed along with magit installation
@@ -747,8 +742,60 @@ current buffer is not associated with a file, do nothing."
   ;; no highlight
   '(defun magit-highlight-section ()))
 
+;;; Eshell command completion
+(defun pcmpl-git-commands ()
+  "Return the most common git commands by parsing the git output."
+  (with-temp-buffer
+    (call-process-shell-command "git" nil (current-buffer) nil "help" "--all")
+    (goto-char 0)
+    (search-forward "available git commands in")
+    (let (commands)
+      (while (re-search-forward
+              "^[[:blank:]]+\\([[:word:]-.]+\\)[[:blank:]]*\\([[:word:]-.]+\\)?"
+              nil t)
+        (push (match-string 1) commands)
+        (when (match-string 2)
+          (push (match-string 2) commands)))
+      (sort commands #'string<))))
+
+(defconst pcmpl-git-commands (pcmpl-git-commands)
+  "List of `git' commands.")
+
+(defvar pcmpl-git-ref-list-cmd "git for-each-ref refs/ --format='%(refname)'"
+  "The `git' command to run to get a list of refs.")
+
+(defun pcmpl-git-get-refs (type)
+  "Return a list of `git' refs filtered by TYPE."
+  (with-temp-buffer
+    (insert (shell-command-to-string pcmpl-git-ref-list-cmd))
+    (goto-char (point-min))
+    (let (refs)
+      (while (re-search-forward (concat "^refs/" type "/\\(.+\\)$") nil t)
+        (push (match-string 1) refs))
+      (nreverse refs))))
+
+(defun pcmpl-git-remotes ()
+  "Return a list of remote repositories."
+  (split-string (shell-command-to-string "git remote")))
+
+(defun pcomplete/git ()
+  "Completion for `git'."
+  ;; Completion for the command argument.
+  (pcomplete-here* pcmpl-git-commands)
+  (cond
+   ((pcomplete-match "help" 1)
+    (pcomplete-here* pcmpl-git-commands))
+   ((pcomplete-match (regexp-opt '("pull" "push")) 1)
+    (pcomplete-here (pcmpl-git-remotes)))
+   ;; provide branch completion for the command `checkout'.
+   ((pcomplete-match "checkout" 1)
+    (pcomplete-here* (append (pcmpl-git-get-refs "heads")
+                             (pcmpl-git-get-refs "tags"))))
+   (t
+    (while (pcomplete-here (pcomplete-entries))))))
+
 ;;----------------------------------------------------------
-;; ---- END magit ---
+;; ---- END git ---
 ;;----------------------------------------------------------
 
 
@@ -861,6 +908,148 @@ current buffer is not associated with a file, do nothing."
 
 
 ;;----------------------------------------------------------
+;; ---- BEGIN Lisp ----
+;;----------------------------------------------------------
+
+;; paredit
+(autoload 'paredit-mode "paredit"
+  "Minor mode for pseudo-structurally editing Lisp code." t)
+
+(eldoc-add-command
+ 'paredit-backward-delete
+ 'paredit-close-round)
+
+(add-hook 'lisp-mode-hook
+          (lambda ()
+            (paredit-mode +1)
+            (eldoc-mode t)))
+
+(add-hook 'lisp-interaction-mode-hook
+          (lambda ()
+            (paredit-mode +1)
+            (eldoc-mode t)))
+
+;;----------------------------------------------------------
+;; ---- END Lisp ----
+;;----------------------------------------------------------
+
+
+
+;;----------------------------------------------------------
+;; ---- BEGIN Emacs Lisp ----
+;;----------------------------------------------------------
+
+(add-hook 'emacs-lisp-mode-hook
+          (lambda ()
+            ;; paredit mode
+            (paredit-mode +1)
+            ;; eldoc
+            (eldoc-mode t)
+            ;; folding
+            (hs-minor-mode t)
+            ))
+
+;; turn on lambda mode by default, showing "lambda" as the lambda symbol
+(add-hook 'emacs-lisp-mode-hook #'lambda-mode 1)
+
+;; turn on paredit for minibuffer when "eval-expression"
+(defun conditionally-enable-paredit-mode ()
+  "Enable `paredit-mode' in the minibuffer, during `eval-expression'."
+  (if (eq this-command 'eval-expression)
+      (paredit-mode 1)))
+
+(add-hook 'minibuffer-setup-hook 'conditionally-enable-paredit-mode)
+
+;; convenient keybindings
+(global-set-key (kbd "C-c e b") 'do-eval-buffer)
+(global-set-key (kbd "C-c e e") 'toggle-debug-on-error)
+(global-set-key (kbd "C-c e f") 'eval-defun)
+(global-set-key (kbd "C-c e r") 'eval-region)
+(global-set-key (kbd "C-c e s") 'scratch)
+(global-set-key (kbd "C-c e p") 'eval-print-last-sexp)
+
+(global-set-key (kbd "C-c h e") 'view-echo-area-messages)
+(global-set-key (kbd "C-c h f") 'find-function)
+(global-set-key (kbd "C-c h k") 'find-function-on-key)
+(global-set-key (kbd "C-c h l") 'find-library)
+(global-set-key (kbd "C-c h v") 'find-variable)
+(global-set-key (kbd "C-c h V") 'apropos-value)
+
+;;----------------------------------------------------------
+;; ---- END Emacs Lisp ----
+;;----------------------------------------------------------
+
+
+
+;;----------------------------------------------------------
+;; ---- BEGIN CEDET ----
+;;----------------------------------------------------------
+(semantic-mode 1)
+(custom-set-variables
+ '(semantic-default-submodes (quote (global-semantic-idle-completions-mode
+                                     global-semantic-idle-scheduler-mode
+                                     global-semanticdb-minor-mode
+                                     global-semantic-idle-summary-mode
+                                     global-semantic-mru-bookmark-mode)))
+ '(semantic-idle-scheduler-idle-time 10)
+ '(semanticdb-javap-classpath (quote ("/usr/lib/jvm/java-6-sun/jre/lib/rt.jar")))
+ '(cedet-android-sdk-root "~/android")
+ )
+(require 'semantic/ia)
+(add-hook 'semantic-init-hook
+          '(lambda ()
+             (imenu-add-to-menubar "TAGS")))
+;; if you want to enable support for gnu global
+(when (cedet-gnu-global-version-check t)
+  (semanticdb-enable-gnu-global-databases 'c-mode)
+  (semanticdb-enable-gnu-global-databases 'c++-mode))
+
+;; enable ctags for some languages:
+;;  Unix Shell, Perl, Pascal, Tcl, Fortran, Asm
+(when (cedet-ectag-version-check)
+  (semantic-load-enable-primary-exuberent-ctags-support))
+
+(global-ede-mode t)
+
+;; enable db-javap
+(require 'semantic/db-javap)
+
+(ede-java-root-project "android-test"
+                       :file "~/hack/android-test/build.xml"
+                       :srcroot '("src")
+                       :classpath '("~/android/platforms/android-15/android.jar"))
+
+(add-hook 'c-mode-common-hook
+          '(lambda ()
+             (local-set-key "\M-n" 'semantic-ia-complete-symbol-menu)
+             (local-set-key "\C-c/" 'semantic-ia-complete-symbol)
+             (local-set-key "\C-cb" 'semantic-mrub-switch-tags)
+             (local-set-key "\C-cj" 'semantic-ia-fast-jump)
+             (local-set-key "\C-cR" 'semantic-symref)
+             (local-set-key "\C-cr" 'semantic-symref-symbol)
+             (local-set-key "." 'semantic-complete-self-insert)
+             (local-set-key ">" 'semantic-complete-self-insert)
+             (add-to-list 'ac-sources 'ac-source-gtags)
+             (add-to-list 'ac-sources 'ac-source-semantic)
+             ))
+;;----------------------------------------------------------
+;; ---- END CEDET ----
+;;----------------------------------------------------------
+
+
+
+;;----------------------------------------------------------
+;; ---- BEGIN Clojure ----
+;;----------------------------------------------------------
+(add-hook 'clojure-mode-hook 'paredit-mode)
+
+;;----------------------------------------------------------
+;; ---- END Clojure ----
+;;----------------------------------------------------------
+
+
+
+;;----------------------------------------------------------
 ;; ---- BEGIN go lang ----
 ;;----------------------------------------------------------
 
@@ -931,6 +1120,23 @@ current buffer is not associated with a file, do nothing."
     (comint-send-input)))
 
 (global-set-key (kbd "C-c i") 'python-interactive)
+
+(defun python-run-this-buffer-file ()
+  "Save current buffer and run it in a shell"
+  (interactive)
+  (progn
+    (let ((old-buf (buffer-name (current-buffer)))
+          (pyfile (expand-file-name (buffer-file-name (current-buffer))))
+          (pyshell "*Python-Shell*"))
+      (save-buffer)
+      (shell pyshell)
+      (insert (concat "python " pyfile))
+      (comint-send-input)
+      (switch-to-buffer old-buf)
+      (display-buffer pyshell)
+      )))
+
+(global-set-key (kbd "C-c r") 'python-run-this-buffer-file)
 
 ;; Python send code
 (add-to-list 'load-path "~/.emacs.d/dotEmacs/isend-mode.el")
@@ -1098,7 +1304,7 @@ current buffer is not associated with a file, do nothing."
             ;; turn on fill-column indicator
             (fci-mode t)
             ;; indentation guide
-            (highlight-indentation)
+            (highlight-indentation-mode t)
             ;; turn on hs-minor-mode for folding
             (hs-minor-mode 1)
             ))
@@ -1165,230 +1371,8 @@ current buffer is not associated with a file, do nothing."
 
 
 ;;----------------------------------------------------------
-;; ---- BEGIN microblog ----
-;;----------------------------------------------------------
-
-(require 'weibo)
-;;----------------------------------------------------------
-;; ---- END microblog ----
-;;----------------------------------------------------------
-
-
-
-;;----------------------------------------------------------
-;; ---- BEGIN IRC ----
-;;----------------------------------------------------------
-
-(require 'erc)
-
-;; hide time-stamp
-(setq erc-hide-timestamps t)
-
-;; highlight nicknames
-(and
- (load-library "erc-highlight-nicknames")
- (add-to-list 'erc-modules 'highlight-nicknames)
- (erc-update-modules))
-
-;; save logs
-(setq erc-log-channels-directory "~/.erc/logs/")
-;; log files automatically written when part a channel or quit
-(setq erc-save-buffer-on-part t)
-
-(defun wenshan-erc ()
-  "Log into freenode with less keystrokes"
-  (interactive)
-  (let
-      ((password-cache nil))
-    (erc
-     :server "irc.freenode.net"
-     :port "6667"
-     :nick "Meatball_py"                ;set your username here
-     :password (password-read (format "Your password for freenode? ")))))
-
-;; invoke fly-spell by default
-(add-hook 'erc-mode-hook (lambda ()
-                           (flyspell-mode 1)))
-
-;;----------------------------------------------------------
-;; ---- END IRC ----
-;;----------------------------------------------------------
-
-
-
-;;----------------------------------------------------------
-;; ---- BEGIN Chrome edit ----
-;;----------------------------------------------------------
-
-;; this is used for "Edit with Emacs" Chrome extension
-(require 'edit-server)
-(edit-server-start)
-
-;;----------------------------------------------------------
-;; ---- END Chrome edit ----
-;;----------------------------------------------------------
-
-
-
-;;----------------------------------------------------------
-;; ---- BEGIN Markdown support ----
-;;----------------------------------------------------------
-
-(autoload 'markdown-mode
-  "markdown-mode.el" "Major mode for editing Markdown files" t)
-(setq auto-mode-alist (cons '("\\.md" . markdown-mode) auto-mode-alist))
-
-;;----------------------------------------------------------
-;; ---- END Markdown support ----
-;;----------------------------------------------------------
-
-
-
-;;----------------------------------------------------------
-;; ---- BEGIN Email client ----
-;;----------------------------------------------------------
-(require 'mu4e)
-
-;; default
-(setq mu4e-maildir "~/Maildir")
-(setq mu4e-drafts-folder "/[Gmail].Drafts")
-(setq mu4e-sent-folder   "/[Gmail].Sent Mail")
-(setq mu4e-trash-folder  "/[Gmail].Trash")
-
-;; don't save message to Sent Messages, Gmail/IMAP takes care of this
-(setq mu4e-sent-messages-behavior 'delete)
-
-;; setup some handy shortcuts
-;; you can quickly switch to your Inbox -- press ``ji''
-;; then, when you want archive some messages, move them to
-;; the 'All Mail' folder by pressing ``ma''.
-
-(setq mu4e-maildir-shortcuts
-      '( ("/INBOX"               . ?i)
-         ("/[Gmail].Sent Mail"   . ?s)
-         ("/[Gmail].Trash"       . ?t)
-         ("/[Gmail].All Mail"    . ?a)))
-
-;; allow for updating mail using 'U' in the main view:
-(setq mu4e-get-mail-command "offlineimap")
-
-;; something about ourselves
-(setq
- user-mail-address "renws1990@gmail.com"
- message-signature
- (concat
-  "任文山 (Ren Wenshan)\n"
-  "Email: renws1990@gmail.com\n"
-  "Blog: wenshanren.org\n"
-  "\n"))
-
-;; sending mail -- replace USERNAME with your gmail username
-;; also, make sure the gnutls command line utils are installed
-;; package 'gnutls-bin' in Debian/Ubuntu
-
-(require 'smtpmail)
-(setq message-send-mail-function 'smtpmail-send-it
-      smtpmail-stream-type 'starttls
-      smtpmail-default-smtp-server "smtp.gmail.com"
-      smtpmail-smtp-server "smtp.gmail.com"
-      smtpmail-smtp-service 587)
-
-;; don't keep message buffers around
-(setq message-kill-buffer-on-exit t)
-
-;; add attachment using dired
-(require 'gnus-dired)
-;; make the `gnus-dired-mail-buffers' function also work on
-;; message-mode derived modes, such as mu4e-compose-mode
-(defun gnus-dired-mail-buffers ()
-  "Return a list of active message buffers."
-  (let (buffers)
-    (save-current-buffer
-      (dolist (buffer (buffer-list t))
-        (set-buffer buffer)
-        (when (and (derived-mode-p 'message-mode)
-                   (null message-sent-message-via))
-          (push (buffer-name buffer) buffers))))
-    (nreverse buffers)))
-
-(setq gnus-dired-mail-mode 'mu4e-user-agent)
-(add-hook 'dired-mode-hook 'turn-on-gnus-dired-mode)
-
-;; turn flyspell mode for editing emails
-(add-hook 'mu4e-compose-mode-hook
-          (lambda ()
-            (flyspell-mode 1)))
-
-;;----------------------------------------------------------
-;; ---- END Email client ----
-;;----------------------------------------------------------
-
-
-
-;;----------------------------------------------------------
-;; ---- Begin w3m web browser ----
-;;----------------------------------------------------------
-(require 'w3m-load)
-;;----------------------------------------------------------
-;; ---- END w3m web browser----
-;;----------------------------------------------------------
-
-
-
-;;----------------------------------------------------------
-;; ---- BEGIN epa ---
-;;----------------------------------------------------------
-
-(require 'epa-file)
-(epa-file-enable)
-
-;; always use symmetric encryption
-(setq epa-file-encrypt-to nil)
-;; turn on passphrase cache, so don't need to type in password for every save
-(setq epa-file-cache-passphrase-for-symmetric-encryption t)
-;; turn on auto save
-(setq epa-file-inhibit-auto-save nil)
-
-;;----------------------------------------------------------
-;; ---- END epa ---
-;;----------------------------------------------------------
-
-
-
-;;----------------------------------------------------------
-;; ---- BEGIN Douban ---
-;;----------------------------------------------------------
-
-(require 'douban-music-mode)
-
-;;----------------------------------------------------------
-;; ---- END Douban ---
-;;----------------------------------------------------------
-
-
-
-;;----------------------------------------------------------
 ;; ---- BEGIN Android ---
 ;;----------------------------------------------------------
-;; Eclim
-(require 'eclim)
-(global-eclim-mode)
-(require 'eclimd)
-
-(setq help-at-pt-display-when-idle t)
-(setq help-at-pt-timer-delay 0.1)
-(help-at-pt-set-timer)
-
-;; add the emacs-eclim source
-(require 'ac-emacs-eclim-source)
-(ac-emacs-eclim-config)
-
-(require 'company)
-(require 'company-emacs-eclim)
-(company-emacs-eclim-setup)
-(global-company-mode t)
-
-(setq eclim-executable "~/eclipse/eclim")
 
 ;; android-mode
 (add-to-list 'load-path "~/.emacs.d/dotEmacs/android-mode")
@@ -1407,6 +1391,9 @@ current buffer is not associated with a file, do nothing."
 (add-to-list 'load-path "~/Dropbox/hack/openerp-mode")
 (require 'openerp-mode)
 
+(setq openerp-server-path "~/openerp/server/")
+(setq openerp-conf-path "~/openerp/conf/")
+
 ;;----------------------------------------------------------
 ;; ---- END OpenERP ---
 ;;----------------------------------------------------------
@@ -1419,6 +1406,25 @@ current buffer is not associated with a file, do nothing."
 (require 'edbi)
 ;;----------------------------------------------------------
 ;; ---- END Database Management ---
+;;----------------------------------------------------------
+
+
+
+;;----------------------------------------------------------
+;; ---- BEGIN Email client ----
+;;----------------------------------------------------------
+(defun my-gnus-group-list-subscribed-groups ()
+  "List all subscribed groups with or without un-read messages"
+  (interactive)
+  (gnus-group-list-all-groups 5)
+  )
+(add-hook 'gnus-group-mode-hook
+          ;; list all the subscribed groups even they contain zero un-read messages
+          (lambda ()
+            (local-set-key "o" 'my-gnus-group-list-subscribed-groups ))
+          )
+;;----------------------------------------------------------
+;; ---- END Email client ----
 ;;----------------------------------------------------------
 
 
