@@ -4,7 +4,7 @@
 ;; Blog: http://wenshanren.org
 
 
-
+;;; Code:
 ;;----------------------------------------------------------
 ;; ---- BEGIN basic configuration ----
 ;;----------------------------------------------------------
@@ -12,7 +12,7 @@
 ;; language and coding environment
 (set-language-environment 'utf-8)
 (set-buffer-file-coding-system 'utf-8)
-(setq default-buffer-file-coding-system 'utf-8)
+(setq buffer-file-coding-system 'utf-8)
 (set-terminal-coding-system 'utf-8)
 (set-keyboard-coding-system 'utf-8)
 (prefer-coding-system 'utf-8)
@@ -43,7 +43,7 @@
  '(user-email-address "renws1990@gmail.com")
  '(speedbar-default-position (quote left))
  )
-
+(setq browse-url-browser-function 'browse-url-firefox)
 ;;----------------------------------------------------------
 ;; ---- END basic configuration ----
 ;;----------------------------------------------------------
@@ -275,6 +275,14 @@
         (find-file file))
     (message "Current buffer does not have an associated file.")))
 
+(defun delete-this-file ()
+  "Delete (move to trash) the file that is associated with the
+current buffer."
+  (interactive)
+  (let ((filename (buffer-file-name)))
+    (delete-file filename t)
+    (kill-buffer)))
+
 (defun google ()
   "Google the selected region if any, display a query prompt otherwise."
   (interactive)
@@ -452,7 +460,9 @@ current buffer is not associated with a file, do nothing."
         ("xen-help" . "xe help")
         ("xen-list-vm" . "xe vm-list")
         ("xen-list-tmpl" . "xe template-list")
-        ("xen-vm-to-tmpl" . "xe snapshot-export-to template snapshot-uuid=<snapshot-uuid> filename=<template-filename>")
+        ("xen-vm-to-tmpl" . (concat "xe snapshot-export-to template "
+                                    "snapshot-uuid=<snapshot-uuid> "
+                                    "filename=<template-filename>"))
         )
       )
 
@@ -480,6 +490,21 @@ current buffer is not associated with a file, do nothing."
 (setq epa-file-cache-passphrase-for-symmetric-encryption t)
 ;; turn on auto save
 (setq epa-file-inhibit-auto-save nil)
+
+(defadvice find-tag (after advice-recenter-after-find-tag activate compile)
+  "Recenter after executing find-tag"
+  (recenter))
+
+ (setq chinese-calendar-celestial-stem
+          ["甲" "乙" "丙" "丁" "戊" "己" "庚" "辛" "壬" "癸"]
+          chinese-calendar-terrestrial-branch
+          ["子" "丑" "寅" "卯" "辰" "巳" "午" "未" "申" "酉" "戌" "亥"])
+
+
+(global-set-key (kbd "C-S-<up>")     'buf-move-up)
+(global-set-key (kbd "C-S-<down>")   'buf-move-down)
+(global-set-key (kbd "C-S-<left>")   'buf-move-left)
+(global-set-key (kbd "C-S-<right>")  'buf-move-right)
 ;;----------------------------------------------------------
 ;; ---- END nicer ----
 ;;----------------------------------------------------------
@@ -526,6 +551,7 @@ current buffer is not associated with a file, do nothing."
     (previous-line 2)
     (org-edit-src-code)))
 
+(setq org-src-fontify-natively t)
 (add-hook 'org-mode-hook '(lambda ()
                             ;; turn on flyspell-mode by default
                             (flyspell-mode 1)
@@ -538,8 +564,55 @@ current buffer is not associated with a file, do nothing."
                             ;; yas/expand
                             (local-set-key (kbd "C-<tab>")
                                            'yas/expand)
+                            ;; insert inactive time-stamp
+                            (local-set-key (kbd "C-x t")
+                                           'org-time-stamp-inactive)
                             ))
+(setq org-log-done 'time)
 
+;; agenda
+(global-set-key (kbd "C-c a") 'org-agenda)
+(setq org-agenda-files '("~/Dropbox/log.org"
+                         "~/Dropbox/wenshan-willowit/worklog.org"
+                         "~/Dropbox/Fitness/Fitness.org"))
+;; Agenda clock report parameters
+(setq org-agenda-clockreport-parameter-plist
+      (quote (:link t :maxlevel 5 :fileskip0 t :compact t :narrow 80)))
+
+(setq org-agenda-custom-commands
+      '(("h" "Habits"
+         ((agenda ""))
+         ((org-agenda-show-log t)
+          (org-agenda-ndays 7)
+          (org-agenda-log-mode-items '(state))
+          ))
+        ))
+
+(defun wenshan-org-calculate-clock ()
+  "Calculate the time spent on a task. This trivial function is
+used for adjusting purpose."
+  (interactive)
+  (let ((now (current-time)))
+    (setq org-clock-out-time now)
+    (save-excursion
+      (widen)
+      (beginning-of-line 1)
+      (looking-at (concat "[ \t]*" org-keyword-time-regexp))
+      (setq ts (match-string 2))
+      (goto-char (+ 2 (match-end 0)))
+      (looking-at "[[<]\\([^]>]+\\)[]>]")
+      (setq te (match-string 0))
+      (goto-char (match-end 0))
+      (delete-region (point) (point-at-eol))
+      (setq s (-
+               (org-float-time (apply 'encode-time (org-parse-time-string te)))
+               (org-float-time (apply 'encode-time (org-parse-time-string ts)))
+               )
+            h (floor (/ s 3600))
+            s (- s (* 3600 h))
+            m (floor (/ s 60))
+            s (- s (* 60 s)))
+      (insert " => " (format "%2d:%02d" h m)))))
 ;;----------------------------------------------------------
 ;; ---- END org-mode ----
 ;;----------------------------------------------------------
@@ -705,22 +778,14 @@ current buffer is not associated with a file, do nothing."
 
 
 ;;----------------------------------------------------------
-;; ---- BEGIN flymake ----
+;; ---- BEGIN Syntax Checking ----
+;;----------------------------------------------------------
+(require 'flycheck)
+(add-hook 'after-init-hook #'global-flycheck-mode)
+;;----------------------------------------------------------
+;; ---- END Syntax Checking ----
 ;;----------------------------------------------------------
 
-(load-library "flymake-cursor")
-
-;; tex files checking, replaced texify with chktex
-(defun flymake-get-tex-args (file-name)
-  (list "chktex" (list "-q" "-v0" file-name)))
-
-;; f7 to go to previous error, f8 to jump to next error
-(global-set-key (kbd "C-<f7>") 'flymake-goto-prev-error)
-(global-set-key (kbd "C-<f8>") 'flymake-goto-next-error)
-
-;;----------------------------------------------------------
-;; ---- END flymake ----
-;;----------------------------------------------------------
 
 
 
@@ -992,7 +1057,8 @@ current buffer is not associated with a file, do nothing."
                                      global-semantic-idle-summary-mode
                                      global-semantic-mru-bookmark-mode)))
  '(semantic-idle-scheduler-idle-time 10)
- '(semanticdb-javap-classpath (quote ("/usr/lib/jvm/java-6-sun/jre/lib/rt.jar")))
+ '(semanticdb-javap-classpath
+   (quote ("/usr/lib/jvm/java-6-oracle/jre/lib/rt.jar")))
  '(cedet-android-sdk-root "~/android")
  )
 (require 'semantic/ia)
@@ -1013,11 +1079,6 @@ current buffer is not associated with a file, do nothing."
 
 ;; enable db-javap
 (require 'semantic/db-javap)
-
-(ede-java-root-project "android-test"
-                       :file "~/hack/android-test/build.xml"
-                       :srcroot '("src")
-                       :classpath '("~/android/platforms/android-15/android.jar"))
 
 (add-hook 'c-mode-common-hook
           '(lambda ()
@@ -1068,25 +1129,13 @@ current buffer is not associated with a file, do nothing."
 ;; load python.el
 (require 'python)
 
-;; elpy: Emacs Python Development Environment
-(add-to-list 'load-path "~/.emacs.d/elpa/elpy-0.9")
-(add-to-list 'load-path "~/.emacs.d/elpa/find-file-in-project-3.2")
-(add-to-list 'load-path "~/.emacs.d/elpa/fuzzy-0.1")
-(add-to-list 'load-path "~/.emacs.d/elpa/idomenu-0.1")
-(add-to-list 'load-path "~/.emacs.d/elpa/iedit-0.97")
-(add-to-list 'load-path "~/.emacs.d/elpa/nose-0.1.1")
-(add-to-list 'load-path "~/.emacs.d/elpa/popup-0.5")
-(add-to-list 'load-path "~/.emacs.d/elpa/virtualenv-1.2")
-
-(require 'elpy)
-(elpy-enable)
-(elpy-clean-modeline)
-
+(setenv "PYTHONPATH"
+        (concat "/home/openerp/.emacs.d/el-get/rope"
+                ":/home/openerp/openerp/server"
+                ":/home/openerp/openerp/addons"
+                ":/home/openerp/openerp/web"))
 ;; grammar checking
 (setq python-check-command "pycheckers")
-
-;; use ipython
-(elpy-use-ipython)
 
 (add-hook 'python-mode-hook
           '(lambda ()
@@ -1094,14 +1143,34 @@ current buffer is not associated with a file, do nothing."
              (hs-minor-mode t)
              (lambda-mode 1)))
 
+(setq jedi:setup-keys t)
+(setq jedi:complete-on-dot t)
+(setq jedi:server-args
+      '("--sys-path" "~/openerp/addons"
+        "--sys-path" "~/openerp/server"
+        "--sys-path" "~/openerp/web"))
+
+(setq
+ python-shell-interpreter "ipython"
+ python-shell-interpreter-args ""
+ python-shell-prompt-regexp "In \\[[0-9]+\\]: "
+ python-shell-prompt-output-regexp "Out\\[[0-9]+\\]: "
+ python-shell-completion-setup-code
+   "from IPython.core.completerlib import module_completion"
+ python-shell-completion-module-string-code
+   "';'.join(module_completion('''%s'''))\n"
+ python-shell-completion-string-code
+   "';'.join(get_ipython().Completer.all_completions('''%s'''))\n")
+
+
 (defun python-add-breakpoint ()
   "Add a break point"
   (interactive)
   (newline-and-indent)
-  (insert "import ipdb; ipdb.set_trace()")
+  (insert "if DEBUG: import ipdb; ipdb.set_trace()")
   (highlight-lines-matching-regexp "^[ ]*import ipdb; ipdb.set_trace()"))
 
-(define-key python-mode-map (kbd "C-c C-b") 'python-add-breakpoint)
+(define-key python-mode-map (kbd "C-c C-t") 'python-add-breakpoint)
 
 ;; add a log print statement
 (defun python-add-log-print ()
@@ -1136,7 +1205,7 @@ current buffer is not associated with a file, do nothing."
       (display-buffer pyshell)
       )))
 
-(global-set-key (kbd "C-c r") 'python-run-this-buffer-file)
+(define-key python-mode-map (kbd "C-c r") 'python-run-this-buffer-file)
 
 ;; Python send code
 (add-to-list 'load-path "~/.emacs.d/dotEmacs/isend-mode.el")
@@ -1165,9 +1234,14 @@ current buffer is not associated with a file, do nothing."
  :doc-spec
  '(("(python)Index" nil "")))
 
-;;; Kivy
-(require 'kivy-mode)
+;; ;; tree style viewer
+;; (require 'jedi-direx)
+;; (eval-after-load "python"
+;;   '(define-key python-mode-map "\C-cx" 'jedi-direx:pop-to-buffer))
 
+;; Kivy
+(require 'kivy-mode)
+(add-to-list 'auto-mode-alist '("\\.kv$" . kivy-mode))
 ;;----------------------------------------------------------
 ;; ---- End Python ----
 ;;----------------------------------------------------------
@@ -1238,8 +1312,6 @@ current buffer is not associated with a file, do nothing."
 
 (defun perl-eval () "Run selected region as Perl code" (interactive)
   (shell-command-on-region (mark) (point) "perl "))
-(global-set-key (kbd "<f9>") 'perl-eval)
-
 
 (defun pde-perl-mode-hook ()
   ;; chmod when saving
@@ -1247,18 +1319,6 @@ current buffer is not associated with a file, do nothing."
              (not (string-match "\\.\\(pm\\|pod\\)$" (buffer-file-name))))
     (add-hook 'after-save-hook 'executable-chmod nil t))
   (set (make-local-variable 'compile-dwim-check-tools) nil))
-
-(defun flymake-goto-next-error-disp ()
-  "Go to next error in err ring, then display error/warning."
-  (interactive)
-  (flymake-goto-next-error)
-  (flymake-display-current-error))
-
-(defun flymake-goto-prev-error-disp ()
-  "Go to previous error in err ring, then display error/warning."
-  (interactive)
-  (flymake-goto-prev-error)
-  (flymake-display-current-error))
 
 ;;----------------------------------------------------------
 ;; ---- END Perl ----
@@ -1297,6 +1357,9 @@ current buffer is not associated with a file, do nothing."
           (lambda ()
             ;; rename tag
             (define-key sgml-mode-map (kbd "C-c C-r") 'rename-sgml-tag)
+            ;; forward/backward sexp
+            (define-key sgml-mode-map (kbd "C-M-n") 'sgml-skip-tag-forward)
+            (define-key sgml-mode-map (kbd "C-M-p") 'sgml-skip-tag-backward)
             ;; turn on spell checker
             (flyspell-prog-mode)
             ;; turn on line numbering
@@ -1317,22 +1380,18 @@ current buffer is not associated with a file, do nothing."
                sgml-skip-tag-forward
                nil))
 
-;; xml/html files checking, default setting not work
-(defun flymake-xml-init ()
-  (list "xmlstarlet"
-        (list "val" "e"
-              (flymake-init-create-temp-buffer-copy
-               'flymake-create-temp-inplace))))
-
-;;; Mozilla REPL,
+;;; Mozilla REPL, js2-mode and etc.
 (autoload 'moz-minor-mode "moz" "Mozilla Minor and Inferior Mozilla Modes" t)
+(require 'moz)
+(require 'json)
+(require 'js2-mode)
 
-(add-hook 'javascript-mode-hook 'javascript-custom-setup)
+(add-to-list 'auto-mode-alist (cons (rx ".js" eos) 'js2-mode))
+
 (defun javascript-custom-setup ()
   (moz-minor-mode 1))
 
-(require 'moz)
-(require 'json)
+(add-hook 'js2-mode-hook 'javascript-custom-setup)
 
 (defun moz-update (&rest ignored)
   "Update the remote mozrepl instance"
@@ -1351,6 +1410,23 @@ current buffer is not associated with a file, do nothing."
   (interactive)
   (remove-hook 'after-change-functions 'moz-update t))
 
+(require 'web-mode)
+(add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
+
+;; nodejs
+(require 'js-comint)
+(setq inferior-js-program-command "nodejs")
+(setq inferior-js-mode-hook
+      (lambda ()
+        ;; We like nice colors
+        (ansi-color-for-comint-mode-on)
+        ;; Deal with some prompt nonsense
+        (add-to-list 'comint-preoutput-filter-functions
+                     (lambda (output)
+                       (replace-regexp-in-string
+                        ".*1G\.\.\..*5G" "..."
+                        (replace-regexp-in-string
+                         ".*1G.*3G" ">>> " output))))))
 ;;----------------------------------------------------------
 ;; ---- END web development ----
 ;;----------------------------------------------------------
@@ -1419,7 +1495,8 @@ current buffer is not associated with a file, do nothing."
   (gnus-group-list-all-groups 5)
   )
 (add-hook 'gnus-group-mode-hook
-          ;; list all the subscribed groups even they contain zero un-read messages
+          ;; list all the subscribed groups even they contain zero un-read
+          ;; messages
           (lambda ()
             (local-set-key "o" 'my-gnus-group-list-subscribed-groups ))
           )
@@ -1466,3 +1543,6 @@ current buffer is not associated with a file, do nothing."
 ;;----------------------------------------------------------
 ;; ---- END MISC ---
 ;;----------------------------------------------------------
+
+;; Work environment at WillowIT
+;; (setenv "PYTHONPATH" "/home/openerp/openerp/addons:/home/openerp/openerp/server:/home/openerp/openerp/web/addons:/home/openerp/code/plyer:/home/openerp/.emacs.d/el-get/rope/:/home/openerp/kivy/kivy")
