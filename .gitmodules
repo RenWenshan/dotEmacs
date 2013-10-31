@@ -1,0 +1,3 @@
+[submodule "org2blog"]
+	path = org2blog
+	url = git@github.com:RenWenshan/org2blog.git
