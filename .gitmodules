@@ -1,3 +1,15 @@
 [submodule "org2blog"]
 	path = org2blog
 	url = git@github.com:RenWenshan/org2blog.git
+[submodule "imp.el"]
+	path = imp.el
+	url = git@github.com:netguy204/imp.el.git
+[submodule "impatient-mode"]
+	path = impatient-mode
+	url = git@github.com:netguy204/imp.el.git
+[submodule "mysemantic"]
+	path = mysemantic
+	url = git@github.com:zhouchongzxc/mysemantic.git
+[submodule "mywindow"]
+	path = mywindow
+	url = git@github.com:zhouchongzxc/mywindow.git
